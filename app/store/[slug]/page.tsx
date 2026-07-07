@@ -86,7 +86,7 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
   const vendor = await fetchVendor(params.slug)
   if (!vendor) return { title: 'Store not found' }
 
-  const title = `${vendor.business_name}, SWK Marketplace`
+  const title = `${vendor.business_name} | SWK Marketplace`
   const description =
     vendor.business_description ||
     `Shop sustainable products from ${vendor.business_name}, a verified green business on SWK Marketplace.`

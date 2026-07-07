@@ -11,7 +11,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { OrderCard } from '@/components/buyer/OrderCard'
 import type { Order, OrderStatus } from '@/types'
 
-export const metadata = { title: 'My Orders, SWK Marketplace' }
+export const metadata = { title: 'My Orders | SWK Marketplace' }
 
 const BUYER_NAV = [
   { href: '/buyer/dashboard', label: 'Dashboard',  icon: LayoutDashboard },

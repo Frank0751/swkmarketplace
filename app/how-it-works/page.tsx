@@ -25,7 +25,7 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'How it works, SWK Marketplace',
+  title: 'How it works | SWK Marketplace',
   description:
     'Learn how SWK Marketplace connects eco-conscious buyers with verified youth-led green entrepreneurs across Ghana. Secure escrow payments, SDG 12 verification, and fair payouts.',
   openGraph: {

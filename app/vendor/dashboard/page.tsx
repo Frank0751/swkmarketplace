@@ -21,7 +21,7 @@ import { ShareStoreLink } from '@/components/vendor/ShareStoreLink'
 import { formatCurrency, formatDate, formatRelativeTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, cn } from '@/lib/utils'
 import type { Order, VendorProfile } from '@/types'
 
-export const metadata = { title: 'Vendor Dashboard, SWK Marketplace' }
+export const metadata = { title: 'Vendor Dashboard | SWK Marketplace' }
 
 const VENDOR_NAV = [
   { href: '/vendor/dashboard',  label: 'Dashboard',    icon: LayoutDashboard },
