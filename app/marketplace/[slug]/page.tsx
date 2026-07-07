@@ -26,6 +26,7 @@ import {
   ShoppingBag,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { demoEnabled, getDemoProductBySlug, isDemoId } from '@/lib/demo/data'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
@@ -145,6 +146,7 @@ function OrderForm({
   const total = subtotal + deliveryFee
 
   const isOutOfStock = max === 0
+  const isSample = isDemoId(product.id)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -187,6 +189,20 @@ function OrderForm({
       setError('Something went wrong. Please check your connection and try again.')
       setLoading(false)
     }
+  }
+
+  if (isSample) {
+    return (
+      <div className="flex items-center gap-3 p-4 rounded-xl bg-gold-50 border border-gold-100">
+        <AlertCircle className="w-5 h-5 text-gold-500 flex-shrink-0" />
+        <div>
+          <p className="text-sm font-semibold text-gold-800">Sample product</p>
+          <p className="text-xs text-gold-700/80 mt-0.5">
+            This is demonstration data showing how a live listing works — it can&rsquo;t be ordered.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   if (isOutOfStock) {
@@ -378,7 +394,7 @@ export default function ProductDetailPage() {
           `
           *,
           vendor:vendor_profiles (
-            id, business_name, business_description, location, region,
+            id, business_name, slug, business_description, location, region,
             logo_url, rating, review_count, status, user_id,
             total_products, total_sales
           )
@@ -391,7 +407,13 @@ export default function ProductDetailPage() {
       if (!isMounted) return
 
       if (error || !data) {
-        setNotFound(true)
+        // Fall back to sample data so demo links stay browsable
+        const demo = demoEnabled() ? getDemoProductBySlug(slug) : undefined
+        if (demo) {
+          setProduct(demo)
+        } else {
+          setNotFound(true)
+        }
       } else {
         setProduct(data as Product)
         // Increment view count (fire and forget)
@@ -601,10 +623,10 @@ export default function ProductDetailPage() {
                   )}
                 </div>
                 <Link
-                  href={`/vendor/${vendor.id}`}
+                  href={`/store/${vendor.slug ?? vendor.id}`}
                   className="flex-shrink-0 flex items-center gap-1 text-xs text-green-600 font-medium hover:text-green-700 transition-colors"
                 >
-                  View store <ExternalLink className="w-3 h-3" />
+                  Visit store <ExternalLink className="w-3 h-3" />
                 </Link>
               </div>
             )}

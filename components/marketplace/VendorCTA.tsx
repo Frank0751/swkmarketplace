@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, ExternalLink } from 'lucide-react'
+import { FadeIn } from '@/components/ui/motion'
 
 const STATS = [
   { value: 'SDG 12', label: 'Aligned listings only' },
@@ -9,7 +11,19 @@ const STATS = [
 
 export function VendorCTA() {
   return (
-    <section className="section relative overflow-hidden bg-gradient-to-br from-green-600 to-green-800">
+    <section className="section relative overflow-hidden">
+      {/* Photography background — young African entrepreneurs at work */}
+      <div className="absolute inset-0" aria-hidden="true">
+        <Image
+          src="/images/vendor-cta.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-green-800/95 via-green-800/90 to-green-900/95" />
+      </div>
+
       {/* Decorative dot pattern */}
       <div
         className="absolute inset-0 opacity-10"
@@ -20,12 +34,8 @@ export function VendorCTA() {
         aria-hidden="true"
       />
 
-      {/* Decorative blobs */}
-      <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-green-500 opacity-20 blur-3xl" aria-hidden="true" />
-      <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-teal-600 opacity-20 blur-3xl" aria-hidden="true" />
-
       <div className="container-app relative">
-        <div className="max-w-3xl mx-auto text-center">
+        <FadeIn className="max-w-3xl mx-auto text-center">
           {/* Pre-headline */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 mb-6">
             <span role="img" aria-hidden="true" className="text-sm">🌱</span>
@@ -82,7 +92,7 @@ export function VendorCTA() {
           <p className="mt-6 text-xs text-white/50">
             Free to apply · Admin-reviewed · Only pay commission on successful sales
           </p>
-        </div>
+        </FadeIn>
       </div>
     </section>
   )

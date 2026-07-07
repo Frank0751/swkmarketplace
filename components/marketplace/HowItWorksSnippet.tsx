@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { FadeIn, Stagger, StaggerItem } from '@/components/ui/motion'
 
 const STEPS = [
   {
@@ -30,7 +31,7 @@ export function HowItWorksSnippet() {
     <section className="section bg-white">
       <div className="container-app">
         {/* Header */}
-        <div className="text-center mb-12">
+        <FadeIn className="text-center mb-12">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold mb-4">
             Simple &amp; Transparent
           </span>
@@ -40,10 +41,10 @@ export function HowItWorksSnippet() {
           <p className="mt-3 text-base text-sand-500 max-w-xl mx-auto">
             Three easy steps from discovery to delivery — backed by our escrow guarantee.
           </p>
-        </div>
+        </FadeIn>
 
         {/* Steps */}
-        <div className="flex flex-col md:flex-row items-start gap-8 md:gap-6 relative">
+        <Stagger className="flex flex-col md:flex-row items-start gap-8 md:gap-6 relative">
           {/* Connector line — desktop only */}
           <div
             className="hidden md:block absolute top-6 left-0 right-0 h-0.5 bg-sand-200"
@@ -52,7 +53,7 @@ export function HowItWorksSnippet() {
           />
 
           {STEPS.map((step, idx) => (
-            <div
+            <StaggerItem
               key={step.number}
               className="flex-1 flex flex-col items-center text-center relative"
             >
@@ -78,9 +79,9 @@ export function HowItWorksSnippet() {
               <p className="text-sm text-sand-500 leading-relaxed max-w-xs mx-auto">
                 {step.description}
               </p>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
 
         {/* CTA */}
         <div className="mt-12 text-center">

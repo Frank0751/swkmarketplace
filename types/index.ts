@@ -26,10 +26,17 @@ export type ProductCategory =
   | 'handmade_crafts'
   | 'organic_produce'
 
+export interface VendorFounder {
+  name: string
+  role: string
+  bio?: string
+}
+
 export interface VendorProfile {
   id: string
   user_id: string
   business_name: string
+  slug?: string                // shareable store URL: /store/[slug]
   business_description: string
   category: ProductCategory
   location: string
@@ -45,6 +52,12 @@ export interface VendorProfile {
   proof_documents?: string[]   // Cloudinary URLs
   logo_url?: string
   banner_url?: string
+  // Mini-website fields
+  story?: string               // long-form "about the business"
+  founders?: VendorFounder[]   // team behind the business
+  year_founded?: number
+  team_size?: number
+  website?: string
   status: VendorStatus
   rejection_reason?: string
   total_sales: number

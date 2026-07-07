@@ -11,6 +11,7 @@ import { CategoryStrip } from '@/components/marketplace/CategoryStrip'
 import { ValueFilterStrip } from '@/components/marketplace/ValueFilterStrip'
 import { ProductGrid } from '@/components/marketplace/ProductGrid'
 import { MobileSortSelect } from '@/components/marketplace/MobileSortSelect'
+import { demoEnabled, getDemoProducts } from '@/lib/demo/data'
 import { CATEGORY_META, GHANA_REGIONS, VALUE_TAG_META, type ProductCategory, type GhanaRegion, type ValueTag } from '@/types'
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
@@ -116,7 +117,7 @@ export default async function MarketplacePage({
 
   const LIMIT = 24
 
-  const totalCount = await fetchProductCount({
+  let totalCount = await fetchProductCount({
     category,
     valueTags,
     search,
@@ -124,6 +125,19 @@ export default async function MarketplacePage({
     minPrice,
     maxPrice,
   })
+
+  // Mirror the ProductGrid sample-data fallback so the header count matches
+  if (totalCount === 0 && demoEnabled()) {
+    totalCount = getDemoProducts({
+      limit: 1000,
+      category,
+      valueTags,
+      search,
+      region,
+      minPrice,
+      maxPrice,
+    }).length
+  }
 
   const totalPages = Math.ceil(totalCount / LIMIT)
 
@@ -334,6 +348,9 @@ export default async function MarketplacePage({
                 search={search}
                 sort={sort}
                 limit={LIMIT}
+                region={region}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
               />
             </Suspense>
 

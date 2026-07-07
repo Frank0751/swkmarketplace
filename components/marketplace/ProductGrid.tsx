@@ -1,6 +1,7 @@
 import { Leaf } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Product, ProductCategory } from '@/types'
+import { demoEnabled, getDemoProducts } from '@/lib/demo/data'
 import { ProductCard } from './ProductCard'
 
 interface ProductGridProps {
@@ -9,6 +10,9 @@ interface ProductGridProps {
   valueTags?: string[]
   search?: string
   sort?: string
+  region?: string
+  minPrice?: number
+  maxPrice?: number
 }
 
 async function fetchProducts({
@@ -17,6 +21,9 @@ async function fetchProducts({
   valueTags,
   search,
   sort = 'newest',
+  region,
+  minPrice,
+  maxPrice,
 }: ProductGridProps): Promise<Product[]> {
   const supabase = await createClient()
 
@@ -54,6 +61,11 @@ async function fetchProducts({
     query = query.ilike('title', `%${search.trim()}%`)
   }
 
+  // Region + price range
+  if (region) query = query.eq('region', region)
+  if (typeof minPrice === 'number') query = query.gte('price_ghs', minPrice)
+  if (typeof maxPrice === 'number') query = query.lte('price_ghs', maxPrice)
+
   // Sorting
   switch (sort) {
     case 'price_asc':
@@ -87,7 +99,22 @@ async function fetchProducts({
 }
 
 export async function ProductGrid(props: ProductGridProps) {
-  const products = await fetchProducts(props)
+  let products = await fetchProducts(props)
+
+  // No live products yet — fall back to sample data so the marketplace
+  // stays presentable (disabled with NEXT_PUBLIC_DEMO_MODE=false)
+  if (products.length === 0 && demoEnabled()) {
+    products = getDemoProducts({
+      limit: props.limit,
+      category: props.category,
+      valueTags: props.valueTags,
+      search: props.search,
+      sort: props.sort,
+      region: props.region,
+      minPrice: props.minPrice,
+      maxPrice: props.maxPrice,
+    })
+  }
 
   if (products.length === 0) {
     return (

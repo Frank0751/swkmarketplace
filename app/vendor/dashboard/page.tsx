@@ -4,8 +4,7 @@ import {
   LayoutDashboard,
   Package,
   PlusCircle,
-  User,
-  ShoppingBag,
+  Store,
   DollarSign,
   BarChart3,
   Clock,
@@ -14,9 +13,11 @@ import {
   XCircle,
   ArrowRight,
   PackageOpen,
+  ExternalLink,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
+import { ShareStoreLink } from '@/components/vendor/ShareStoreLink'
 import { formatCurrency, formatDate, formatRelativeTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, cn } from '@/lib/utils'
 import type { Order, VendorProfile } from '@/types'
 
@@ -26,8 +27,7 @@ const VENDOR_NAV = [
   { href: '/vendor/dashboard',  label: 'Dashboard',    icon: LayoutDashboard },
   { href: '/vendor/listings',   label: 'My Listings',  icon: Package },
   { href: '/vendor/listings/new', label: 'Add Listing', icon: PlusCircle },
-  { href: '/vendor/orders',     label: 'Orders',       icon: ShoppingBag },
-  { href: '/vendor/profile',    label: 'Profile',      icon: User },
+  { href: '/vendor/store',      label: 'My Store Page', icon: Store },
 ]
 
 export default async function VendorDashboardPage() {
@@ -315,6 +315,27 @@ export default async function VendorDashboardPage() {
                     </span>
                   )}
                 </Link>
+                <Link
+                  href={`/store/${vendor.slug ?? vendor.id}`}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white border border-sand-200 text-sand-700 text-sm font-medium rounded-lg hover:bg-sand-50 transition-colors shadow-card"
+                >
+                  <ExternalLink className="w-4 h-4" /> View My Store
+                </Link>
+              </div>
+
+              {/* Shareable store link — the vendor's mini-website */}
+              <div className="mb-8">
+                <ShareStoreLink
+                  slug={vendor.slug ?? vendor.id}
+                  businessName={vendor.business_name}
+                  variant="card"
+                />
+                <p className="mt-2 text-xs text-sand-400">
+                  Want to add your story, founders and team to your store page?{' '}
+                  <Link href="/vendor/store" className="text-green-600 font-semibold hover:underline">
+                    Edit your store profile →
+                  </Link>
+                </p>
               </div>
 
               {/* Recent orders */}

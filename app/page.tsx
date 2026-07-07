@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { AnnouncementBar }  from '@/components/layout/AnnouncementBar'
 import { Navbar }           from '@/components/layout/Navbar'
 import { HeroSection }      from '@/components/marketplace/HeroSection'
-import { CategoryStrip }    from '@/components/marketplace/CategoryStrip'
+import { CategoryShowcase } from '@/components/marketplace/CategoryShowcase'
 import { ValueFilterStrip } from '@/components/marketplace/ValueFilterStrip'
 import { ProductGrid }      from '@/components/marketplace/ProductGrid'
 import { TrustSection }     from '@/components/marketplace/TrustSection'
@@ -20,7 +20,7 @@ export default function HomePage() {
 
       <main>
         <HeroSection />
-        <CategoryStrip />
+        <CategoryShowcase />
         <ValueFilterStrip />
 
         <section className="section">

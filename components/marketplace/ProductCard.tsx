@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { MapPin, ShoppingBag } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { isDemoId } from '@/lib/demo/data'
 import { Product, CATEGORY_META, VALUE_TAG_META, ValueTag } from '@/types'
 
 interface ProductCardProps {
@@ -23,6 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const isOutOfStock = product.stock_quantity === 0
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity < 5
+  const isSample = isDemoId(product.id)
 
   return (
     <Link
@@ -55,15 +57,24 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
+        {/* Sample badge (demo data) */}
+        {isSample && (
+          <div className="absolute top-2 right-2">
+            <span className="px-2 py-0.5 text-[10px] font-semibold bg-sand-900/70 backdrop-blur-sm text-white rounded-full">
+              Sample
+            </span>
+          </div>
+        )}
+
         {/* Stock badges */}
-        {isOutOfStock && (
+        {isOutOfStock && !isSample && (
           <div className="absolute top-2 right-2">
             <span className="px-2 py-0.5 text-[10px] font-semibold bg-sand-800 text-white rounded-full">
               Out of stock
             </span>
           </div>
         )}
-        {isLowStock && !isOutOfStock && (
+        {isLowStock && !isOutOfStock && !isSample && (
           <div className="absolute top-2 right-2">
             <span className="px-2 py-0.5 text-[10px] font-semibold bg-gold-400 text-white rounded-full">
               Low stock
