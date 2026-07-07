@@ -33,3 +33,11 @@ yarn-error.log*
 
 # Supabase
 supabase/.temp/
+
+# Claude Code internal
+.claude/
+
+# Planning artifacts
+implementation_plan.md
+system_architecture.md
+task.md
