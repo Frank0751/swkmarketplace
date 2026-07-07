@@ -195,7 +195,7 @@ export async function PATCH(
     if (updateError) throw updateError
 
     // Status changes are auto-logged to order_history by the orders_log_status
-    // trigger — only insert here when there is a note to attach
+    // trigger, only insert here when there is a note to attach
     if (newStatus && newStatus !== currentStatus) {
       if (note) {
         const { error: historyError } = await adminSupabase

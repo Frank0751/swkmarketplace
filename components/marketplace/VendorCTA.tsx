@@ -6,13 +6,13 @@ import { FadeIn } from '@/components/ui/motion'
 const STATS = [
   { value: 'SDG 12', label: 'Aligned listings only' },
   { value: 'Escrow', label: 'Protected sales' },
-  { value: '15%', label: 'Commission — nothing more' },
+  { value: '15%', label: 'Commission, nothing more' },
 ]
 
 export function VendorCTA() {
   return (
     <section className="section relative overflow-hidden">
-      {/* Photography background — young African entrepreneurs at work */}
+      {/* Photography background, young African entrepreneurs at work */}
       <div className="absolute inset-0" aria-hidden="true">
         <Image
           src="/images/vendor-cta.jpg"

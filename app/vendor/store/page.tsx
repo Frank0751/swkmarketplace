@@ -128,7 +128,7 @@ export default function VendorStoreProfilePage() {
       .eq('id', vendor.id)
 
     if (error) {
-      toast.error('Could not save your store profile — please try again')
+      toast.error('Could not save your store profile, please try again')
       return
     }
     toast.success('Store profile saved!')
@@ -160,7 +160,7 @@ export default function VendorStoreProfilePage() {
               <Store className="w-6 h-6 text-green-600" /> My Store Page
             </h1>
             <p className="text-sm text-sand-500 mt-1 max-w-lg">
-              This is your mini-website. Everything here appears on your public store page — the
+              This is your mini-website. Everything here appears on your public store page, the
               link you share with customers, even if you don&rsquo;t have a website of your own.
             </p>
           </div>
@@ -211,7 +211,7 @@ export default function VendorStoreProfilePage() {
               <span className="text-xs text-sand-400">{fields.length}/8</span>
             </div>
             <p className="text-xs text-sand-400 mb-4">
-              Add the people behind the business — founders, makers, farm leads. Shown as
+              Add the people behind the business, founders, makers, farm leads. Shown as
               &ldquo;Meet the people behind it&rdquo; on your store page.
             </p>
 

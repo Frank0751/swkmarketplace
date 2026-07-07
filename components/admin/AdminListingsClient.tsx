@@ -221,7 +221,7 @@ export function AdminListingsClient({ initialProducts }: AdminListingsClientProp
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sand-600 hidden md:table-cell">
-                          {product.vendor?.business_name ?? '—'}
+                          {product.vendor?.business_name ?? '-'}
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <span className="inline-flex items-center gap-1 text-xs text-sand-600">

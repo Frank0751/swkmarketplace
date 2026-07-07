@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   const signature = request.headers.get('x-paystack-signature') || ''
 
   if (!verifyWebhookSignature(body, signature)) {
-    console.warn('[Paystack Webhook] Invalid signature — rejecting request')
+    console.warn('[Paystack Webhook] Invalid signature, rejecting request')
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
   }
 
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (order) {
-        // Send emails (non-blocking — don't fail webhook if email fails)
+        // Send emails (non-blocking, don't fail webhook if email fails)
         const buyerEmail = order.buyer?.email
         const vendorEmail = (order.vendor as { business_name?: string; user?: { email?: string } } | null)?.user?.email
         const buyerName  = order.buyer?.full_name ?? 'Customer'
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
     }
   } catch (err) {
     console.error('[Paystack Webhook] Processing error:', err)
-    // Return 200 to prevent Paystack from retrying — log error for investigation
+    // Return 200 to prevent Paystack from retrying, log error for investigation
     return NextResponse.json({ received: true, warning: 'Processing error logged' })
   }
 

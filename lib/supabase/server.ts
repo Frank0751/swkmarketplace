@@ -4,13 +4,13 @@ import { cookies } from 'next/headers'
 type CookieToSet = { name: string; value: string; options: CookieOptions }
 
 // Fall back to a placeholder project when env vars are missing so pages render
-// with empty data instead of crashing — mirrors the middleware's resilience.
+// with empty data instead of crashing, mirrors the middleware's resilience.
 const FALLBACK_URL = 'https://placeholder.supabase.co'
 const FALLBACK_KEY = 'placeholder-anon-key'
 
 function envOrFallback(url: string | undefined, key: string | undefined): [string, string] {
   if (!url || !key) {
-    console.warn('[Supabase] Environment variables are not set — using a placeholder client; no data will load')
+    console.warn('[Supabase] Environment variables are not set, using a placeholder client; no data will load')
     return [FALLBACK_URL, FALLBACK_KEY]
   }
   return [url, key]
@@ -34,7 +34,7 @@ export async function createClient() {
             cookieStore.set(name, value, options)
           )
         } catch {
-          // Called from Server Component — middleware handles session refresh
+          // Called from Server Component, middleware handles session refresh
         }
       },
     },

@@ -1,4 +1,4 @@
--- ─── SWK Marketplace — sample data seed ────────────────────────────────────────
+-- ─── SWK Marketplace, sample data seed ────────────────────────────────────────
 --
 -- Inserts the same 4 sample vendors + 13 sample products that the app shows in
 -- demo mode, as REAL database rows. Use on a fresh/local Supabase project:
@@ -81,13 +81,13 @@ begin
      'A women-led artisan collective crafting ceramics, jewellery and home goods from natural and reclaimed materials in Jamestown, Accra.',
      'handmade_crafts', 'Accra', 'Greater Accra', '+233 24 333 3333',
      'Local clay, reclaimed glass beads, natural soy wax and zero air-freighted materials. 70% of our makers are young women learning a lifelong craft.',
-     E'Sankofa — "go back and get it" — is a Jamestown studio where traditional Ga craftsmanship meets modern design. What began as evening pottery classes for six young women is now a 19-member collective.\nThe collective reinvests a fifth of every sale into free apprenticeships for school leavers.',
+     E'Sankofa, "go back and get it", is a Jamestown studio where traditional Ga craftsmanship meets modern design. What began as evening pottery classes for six young women is now a 19-member collective.\nThe collective reinvests a fifth of every sale into free apprenticeships for school leavers.',
      '[{"name":"Abena Osei","role":"Founder & Creative Director","bio":"Ceramicist trained in Kumasi and Copenhagen. Named a 2025 Design Network Africa fellow."},{"name":"Naa Adjeley Quaye","role":"Studio Manager","bio":"Runs the apprenticeship programme and the collective''s fair-pay framework."}]'::jsonb,
      2020, 19, '{"instagram":"https://instagram.com/sankofacrafts","facebook":"https://facebook.com/sankofacrafts"}'::jsonb,
      '/images/cat-handmade.jpg', '/images/cat-handmade.jpg', 'approved', 4.9, 58, 640, now()),
 
     (uid_ecocycle, 'EcoCycle Ghana',
-     'Turning Tema''s waste stream into everyday products — kraft totes, zero-waste soap and stationery made from reclaimed paper and oils.',
+     'Turning Tema''s waste stream into everyday products, kraft totes, zero-waste soap and stationery made from reclaimed paper and oils.',
      'recycled_upcycled', 'Tema', 'Greater Accra', '+233 24 444 4444',
      'Every product diverts waste from landfill: reclaimed kraft paper, recovered cooking oils saponified into soap, and compostable packaging only.',
      E'EcoCycle was founded by two environmental engineering students who audited their campus bins and found 80% of the "waste" was reusable.\nStarting with a single paper press in a Tema garage, the team now processes three tonnes of reclaimed paper and oils a month, employs 11 young people, and runs recycling drives in 15 schools.',
@@ -109,7 +109,7 @@ begin
   values
     (v_greenharvest, 'Raw Forest Honey (500ml)', 'raw-forest-honey',
      E'Raw, unheated and unfiltered honey from our agroforestry apiaries in the Ashanti Region. Each jar is traceable to the hive cluster it came from.\nTasting notes: wildflower, citrus blossom, soft caramel finish.',
-     'Unfiltered honey from agroforestry hives around Kumasi — harvested by youth-trained beekeepers.',
+     'Unfiltered honey from agroforestry hives around Kumasi, harvested by youth-trained beekeepers.',
      65, 40, array['/images/prod-honey.jpg'], 'agribusiness',
      array['sdg_12_responsible_consumption','sdg_8_decent_work','sdg_15_life_on_land']::text[],
      array['organic','youth_led','locally_sourced']::text[], 'Kumasi', 'Ashanti', 'per jar', 'approved', 342, 58),
@@ -129,21 +129,21 @@ begin
      array['biodegradable','organic']::text[], 'Kumasi', 'Ashanti', 'per tray', 'approved', 148, 19),
 
     (v_adom, 'Weekly Organic Veggie Box', 'weekly-organic-veggie-box',
-     E'8â€“10 seasonal vegetables harvested within 24 hours of delivery — garden eggs, kontomire, sweet peppers, spring onions and salad greens. Delivered in returnable crates, never plastic.\nDelivery to Accra & Tema every Saturday.',
+     E'8â€“10 seasonal vegetables harvested within 24 hours of delivery, garden eggs, kontomire, sweet peppers, spring onions and salad greens. Delivered in returnable crates, never plastic.\nDelivery to Accra & Tema every Saturday.',
      'A rotating box of 8â€“10 chemical-free vegetables from Akuapem family farms.',
      120, 20, array['/images/prod-veg-box.jpg'], 'organic_produce',
      array['sdg_12_responsible_consumption']::text[],
      array['organic','plastic_free','locally_sourced']::text[], 'Aburi', 'Eastern', 'per box', 'approved', 505, 92),
 
     (v_adom, 'Vine-Ripened Tomatoes (1kg)', 'vine-ripened-tomatoes',
-     'Grown in open fields with compost and neem-based pest control only. Picked ripe — not gassed — so they actually taste like tomatoes.',
+     'Grown in open fields with compost and neem-based pest control only. Picked ripe, not gassed, so they actually taste like tomatoes.',
      'Sun-ripened on the vine in the Akuapem hills. No sprays, ever.',
      22, 50, array['/images/prod-tomatoes.jpg'], 'organic_produce',
      array['sdg_12_responsible_consumption']::text[],
      array['organic','locally_sourced']::text[], 'Aburi', 'Eastern', 'per kg', 'approved', 210, 40),
 
     (v_adom, 'Organic Bananas (bunch)', 'organic-bananas',
-     'Sweet, naturally ripened bananas intercropped with cocoa and plantain — no ripening chemicals, no monoculture.',
+     'Sweet, naturally ripened bananas intercropped with cocoa and plantain, no ripening chemicals, no monoculture.',
      'Naturally ripened bananas from mixed-crop family plots.',
      18, 60, array['/images/prod-bananas.jpg'], 'organic_produce',
      array['sdg_12_responsible_consumption']::text[],
@@ -157,7 +157,7 @@ begin
      array['organic','locally_sourced']::text[], 'Aburi', 'Eastern', 'each', 'approved', 132, 21),
 
     (v_adom, 'Cold-Pressed Baobab Oil (100ml)', 'cold-pressed-baobab-oil',
-     'Wild-harvested baobab seeds from northern Ghana, cold-pressed within days of collection. Rich in omega fatty acids — a natural moisturiser for skin and hair. Amber glass bottle, zero plastic.',
+     'Wild-harvested baobab seeds from northern Ghana, cold-pressed within days of collection. Rich in omega fatty acids, a natural moisturiser for skin and hair. Amber glass bottle, zero plastic.',
      'Single-origin baobab seed oil for skin and hair, pressed in small batches.',
      85, 24, array['/images/prod-shea.jpg'], 'organic_produce',
      array['sdg_12_responsible_consumption']::text[],
@@ -172,13 +172,13 @@ begin
 
     (v_sankofa, 'Recycled-Glass Statement Earrings', 'recycled-glass-statement-earrings',
      'Statement earrings built around Krobo recycled-glass beads, hand-set in locally cast brass. Each pair supports our free apprenticeship programme for young women in Jamestown.',
-     'Krobo recycled-glass beads set in brass — crafted by our women-led studio.',
+     'Krobo recycled-glass beads set in brass, crafted by our women-led studio.',
      95, 15, array['/images/prod-jewelry.jpg'], 'handmade_crafts',
      array['sdg_12_responsible_consumption','sdg_8_decent_work']::text[],
      array['handmade','upcycled','women_led']::text[], 'Accra', 'Greater Accra', 'per pair', 'approved', 441, 63),
 
-    (v_sankofa, 'Soy Wax Candle — Shea & Lemongrass', 'soy-wax-candle-shea-lemongrass',
-     'Clean-burning soy wax, cotton wick, and essential oils of lemongrass and shea blossom. When it burns down, the glass becomes your new cup — bring it back for a refill discount.',
+    (v_sankofa, 'Soy Wax Candle, Shea & Lemongrass', 'soy-wax-candle-shea-lemongrass',
+     'Clean-burning soy wax, cotton wick, and essential oils of lemongrass and shea blossom. When it burns down, the glass becomes your new cup, bring it back for a refill discount.',
      '45-hour soy candle poured into a reusable glass, scented with Ghanaian lemongrass.',
      70, 22, array['/images/prod-candle.jpg'], 'handmade_crafts',
      array['sdg_12_responsible_consumption']::text[],
@@ -186,13 +186,13 @@ begin
 
     (v_ecocycle, 'Reclaimed Kraft Tote Bag', 'reclaimed-kraft-tote-bag',
      'Made from reclaimed kraft paper recovered in Tema, pressed and stitched into a washable, tear-resistant everyday tote. Carries 10kg of market shopping and composts at end of life.',
-     'Washable kraft-paper tote pressed from reclaimed packaging — carries 10kg.',
+     'Washable kraft-paper tote pressed from reclaimed packaging, carries 10kg.',
      55, 45, array['/images/prod-totebag.jpg'], 'recycled_upcycled',
      array['sdg_12_responsible_consumption','sdg_13_climate_action']::text[],
      array['upcycled','zero_waste','biodegradable']::text[], 'Tema', 'Greater Accra', 'each', 'approved', 312, 51),
 
     (v_ecocycle, 'Zero-Waste Soap Bars (4 pack)', 'zero-waste-soap-bars',
-     'Four cold-process bars saponified from recovered and filtered plant oils — lavender, neem, charcoal and unscented. Wrapped in our own reclaimed paper.',
+     'Four cold-process bars saponified from recovered and filtered plant oils, lavender, neem, charcoal and unscented. Wrapped in our own reclaimed paper.',
      'Cold-process bars from recovered plant oils, wrapped in reclaimed paper.',
      60, 38, array['/images/prod-soap.jpg'], 'recycled_upcycled',
      array['sdg_12_responsible_consumption']::text[],

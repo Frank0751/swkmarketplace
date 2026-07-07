@@ -34,11 +34,11 @@ import {
 // ─── Constants (same as new listing page) ────────────────────────────────────
 
 const SDG_OPTIONS: { value: SDGTag; label: string; color: string }[] = [
-  { value: 'sdg_1_no_poverty',               label: 'SDG 1 — No Poverty',                   color: 'bg-red-50 border-red-200 text-red-700' },
-  { value: 'sdg_8_decent_work',              label: 'SDG 8 — Decent Work & Economic Growth', color: 'bg-amber-50 border-amber-200 text-amber-700' },
-  { value: 'sdg_12_responsible_consumption', label: 'SDG 12 — Responsible Consumption',      color: 'bg-gold-50 border-gold-200 text-gold-700' },
-  { value: 'sdg_13_climate_action',          label: 'SDG 13 — Climate Action',               color: 'bg-teal-50 border-teal-200 text-teal-700' },
-  { value: 'sdg_15_life_on_land',            label: 'SDG 15 — Life on Land',                 color: 'bg-green-50 border-green-200 text-green-700' },
+  { value: 'sdg_1_no_poverty',               label: 'SDG 1, No Poverty',                   color: 'bg-red-50 border-red-200 text-red-700' },
+  { value: 'sdg_8_decent_work',              label: 'SDG 8, Decent Work & Economic Growth', color: 'bg-amber-50 border-amber-200 text-amber-700' },
+  { value: 'sdg_12_responsible_consumption', label: 'SDG 12, Responsible Consumption',      color: 'bg-gold-50 border-gold-200 text-gold-700' },
+  { value: 'sdg_13_climate_action',          label: 'SDG 13, Climate Action',               color: 'bg-teal-50 border-teal-200 text-teal-700' },
+  { value: 'sdg_15_life_on_land',            label: 'SDG 15, Life on Land',                 color: 'bg-green-50 border-green-200 text-green-700' },
 ]
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
@@ -134,7 +134,7 @@ export default function EditListingPage() {
 
     setVendorId(vendor.id)
 
-    // Fetch product — must belong to this vendor
+    // Fetch product, must belong to this vendor
     const { data: prod, error } = await supabase
       .from('products')
       .select('*')

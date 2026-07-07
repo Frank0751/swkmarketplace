@@ -46,7 +46,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
       setCanReview(Boolean(json.can_review))
       setReviewableOrderId(json.reviewable_order_id ?? null)
     } catch {
-      // Non-critical — leave the section empty
+      // Non-critical, leave the section empty
     } finally {
       setLoading(false)
     }
@@ -76,7 +76,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Failed to submit review')
-      toast.success('Review submitted — thank you!')
+      toast.success('Review submitted, thank you!')
       setRating(0)
       setComment('')
       setCanReview(false)
@@ -106,7 +106,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
         )}
       </div>
 
-      {/* Review form — verified buyers with a delivered order only */}
+      {/* Review form, verified buyers with a delivered order only */}
       {canReview && (
         <form
           onSubmit={handleSubmit}
@@ -115,7 +115,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
           <div className="flex items-center gap-2 mb-3">
             <MessageSquarePlus className="w-4 h-4 text-green-600" />
             <p className="text-sm font-semibold text-sand-900">
-              You bought this product — leave a review
+              You bought this product, leave a review
             </p>
           </div>
           <div className="flex items-center gap-1 mb-3">

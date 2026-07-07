@@ -6,7 +6,7 @@ import type {
 
 // ─── Demo / sample data ─────────────────────────────────────────────────────────
 //
-// Shown when Supabase has no (matching) products — keeps the marketplace looking
+// Shown when Supabase has no (matching) products, keeps the marketplace looking
 // alive for pitches and demos before real vendors join. Every id is prefixed
 // "demo-" so the UI can badge these as samples and disable ordering.
 // Set NEXT_PUBLIC_DEMO_MODE=false to turn the fallback off in production.
@@ -109,7 +109,7 @@ export const DEMO_VENDORS: DemoVendor[] = [
     sustainability_statement:
       'Local clay, reclaimed glass beads, natural soy wax and zero air-freighted materials. 70% of our makers are young women learning a lifelong craft.',
     story:
-      'Sankofa — "go back and get it" — is a Jamestown studio where traditional Ga craftsmanship meets modern design. What began as evening pottery classes for six young women is now a 19-member collective whose hand-thrown ceramics and recycled-glass jewellery have been exhibited at the Chale Wote festival. The collective reinvests a fifth of every sale into free apprenticeships for school leavers.',
+      'Sankofa, "go back and get it", is a Jamestown studio where traditional Ga craftsmanship meets modern design. What began as evening pottery classes for six young women is now a 19-member collective whose hand-thrown ceramics and recycled-glass jewellery have been exhibited at the Chale Wote festival. The collective reinvests a fifth of every sale into free apprenticeships for school leavers.',
     founders: [
       { name: 'Abena Osei', role: 'Founder & Creative Director', bio: 'Ceramicist trained in Kumasi and Copenhagen. Named a 2025 Design Network Africa fellow.' },
       { name: 'Naa Adjeley Quaye', role: 'Studio Manager', bio: 'Runs the apprenticeship programme and the collective\'s fair-pay framework.' },
@@ -131,7 +131,7 @@ export const DEMO_VENDORS: DemoVendor[] = [
     logo_url: '/images/cat-recycled.jpg',
     banner_url: '/images/cat-recycled.jpg',
     business_description:
-      'Turning Tema\'s waste stream into everyday products — kraft totes, zero-waste soap and stationery made from reclaimed paper and oils.',
+      'Turning Tema\'s waste stream into everyday products, kraft totes, zero-waste soap and stationery made from reclaimed paper and oils.',
     sustainability_statement:
       'Every product diverts waste from landfill: reclaimed kraft paper, recovered cooking oils saponified into soap, and compostable packaging only.',
     story:
@@ -186,7 +186,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     title: 'Raw Forest Honey (500ml)', slug: 'demo-raw-forest-honey',
     price_ghs: 65, unit: 'per jar', images: ['/images/prod-honey.jpg'],
     category: 'agribusiness',
-    short_description: 'Unfiltered honey from agroforestry hives around Kumasi — harvested by youth-trained beekeepers.',
+    short_description: 'Unfiltered honey from agroforestry hives around Kumasi, harvested by youth-trained beekeepers.',
     description: 'Raw, unheated and unfiltered honey from our agroforestry apiaries in the Ashanti Region. Each jar is traceable to the hive cluster it came from, and every harvest funds our apiary school for young beekeepers.\nTasting notes: wildflower, citrus blossom, soft caramel finish.',
     value_tags: ['organic', 'youth_led', 'locally_sourced'],
     sdg_tags: ['sdg_12_responsible_consumption', 'sdg_8_decent_work', 'sdg_15_life_on_land'],
@@ -222,7 +222,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     price_ghs: 120, unit: 'per box', images: ['/images/prod-veg-box.jpg'],
     category: 'organic_produce',
     short_description: 'A rotating box of 8–10 chemical-free vegetables from Akuapem family farms, delivered in reusable crates.',
-    description: 'Our signature box: 8–10 seasonal vegetables harvested within 24 hours of delivery — think garden eggs, kontomire, sweet peppers, spring onions and salad greens. Delivered in returnable crates, never plastic.\nDelivery to Accra & Tema every Saturday.',
+    description: 'Our signature box: 8–10 seasonal vegetables harvested within 24 hours of delivery, think garden eggs, kontomire, sweet peppers, spring onions and salad greens. Delivered in returnable crates, never plastic.\nDelivery to Accra & Tema every Saturday.',
     value_tags: ['organic', 'plastic_free', 'locally_sourced'],
     views: 505, order_count: 92, stock_quantity: 20,
   }),
@@ -232,7 +232,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     price_ghs: 22, unit: 'per kg', images: ['/images/prod-tomatoes.jpg'],
     category: 'organic_produce',
     short_description: 'Sun-ripened on the vine in the Akuapem hills. No sprays, ever.',
-    description: 'Grown in open fields with compost and neem-based pest control only. Picked ripe — not gassed — so they actually taste like tomatoes.',
+    description: 'Grown in open fields with compost and neem-based pest control only. Picked ripe, not gassed, so they actually taste like tomatoes.',
     value_tags: ['organic', 'locally_sourced'],
     views: 210, order_count: 40, stock_quantity: 50,
   }),
@@ -242,7 +242,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     price_ghs: 18, unit: 'per bunch', images: ['/images/prod-bananas.jpg'],
     category: 'organic_produce',
     short_description: 'Naturally ripened bananas from mixed-crop family plots.',
-    description: 'Sweet, naturally ripened bananas intercropped with cocoa and plantain — no ripening chemicals, no monoculture.',
+    description: 'Sweet, naturally ripened bananas intercropped with cocoa and plantain, no ripening chemicals, no monoculture.',
     value_tags: ['organic'],
     views: 176, order_count: 28, stock_quantity: 60,
   }),
@@ -262,7 +262,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     price_ghs: 85, unit: 'per bottle', images: ['/images/prod-shea.jpg'],
     category: 'organic_produce',
     short_description: 'Single-origin baobab seed oil for skin and hair, pressed in small batches.',
-    description: 'Wild-harvested baobab seeds from northern Ghana, cold-pressed within days of collection. Rich in omega fatty acids — a natural moisturiser for skin and hair. Amber glass bottle, zero plastic.',
+    description: 'Wild-harvested baobab seeds from northern Ghana, cold-pressed within days of collection. Rich in omega fatty acids, a natural moisturiser for skin and hair. Amber glass bottle, zero plastic.',
     value_tags: ['organic', 'plastic_free', 'women_led'],
     views: 298, order_count: 45, stock_quantity: 24,
   }),
@@ -274,7 +274,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     price_ghs: 240, unit: 'per set', images: ['/images/prod-pottery.jpg'],
     category: 'handmade_crafts',
     short_description: 'Matte stoneware vases thrown from local clay in our Jamestown studio.',
-    description: 'A set of three bottle vases in speckled matte glaze, each thrown by hand from clay dug in the Eastern Region. No two sets are identical — expect beautiful small variations.\nFood-safe glaze, fired with efficient twin kilns.',
+    description: 'A set of three bottle vases in speckled matte glaze, each thrown by hand from clay dug in the Eastern Region. No two sets are identical, expect beautiful small variations.\nFood-safe glaze, fired with efficient twin kilns.',
     value_tags: ['handmade', 'women_led', 'locally_sourced'],
     views: 387, order_count: 26, stock_quantity: 8,
   }),
@@ -283,18 +283,18 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     title: 'Recycled-Glass Statement Earrings', slug: 'demo-recycled-glass-earrings',
     price_ghs: 95, unit: 'per pair', images: ['/images/prod-jewelry.jpg'],
     category: 'handmade_crafts',
-    short_description: 'Krobo recycled-glass beads set in brass — crafted by our women-led studio.',
+    short_description: 'Krobo recycled-glass beads set in brass, crafted by our women-led studio.',
     description: 'Statement earrings built around Krobo recycled-glass beads, hand-set in locally cast brass. Each pair supports our free apprenticeship programme for young women in Jamestown.',
     value_tags: ['handmade', 'upcycled', 'women_led'],
     views: 441, order_count: 63, stock_quantity: 15,
   }),
   product({
     id: 'demo-p-candle', vendorId: 'demo-v-sankofa',
-    title: 'Soy Wax Candle — Shea & Lemongrass', slug: 'demo-soy-candle-shea-lemongrass',
+    title: 'Soy Wax Candle, Shea & Lemongrass', slug: 'demo-soy-candle-shea-lemongrass',
     price_ghs: 70, unit: 'each', images: ['/images/prod-candle.jpg'],
     category: 'handmade_crafts',
     short_description: '45-hour soy candle poured into a reusable glass, scented with Ghanaian lemongrass.',
-    description: 'Clean-burning soy wax, cotton wick, and essential oils of lemongrass and shea blossom. When it burns down, the glass becomes your new cup — bring it back for a refill discount.',
+    description: 'Clean-burning soy wax, cotton wick, and essential oils of lemongrass and shea blossom. When it burns down, the glass becomes your new cup, bring it back for a refill discount.',
     value_tags: ['handmade', 'zero_waste'],
     views: 265, order_count: 38, stock_quantity: 22,
   }),
@@ -305,7 +305,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     title: 'Reclaimed Kraft Tote Bag', slug: 'demo-reclaimed-kraft-tote',
     price_ghs: 55, unit: 'each', images: ['/images/prod-totebag.jpg'],
     category: 'recycled_upcycled',
-    short_description: 'Washable kraft-paper tote pressed from reclaimed packaging — carries 10kg.',
+    short_description: 'Washable kraft-paper tote pressed from reclaimed packaging, carries 10kg.',
     description: 'Made from reclaimed kraft paper recovered in Tema, pressed and stitched into a washable, tear-resistant everyday tote. Carries 10kg of market shopping and composts at end of life.',
     value_tags: ['upcycled', 'zero_waste', 'biodegradable'],
     views: 312, order_count: 51, stock_quantity: 45,
@@ -316,7 +316,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     price_ghs: 60, unit: 'per pack', images: ['/images/prod-soap.jpg'],
     category: 'recycled_upcycled',
     short_description: 'Cold-process bars from recovered plant oils, wrapped in reclaimed paper.',
-    description: 'Four cold-process bars saponified from recovered and filtered plant oils — lavender, neem, charcoal and unscented. Wrapped in our own reclaimed paper. Plastic never touches this product.',
+    description: 'Four cold-process bars saponified from recovered and filtered plant oils, lavender, neem, charcoal and unscented. Wrapped in our own reclaimed paper. Plastic never touches this product.',
     value_tags: ['upcycled', 'zero_waste', 'plastic_free'],
     views: 289, order_count: 44, stock_quantity: 38,
   }),

@@ -13,7 +13,7 @@ export default function NotFound() {
             <Leaf className="w-10 h-10 text-green-600" />
           </div>
           <p className="text-sm font-semibold text-green-600 uppercase tracking-wide mb-2">
-            404 — Page not found
+            404, Page not found
           </p>
           <h1 className="font-display text-3xl font-bold text-sand-900 mb-3">
             This page has gone off the grid

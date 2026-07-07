@@ -23,7 +23,7 @@ export function CategoryShowcase() {
               Shop by category
             </h2>
             <p className="text-sand-500 text-sm mt-1">
-              Four ways to buy sustainably — every product SDG 12-verified
+              Four ways to buy sustainably, every product SDG 12-verified
             </p>
           </div>
           <Link

@@ -104,7 +104,7 @@ export default function SignupForm() {
     })
 
     if (profileError) {
-      // Not fatal — the trigger may have already created the row, or email confirmation is pending
+      // Not fatal, the trigger may have already created the row, or email confirmation is pending
       console.warn('Profile insert warning:', profileError.message)
     }
 

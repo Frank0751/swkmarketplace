@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { verifyPayment } from '@/lib/paystack/client'
 
-// POST /api/paystack/verify — reconcile an order's payment status directly
+// POST /api/paystack/verify, reconcile an order's payment status directly
 // with Paystack. Fallback for when the buyer returns via callback_url before
 // (or without) the webhook being processed.
 export async function POST(request: NextRequest) {
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
-    // Already reconciled (webhook got there first) — nothing to do
+    // Already reconciled (webhook got there first), nothing to do
     if (order.status !== 'pending') {
       return NextResponse.json({ status: order.status, reconciled: false })
     }

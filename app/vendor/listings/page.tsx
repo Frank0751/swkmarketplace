@@ -17,7 +17,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { formatCurrency, cn } from '@/lib/utils'
 import type { Product, ProductStatus } from '@/types'
 
-export const metadata = { title: 'My Listings — SWK Marketplace' }
+export const metadata = { title: 'My Listings, SWK Marketplace' }
 
 const VENDOR_NAV = [
   { href: '/vendor/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },

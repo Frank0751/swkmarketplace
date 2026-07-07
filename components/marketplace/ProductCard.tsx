@@ -82,7 +82,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Category pill — bottom left */}
+        {/* Category pill, bottom left */}
         <div className="absolute bottom-2 left-2">
           <span className="px-2 py-0.5 text-[10px] font-medium bg-white/90 backdrop-blur-sm text-sand-700 rounded-full flex items-center gap-1 shadow-card">
             <span role="img" aria-hidden="true">{categoryMeta?.emoji}</span>

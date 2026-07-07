@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Search, Menu, X, ShoppingBag, User, ChevronDown, Leaf } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -56,13 +57,18 @@ export function Navbar() {
           <div className="flex items-center h-16 gap-4">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 flex-shrink-0 group">
-              <div className="w-8 h-8 rounded-lg bg-green-600 flex items-center justify-center transition-transform group-hover:scale-105">
-                <Leaf className="w-4 h-4 text-white" />
-              </div>
+            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+              <Image
+                src="/images/swk-logo.png"
+                alt="SWK: Sustainability with Koomson"
+                width={77}
+                height={40}
+                priority
+                className="h-10 w-auto transition-transform group-hover:scale-105"
+              />
               <div className="hidden sm:block">
-                <div className="text-sm font-display font-semibold text-sand-900 leading-tight">SWK</div>
-                <div className="text-[10px] font-medium text-green-600 leading-tight tracking-wide uppercase">Marketplace</div>
+                <div className="text-sm font-display font-bold text-sand-900 leading-tight">Marketplace</div>
+                <div className="text-[10px] font-medium text-green-600 leading-tight tracking-wide uppercase">by SWK Ghana</div>
               </div>
             </Link>
 
@@ -87,7 +93,7 @@ export function Navbar() {
               ))}
             </div>
 
-            {/* Search bar — desktop */}
+            {/* Search bar, desktop */}
             <div className="hidden md:flex flex-1 max-w-sm mx-4">
               <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-400" />

@@ -15,7 +15,7 @@ import { OrderCard } from '@/components/buyer/OrderCard'
 import { formatCurrency } from '@/lib/utils'
 import type { Order } from '@/types'
 
-export const metadata = { title: 'My Dashboard — SWK Marketplace' }
+export const metadata = { title: 'My Dashboard, SWK Marketplace' }
 
 const BUYER_NAV = [
   { href: '/buyer/dashboard', label: 'Dashboard',    icon: LayoutDashboard },

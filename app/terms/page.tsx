@@ -6,7 +6,7 @@ import { Footer } from '@/components/layout/Footer'
 export const metadata: Metadata = {
   title: 'Terms & Conditions',
   description:
-    'Terms and conditions for buyers and vendors on SWK Marketplace — Ghana\'s youth-powered sustainable marketplace.',
+    'Terms and conditions for buyers and vendors on SWK Marketplace, Ghana\'s youth-powered sustainable marketplace.',
 }
 
 function Section({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
@@ -40,7 +40,7 @@ export default function TermsPage() {
             <p>
               SWK Marketplace (marketplace.swkghana.org) is a curated digital marketplace connecting
               eco-conscious buyers with verified youth-led green entrepreneurs across Ghana and Africa.
-              Every product listed must align with UN Sustainable Development Goal 12 — Responsible
+              Every product listed must align with UN Sustainable Development Goal 12, Responsible
               Consumption and Production.
             </p>
             <p>
@@ -88,7 +88,7 @@ export default function TermsPage() {
               <li>Please confirm delivery promptly once your order arrives as described</li>
               <li>
                 If an order does not arrive or differs significantly from its description, raise a
-                dispute from your dashboard instead of confirming delivery — SWK Ghana will investigate
+                dispute from your dashboard instead of confirming delivery, SWK Ghana will investigate
                 and, where appropriate, issue a refund
               </li>
             </ul>

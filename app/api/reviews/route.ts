@@ -3,7 +3,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 
 const REVIEWABLE_STATUSES = ['delivered', 'released']
 
-// GET /api/reviews?product_id=xxx — public review list + reviewer names,
+// GET /api/reviews?product_id=xxx, public review list + reviewer names,
 // plus eligibility info for the signed-in user
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Admin client: users RLS hides other buyers' rows, but reviews should
-    // display reviewer names — expose only full_name + avatar_url
+    // display reviewer names, expose only full_name + avatar_url
     const adminSupabase = await createAdminClient()
     const { data: reviews, error } = await adminSupabase
       .from('product_reviews')
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/reviews — buyer reviews a product from a delivered order
+// POST /api/reviews, buyer reviews a product from a delivered order
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       throw insertError
     }
 
-    return NextResponse.json({ data: review, message: 'Review submitted — thank you!' }, { status: 201 })
+    return NextResponse.json({ data: review, message: 'Review submitted, thank you!' }, { status: 201 })
   } catch (err) {
     console.error('[POST /api/reviews]', err)
     return NextResponse.json({ error: 'Failed to submit review' }, { status: 500 })

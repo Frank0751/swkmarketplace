@@ -5,7 +5,7 @@ export function ProductGridSkeleton() {
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
         <div key={i} className="product-card pointer-events-none">
-          {/* Image skeleton — 4:3 aspect ratio */}
+          {/* Image skeleton, 4:3 aspect ratio */}
           <div className="w-full rounded-lg overflow-hidden bg-sand-100" style={{ aspectRatio: '4/3' }}>
             <div className="skeleton w-full h-full" />
           </div>
@@ -15,7 +15,7 @@ export function ProductGridSkeleton() {
             {/* Vendor name skeleton */}
             <div className="skeleton h-3 w-24 rounded" />
 
-            {/* Title skeleton — two lines */}
+            {/* Title skeleton, two lines */}
             <div className="space-y-1.5">
               <div className="skeleton h-4 w-full rounded" />
               <div className="skeleton h-4 w-3/4 rounded" />

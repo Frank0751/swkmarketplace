@@ -60,14 +60,14 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
       <div className="relative w-full overflow-hidden rounded-2xl bg-sand-100" style={{ aspectRatio: '4/3' }}>
         <Image
           src={safeImages[activeIdx]}
-          alt={`${title} — image ${activeIdx + 1}`}
+          alt={`${title}, image ${activeIdx + 1}`}
           fill
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="object-cover"
           priority
         />
 
-        {/* Nav arrows — only when multiple images */}
+        {/* Nav arrows, only when multiple images */}
         {safeImages.length > 1 && (
           <>
             <button
@@ -141,7 +141,7 @@ function OrderForm({
 
   const min = product.minimum_order || 1
   const max = product.stock_quantity
-  const deliveryFee = 15 // flat GHS 15 placeholder — can be dynamic
+  const deliveryFee = 15 // flat GHS 15 placeholder, can be dynamic
   const subtotal = product.price_ghs * quantity
   const total = subtotal + deliveryFee
 
@@ -198,7 +198,7 @@ function OrderForm({
         <div>
           <p className="text-sm font-semibold text-gold-800">Sample product</p>
           <p className="text-xs text-gold-700/80 mt-0.5">
-            This is demonstration data showing how a live listing works — it can&rsquo;t be ordered.
+            This is demonstration data showing how a live listing works, it can&rsquo;t be ordered.
           </p>
         </div>
       </div>
@@ -332,7 +332,7 @@ function OrderForm({
         ) : (
           <>
             <ShoppingBag className="w-4 h-4" />
-            Place order — {formatCurrency(total)}
+            Place order, {formatCurrency(total)}
           </>
         )}
       </button>

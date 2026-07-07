@@ -21,7 +21,7 @@ import { ShareStoreLink } from '@/components/vendor/ShareStoreLink'
 import { formatCurrency, formatDate, formatRelativeTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, cn } from '@/lib/utils'
 import type { Order, VendorProfile } from '@/types'
 
-export const metadata = { title: 'Vendor Dashboard — SWK Marketplace' }
+export const metadata = { title: 'Vendor Dashboard, SWK Marketplace' }
 
 const VENDOR_NAV = [
   { href: '/vendor/dashboard',  label: 'Dashboard',    icon: LayoutDashboard },
@@ -282,7 +282,7 @@ export default async function VendorDashboardPage() {
                       <BarChart3 className="w-4 h-4 text-gold-600" />
                     </div>
                   </div>
-                  <p className="text-3xl font-display font-bold text-sand-900">{vendor.total_sales > 0 ? '—' : 0}</p>
+                  <p className="text-3xl font-display font-bold text-sand-900">{vendor.total_sales > 0 ? '-' : 0}</p>
                 </div>
 
                 <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
@@ -323,7 +323,7 @@ export default async function VendorDashboardPage() {
                 </Link>
               </div>
 
-              {/* Shareable store link — the vendor's mini-website */}
+              {/* Shareable store link, the vendor's mini-website */}
               <div className="mb-8">
                 <ShareStoreLink
                   slug={vendor.slug ?? vendor.id}

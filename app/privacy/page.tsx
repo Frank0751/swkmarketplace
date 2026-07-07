@@ -50,7 +50,7 @@ export default function PrivacyPage() {
                 history
               </li>
               <li>
-                <strong>Payment data:</strong> payments are processed by Paystack — SWK Ghana never
+                <strong>Payment data:</strong> payments are processed by Paystack, SWK Ghana never
                 sees or stores your card or mobile money credentials
               </li>
             </ul>

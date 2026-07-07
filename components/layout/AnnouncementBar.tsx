@@ -2,7 +2,7 @@
 
 const MESSAGES = [
   { icon: '🌿', text: 'Every product is SDG 12-verified before going live' },
-  { icon: '🛡️', text: 'All payments are escrow-protected — your money is safe' },
+  { icon: '🛡️', text: 'All payments are escrow-protected, your money is safe' },
   { icon: '✊', text: '100% youth-led green entrepreneurs' },
   { icon: '📍', text: 'Shipping across Ghana and Africa' },
   { icon: '♻️', text: 'Supporting responsible consumption since 2022' },

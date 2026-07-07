@@ -86,7 +86,7 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
   const vendor = await fetchVendor(params.slug)
   if (!vendor) return { title: 'Store not found' }
 
-  const title = `${vendor.business_name} — SWK Marketplace`
+  const title = `${vendor.business_name}, SWK Marketplace`
   const description =
     vendor.business_description ||
     `Shop sustainable products from ${vendor.business_name}, a verified green business on SWK Marketplace.`
@@ -149,7 +149,7 @@ export default async function StorePage({ params }: StorePageProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-sand-900/60 via-sand-900/10 to-transparent" />
           {isSample && (
             <span className="absolute top-4 right-4 px-2.5 py-1 text-[11px] font-semibold bg-sand-900/70 backdrop-blur-sm text-white rounded-full">
-              Sample store — for demonstration
+              Sample store, for demonstration
             </span>
           )}
         </div>
@@ -241,7 +241,7 @@ export default async function StorePage({ params }: StorePageProps) {
           {products.length === 0 ? (
             <div className="bg-white rounded-2xl border border-sand-200 p-12 text-center">
               <Leaf className="w-10 h-10 text-green-200 mx-auto mb-3" />
-              <p className="text-sm text-sand-400">No live products yet — check back soon.</p>
+              <p className="text-sm text-sand-400">No live products yet, check back soon.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -392,7 +392,7 @@ export default async function StorePage({ params }: StorePageProps) {
               <Link href="/" className="text-green-600 font-semibold hover:underline">
                 SWK Marketplace
               </Link>{' '}
-              — Ghana&rsquo;s youth-powered sustainable marketplace.
+             , Ghana&rsquo;s youth-powered sustainable marketplace.
             </p>
             <Link
               href="/vendor/apply"

@@ -22,7 +22,7 @@ export async function POST(
       .single()
 
     if (adminProfile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden — admin access required' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden, admin access required' }, { status: 403 })
     }
 
     const body = await request.json()

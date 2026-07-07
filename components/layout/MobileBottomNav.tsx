@@ -28,7 +28,7 @@ export function MobileBottomNav() {
     <nav
       aria-label="Mobile navigation"
       className={cn(
-        // Visibility — only show on mobile
+        // Visibility, only show on mobile
         'fixed bottom-0 inset-x-0 z-40 md:hidden',
         // Appearance
         'h-14 bg-white border-t border-sand-200 shadow-card-lg',

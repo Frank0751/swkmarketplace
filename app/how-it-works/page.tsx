@@ -25,7 +25,7 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'How it works — SWK Marketplace',
+  title: 'How it works, SWK Marketplace',
   description:
     'Learn how SWK Marketplace connects eco-conscious buyers with verified youth-led green entrepreneurs across Ghana. Secure escrow payments, SDG 12 verification, and fair payouts.',
   openGraph: {
@@ -63,7 +63,7 @@ function StepCard({ step, icon, title, description, accent = 'green' }: StepCard
         >
           {step}
         </div>
-        {/* Connector line — hidden on last item (handled via CSS in list) */}
+        {/* Connector line, hidden on last item (handled via CSS in list) */}
         <div className="flex-1 w-0.5 bg-sand-200 my-2 min-h-8" />
       </div>
 
@@ -128,7 +128,7 @@ export default function HowItWorksPage() {
             </h1>
 
             <p className="text-green-100 text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-8">
-              We connect eco-conscious buyers with verified youth-led green entrepreneurs across Ghana — safely, transparently, and sustainably.
+              We connect eco-conscious buyers with verified youth-led green entrepreneurs across Ghana, safely, transparently, and sustainably.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -184,7 +184,7 @@ export default function HowItWorksPage() {
                   Shop sustainably with confidence
                 </h2>
                 <p className="text-sand-500 text-sm leading-relaxed mb-8">
-                  Every product on SWK Marketplace is reviewed for SDG 12 alignment before going live. Your payment is held in escrow and only released after you confirm delivery — you're always protected.
+                  Every product on SWK Marketplace is reviewed for SDG 12 alignment before going live. Your payment is held in escrow and only released after you confirm delivery, you're always protected.
                 </p>
 
                 {/* Steps */}
@@ -193,13 +193,13 @@ export default function HowItWorksPage() {
                     step={1}
                     icon={<ShoppingBag className="w-5 h-5" />}
                     title="Browse & discover"
-                    description="Browse hundreds of eco-friendly products across four categories: Agribusiness, Organic Produce, Recycled & Upcycled goods, and Handmade Crafts. Filter by values — zero-waste, organic, women-led, and more."
+                    description="Browse hundreds of eco-friendly products across four categories: Agribusiness, Organic Produce, Recycled & Upcycled goods, and Handmade Crafts. Filter by values, zero-waste, organic, women-led, and more."
                   />
                   <StepCard
                     step={2}
                     icon={<ShieldCheck className="w-5 h-5" />}
                     title="Pay securely via Paystack"
-                    description="Place your order and pay securely using your card, mobile money, or bank transfer. Your payment goes into escrow — held safely by SWK Ghana, not released to the vendor until delivery is confirmed."
+                    description="Place your order and pay securely using your card, mobile money, or bank transfer. Your payment goes into escrow, held safely by SWK Ghana, not released to the vendor until delivery is confirmed."
                     accent="teal"
                   />
                   <StepCard
@@ -212,7 +212,7 @@ export default function HowItWorksPage() {
                     step={4}
                     icon={<CheckCircle2 className="w-5 h-5" />}
                     title="Confirm delivery & release payment"
-                    description="Once your order arrives and you're happy, confirm delivery in your dashboard. This triggers the release of payment to the vendor. You can raise a dispute if anything is wrong — we're here to help."
+                    description="Once your order arrives and you're happy, confirm delivery in your dashboard. This triggers the release of payment to the vendor. You can raise a dispute if anything is wrong, we're here to help."
                     accent="gold"
                   />
                 </div>
@@ -236,7 +236,7 @@ export default function HowItWorksPage() {
                     {
                       icon: <Star className="w-5 h-5 text-gold-400" />,
                       title: 'Vendor ratings',
-                      desc: 'Real reviews from real buyers — shop with confidence.',
+                      desc: 'Real reviews from real buyers, shop with confidence.',
                     },
                     {
                       icon: <ClipboardList className="w-5 h-5 text-green-600" />,
@@ -257,7 +257,7 @@ export default function HowItWorksPage() {
                 <div className="mt-5 rounded-2xl overflow-hidden bg-green-600 p-6 text-white">
                   <div className="text-xs font-semibold uppercase tracking-widest text-green-200 mb-2">Did you know?</div>
                   <p className="text-sm text-green-100 leading-relaxed">
-                    Every purchase on SWK Marketplace directly supports a young Ghanaian green entrepreneur. 85% of your payment goes straight to the vendor — supporting livelihoods and sustainable businesses.
+                    Every purchase on SWK Marketplace directly supports a young Ghanaian green entrepreneur. 85% of your payment goes straight to the vendor, supporting livelihoods and sustainable businesses.
                   </p>
                 </div>
               </div>
@@ -295,7 +295,7 @@ export default function HowItWorksPage() {
                   icon: <BadgeCheck className="w-6 h-6 text-teal-600" />,
                   title: 'Get verified & approved',
                   description:
-                    'Once approved, you receive your "SDG 12 Verified Vendor" status. You can now create product listings — each one goes through a quick review to ensure quality and alignment.',
+                    'Once approved, you receive your "SDG 12 Verified Vendor" status. You can now create product listings, each one goes through a quick review to ensure quality and alignment.',
                 },
                 {
                   step: 3,
@@ -347,7 +347,7 @@ export default function HowItWorksPage() {
               </div>
               <h3 className="text-lg font-display font-bold text-sand-900 mb-2">Platform fee: just 15%</h3>
               <p className="text-sm text-sand-600 leading-relaxed mb-4">
-                SWK Ghana charges a <strong>15% commission</strong> on each sale — significantly lower than most marketplaces. This fee covers payment processing, platform maintenance, vendor support, and SDG 12 verification services.
+                SWK Ghana charges a <strong>15% commission</strong> on each sale, significantly lower than most marketplaces. This fee covers payment processing, platform maintenance, vendor support, and SDG 12 verification services.
               </p>
               <div className="flex items-center justify-center gap-6 text-sm">
                 <div className="text-center">
@@ -375,7 +375,7 @@ export default function HowItWorksPage() {
                 How escrow payments protect everyone
               </h2>
               <p className="text-teal-100 text-sm sm:text-base leading-relaxed mb-10 max-w-2xl mx-auto">
-                Escrow is a neutral holding mechanism. SWK Ghana acts as a trusted third party that holds your payment safely until the transaction is complete — protecting both buyers and vendors.
+                Escrow is a neutral holding mechanism. SWK Ghana acts as a trusted third party that holds your payment safely until the transaction is complete, protecting both buyers and vendors.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
@@ -383,7 +383,7 @@ export default function HowItWorksPage() {
                   {
                     step: '01',
                     label: 'Buyer pays',
-                    desc: 'Payment goes to SWK Ghana escrow — not directly to the vendor.',
+                    desc: 'Payment goes to SWK Ghana escrow, not directly to the vendor.',
                     color: 'bg-white/10 border-white/20',
                   },
                   {
@@ -414,7 +414,7 @@ export default function HowItWorksPage() {
               </div>
 
               <p className="text-teal-200 text-xs mt-6">
-                If a dispute is raised, SWK Ghana mediates and can issue a refund — funds are never stuck.
+                If a dispute is raised, SWK Ghana mediates and can issue a refund, funds are never stuck.
               </p>
             </div>
           </div>
@@ -434,7 +434,7 @@ export default function HowItWorksPage() {
                     Why every product is SDG 12 verified
                   </h2>
                   <p className="text-sand-500 text-sm leading-relaxed mb-5">
-                    SDG 12 — Responsible Consumption and Production — is at the core of everything SWK Marketplace does. We believe commerce can be a force for good on the planet.
+                    SDG 12, Responsible Consumption and Production, is at the core of everything SWK Marketplace does. We believe commerce can be a force for good on the planet.
                   </p>
                   <p className="text-sand-500 text-sm leading-relaxed mb-5">
                     Every vendor application and product listing is reviewed by the SWK Ghana team against our SDG 12 criteria before being approved. This means buyers can trust that every purchase they make supports sustainable practices.
@@ -495,11 +495,11 @@ export default function HowItWorksPage() {
               />
               <FAQItem
                 question="How do I know my payment is safe?"
-                answer="All payments go through Paystack — one of Africa's most trusted payment processors. Your money is held in escrow by SWK Ghana and only released after you confirm that your order has arrived. If you have a problem, you can raise a dispute and we'll mediate. You are never at risk of losing money without recourse."
+                answer="All payments go through Paystack, one of Africa's most trusted payment processors. Your money is held in escrow by SWK Ghana and only released after you confirm that your order has arrived. If you have a problem, you can raise a dispute and we'll mediate. You are never at risk of losing money without recourse."
               />
               <FAQItem
                 question="Can I sell on SWK Marketplace as a vendor?"
-                answer="Yes! If you run a sustainable, eco-friendly business in Ghana or Africa, we'd love to have you. Apply by clicking 'Become a vendor' — our team reviews every application within 2–3 business days and checks for alignment with SDG 12. Once approved, you can start listing products immediately. There's no monthly fee — we only take 15% when you make a sale."
+                answer="Yes! If you run a sustainable, eco-friendly business in Ghana or Africa, we'd love to have you. Apply by clicking 'Become a vendor', our team reviews every application within 2–3 business days and checks for alignment with SDG 12. Once approved, you can start listing products immediately. There's no monthly fee, we only take 15% when you make a sale."
               />
               <FAQItem
                 question="What happens if I'm not happy with my order?"

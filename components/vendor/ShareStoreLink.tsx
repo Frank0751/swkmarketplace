@@ -32,7 +32,7 @@ export function ShareStoreLink({ slug, businessName, variant = 'row' }: ShareSto
       toast.success('Store link copied!')
       setTimeout(() => setCopied(false), 2500)
     } catch {
-      toast.error('Could not copy — long-press the link to copy manually')
+      toast.error('Could not copy, long-press the link to copy manually')
     }
   }
 
@@ -41,7 +41,7 @@ export function ShareStoreLink({ slug, businessName, variant = 'row' }: ShareSto
       try {
         await navigator.share({ title: businessName, text: shareText, url })
       } catch {
-        // user dismissed the sheet — nothing to do
+        // user dismissed the sheet, nothing to do
       }
     } else {
       handleCopy()
@@ -101,7 +101,7 @@ export function ShareStoreLink({ slug, businessName, variant = 'row' }: ShareSto
         <h2 className="text-sm font-bold text-sand-900">Your store link</h2>
       </div>
       <p className="text-xs text-sand-500 mb-3">
-        Share this link anywhere — WhatsApp, Instagram bio, business cards. Anyone can open it
+        Share this link anywhere, WhatsApp, Instagram bio, business cards. Anyone can open it
         and see your full store, no login needed. It&rsquo;s your mini-website.
       </p>
       <div className="flex items-center gap-2 bg-sand-50 border border-sand-200 rounded-lg px-3 py-2.5 mb-3 overflow-x-auto">

@@ -1,26 +1,28 @@
 import type { Metadata } from 'next'
-import { Plus_Jakarta_Sans, Playfair_Display } from 'next/font/google'
+import { Ubuntu } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 
-const bodyFont = Plus_Jakarta_Sans({
+// Brand font: Ubuntu everywhere (body + display)
+const bodyFont = Ubuntu({
   subsets: ['latin'],
   variable: '--font-body',
   display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['300', '400', '500', '700'],
+  style: ['normal', 'italic'],
 })
 
-const displayFont = Playfair_Display({
+const displayFont = Ubuntu({
   subsets: ['latin'],
   variable: '--font-display',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '700'],
   style: ['normal', 'italic'],
 })
 
 export const metadata: Metadata = {
   title: {
-    default: 'SWK Marketplace — Ghana\'s Sustainable Youth Marketplace',
+    default: 'SWK Marketplace: Ghana\'s Sustainable Youth Marketplace',
     template: '%s | SWK Marketplace',
   },
   description:
@@ -32,7 +34,7 @@ export const metadata: Metadata = {
     locale: 'en_GH',
     url: 'https://marketplace.swkghana.org',
     siteName: 'SWK Marketplace',
-    title: 'SWK Marketplace — Ghana\'s Sustainable Youth Marketplace',
+    title: 'SWK Marketplace: Ghana\'s Sustainable Youth Marketplace',
     description: 'Shop verified eco-friendly products from youth-led green entrepreneurs across Ghana.',
     images: [{ url: '/images/og-image.jpg', width: 1200, height: 630 }],
   },

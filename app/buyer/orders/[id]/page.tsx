@@ -57,7 +57,7 @@ export default function BuyerOrderDetailPage() {
       .then(res => res.json())
       .then(json => {
         if (json.reconciled) {
-          toast.success('Payment confirmed — funds held in escrow')
+          toast.success('Payment confirmed, funds held in escrow')
           fetchOrder()
         }
       })

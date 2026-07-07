@@ -51,7 +51,7 @@ async function fetchProducts({
     query = query.eq('category', category)
   }
 
-  // Value tags filter — product must contain ALL selected tags
+  // Value tags filter, product must contain ALL selected tags
   if (valueTags && valueTags.length > 0) {
     query = query.contains('value_tags', valueTags)
   }
@@ -101,7 +101,7 @@ async function fetchProducts({
 export async function ProductGrid(props: ProductGridProps) {
   let products = await fetchProducts(props)
 
-  // No live products yet — fall back to sample data so the marketplace
+  // No live products yet, fall back to sample data so the marketplace
   // stays presentable (disabled with NEXT_PUBLIC_DEMO_MODE=false)
   if (products.length === 0 && demoEnabled()) {
     products = getDemoProducts({

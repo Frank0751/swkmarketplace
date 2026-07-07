@@ -17,11 +17,11 @@ import { CATEGORY_META, GHANA_REGIONS, VALUE_TAG_META, type ProductCategory, typ
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'Shop sustainable products — SWK Marketplace',
+  title: 'Shop sustainable products | SWK Marketplace',
   description:
     'Discover eco-friendly, SDG 12-verified products from verified youth-led green entrepreneurs across Ghana and Africa.',
   openGraph: {
-    title: 'Shop sustainable products — SWK Marketplace',
+    title: 'Shop sustainable products | SWK Marketplace',
     description:
       'Browse organic, recycled, handmade, and agribusiness products supporting responsible consumption.',
     url: 'https://marketplace.swkghana.org/marketplace',

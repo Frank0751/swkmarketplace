@@ -22,7 +22,7 @@ export async function POST(
       .single()
 
     if (adminProfile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden — admin access required' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden, admin access required' }, { status: 403 })
     }
 
     const adminSupabase = await createAdminClient()
@@ -66,7 +66,7 @@ export async function POST(
 
     if (userUpdateError) {
       console.error('[Vendor approve] Failed to update user role:', userUpdateError)
-      // Non-fatal — vendor profile is already approved
+      // Non-fatal, vendor profile is already approved
     }
 
     // Send approval email

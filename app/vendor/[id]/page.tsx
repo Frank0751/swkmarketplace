@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: VendorProfilePageProps): Prom
 
   const { vendor } = data
   return {
-    title: `${vendor.business_name} — SWK Marketplace`,
+    title: `${vendor.business_name}, SWK Marketplace`,
     description: vendor.sustainability_statement?.slice(0, 160),
     openGraph: {
       title: vendor.business_name,

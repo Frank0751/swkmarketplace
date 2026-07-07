@@ -15,7 +15,7 @@ const STEPS = [
     emoji: '🔒',
     title: 'Pay Securely',
     description:
-      'Your payment is processed via Paystack and held in escrow by SWK Ghana — completely safe until delivery.',
+      'Your payment is processed via Paystack and held in escrow by SWK Ghana, completely safe until delivery.',
   },
   {
     number: 3,
@@ -39,13 +39,13 @@ export function HowItWorksSnippet() {
             How it works
           </h2>
           <p className="mt-3 text-base text-sand-500 max-w-xl mx-auto">
-            Three easy steps from discovery to delivery — backed by our escrow guarantee.
+            Three easy steps from discovery to delivery, backed by our escrow guarantee.
           </p>
         </FadeIn>
 
         {/* Steps */}
         <Stagger className="flex flex-col md:flex-row items-start gap-8 md:gap-6 relative">
-          {/* Connector line — desktop only */}
+          {/* Connector line, desktop only */}
           <div
             className="hidden md:block absolute top-6 left-0 right-0 h-0.5 bg-sand-200"
             style={{ left: '10%', right: '10%', top: '1.5rem' }}
@@ -62,7 +62,7 @@ export function HowItWorksSnippet() {
                 {step.number}
               </div>
 
-              {/* Connector arrow — mobile only (between steps) */}
+              {/* Connector arrow, mobile only (between steps) */}
               {idx < STEPS.length - 1 && (
                 <div className="md:hidden mb-4 text-sand-300" aria-hidden="true">
                   <ArrowRight className="w-5 h-5 rotate-90 mx-auto" />

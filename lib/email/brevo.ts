@@ -9,7 +9,7 @@ const MARKETPLACE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://marketplace.
 async function sendEmail(to: string, subject: string, html: string) {
   const apiKey = process.env.BREVO_API_KEY
   if (!apiKey || apiKey === 'your_brevo_api_key') {
-    console.warn(`[Brevo] BREVO_API_KEY not configured — skipping email "${subject}" to ${to}`)
+    console.warn(`[Brevo] BREVO_API_KEY not configured, skipping email "${subject}" to ${to}`)
     return { skipped: true }
   }
 
@@ -101,7 +101,7 @@ export async function sendOrderConfirmation(
     buyer_name: string
   },
 ) {
-  const subject = `Order confirmed — ${order.reference}`
+  const subject = `Order confirmed, ${order.reference}`
   const body = `
     <h1>Your order is confirmed! 🎉</h1>
     <p>Hi ${order.buyer_name}, thank you for your purchase. Your payment is securely held in escrow and will be released to the vendor only after you confirm delivery.</p>
@@ -131,7 +131,7 @@ export async function sendVendorOrderNotification(
     buyer_name: string
   },
 ) {
-  const subject = `New order received — ${order.reference}`
+  const subject = `New order received, ${order.reference}`
   const body = `
     <h1>You have a new order! 🛒</h1>
     <p>Great news! A buyer has placed an order for one of your products. Please confirm the order within 24 hours.</p>
@@ -158,7 +158,7 @@ export async function sendOrderDispatched(
     estimated_delivery?: string
   },
 ) {
-  const subject = `Your order is on its way — ${order.reference}`
+  const subject = `Your order is on its way, ${order.reference}`
   const body = `
     <h1>Your order has been dispatched! 🚚</h1>
     <p>Your vendor has marked your order as dispatched. It should be arriving soon.</p>
@@ -174,7 +174,7 @@ export async function sendOrderDispatched(
   return sendEmail(to, subject, baseTemplate(subject, body))
 }
 
-// ─── 4. Delivery confirmed — notify vendor + admin ────────────────────────────
+// ─── 4. Delivery confirmed, notify vendor + admin ────────────────────────────
 
 export async function sendDeliveryConfirmed(
   to: string,
@@ -183,7 +183,7 @@ export async function sendDeliveryConfirmed(
     net_amount: number
   },
 ) {
-  const subject = `Delivery confirmed — payout pending — ${order.reference}`
+  const subject = `Delivery confirmed, payout pending, ${order.reference}`
   const body = `
     <h1>Delivery confirmed! Payout is being processed 🎉</h1>
     <p>The buyer has confirmed delivery for order ${order.reference}. Your payout is now pending admin approval.</p>
@@ -206,7 +206,7 @@ export async function sendPayoutReleased(
     net_amount: number
   },
 ) {
-  const subject = `Your payout has been released — ${payout.order_reference}`
+  const subject = `Your payout has been released, ${payout.order_reference}`
   const body = `
     <h1>Your payout is on its way! 💰</h1>
     <p>SWK Ghana has released your payout for order ${payout.order_reference}. The funds will arrive in your account within 1–3 business days depending on your bank.</p>
@@ -226,7 +226,7 @@ export async function sendVendorApproved(
   to: string,
   vendor: { business_name: string },
 ) {
-  const subject = `Congratulations! Your vendor account is approved — SWK Marketplace`
+  const subject = `Congratulations! Your vendor account is approved, SWK Marketplace`
   const body = `
     <h1>Welcome to SWK Marketplace, ${vendor.business_name}! 🌿</h1>
     <p>Your vendor application has been reviewed and <strong>approved</strong> by the SWK Ghana team. You are now a verified green entrepreneur on our platform.</p>
@@ -238,7 +238,7 @@ export async function sendVendorApproved(
       <li>SWK Ghana deducts a 15% platform commission from each sale</li>
     </ul>
     <a href="${MARKETPLACE_URL}/vendor/listings/new" class="cta-btn">Create your first listing</a>
-    <p style="font-size:13px;color:#888580;">Questions? We're here to help — info@swkghana.org</p>
+    <p style="font-size:13px;color:#888580;">Questions? We're here to help, info@swkghana.org</p>
   `
   return sendEmail(to, subject, baseTemplate(subject, body))
 }
@@ -249,7 +249,7 @@ export async function sendVendorRejected(
   to: string,
   vendor: { business_name: string; reason: string },
 ) {
-  const subject = `Update on your vendor application — SWK Marketplace`
+  const subject = `Update on your vendor application, SWK Marketplace`
   const body = `
     <h1>Application update for ${vendor.business_name}</h1>
     <p>Thank you for applying to sell on SWK Marketplace. After careful review, we were unable to approve your application at this time.</p>

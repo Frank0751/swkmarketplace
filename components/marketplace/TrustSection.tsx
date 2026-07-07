@@ -14,7 +14,7 @@ const ESCROW_STEPS = [
   {
     icon: ShieldCheck,
     title: 'SWK holds your money',
-    description: 'Funds sit safely in escrow — the vendor is not paid yet.',
+    description: 'Funds sit safely in escrow, the vendor is not paid yet.',
     accent: 'bg-teal-50 text-teal-600 border-teal-100',
   },
   {
@@ -61,7 +61,7 @@ export function TrustSection() {
 
         {/* Escrow flow infographic */}
         <div className="relative mb-16">
-          {/* Connecting line — desktop */}
+          {/* Connecting line, desktop */}
           <div
             className="hidden lg:block absolute top-10 h-0.5 bg-gradient-to-r from-green-200 via-teal-300 to-green-200"
             style={{ left: '12%', right: '12%' }}
@@ -103,7 +103,7 @@ export function TrustSection() {
               <div className="relative min-h-[220px] lg:min-h-0">
                 <Image
                   src="/images/impact-seedling.jpg"
-                  alt="Seedlings growing — SWK youth impact"
+                  alt="Seedlings growing, SWK youth impact"
                   fill
                   sizes="(max-width: 1024px) 100vw, 380px"
                   className="object-cover"

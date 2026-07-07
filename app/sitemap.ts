@@ -30,7 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [...staticEntries, ...productEntries]
   } catch {
-    // Supabase unreachable (e.g. build without credentials) — static entries only
+    // Supabase unreachable (e.g. build without credentials), static entries only
     return staticEntries
   }
 }

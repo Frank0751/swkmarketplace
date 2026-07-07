@@ -144,14 +144,14 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                           {order.reference}
                         </td>
                         <td className="px-4 py-3 text-sand-700">
-                          <div className="font-medium">{order.buyer?.full_name ?? '—'}</div>
+                          <div className="font-medium">{order.buyer?.full_name ?? '-'}</div>
                           <div className="text-xs text-sand-400">{order.buyer?.email}</div>
                         </td>
                         <td className="px-4 py-3 text-sand-600 hidden lg:table-cell">
-                          {order.vendor?.business_name ?? '—'}
+                          {order.vendor?.business_name ?? '-'}
                         </td>
                         <td className="px-4 py-3 text-sand-600 hidden xl:table-cell max-w-xs truncate">
-                          {order.product?.title ?? '—'}
+                          {order.product?.title ?? '-'}
                         </td>
                         <td className="px-4 py-3 text-right font-semibold text-sand-900">
                           {formatCurrency(order.total_amount)}
@@ -256,7 +256,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                         }
                                         className="w-full px-3 py-2 text-sm border border-sand-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 bg-white"
                                       >
-                                        <option value="">— select status —</option>
+                                        <option value="">- select status -</option>
                                         {transitions.map(s => (
                                           <option key={s} value={s}>
                                             {ORDER_STATUS_LABELS[s]}

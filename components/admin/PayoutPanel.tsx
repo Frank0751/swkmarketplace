@@ -164,7 +164,7 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                     <tr key={payout.id} className="hover:bg-sand-50 transition-colors">
                       <td className="px-4 py-3">
                         <div className="font-medium text-sand-900">
-                          {payout.vendor?.business_name ?? '—'}
+                          {payout.vendor?.business_name ?? '-'}
                         </div>
                         <div className="text-xs text-sand-400">
                           {payout.vendor?.user?.email ?? ''}
@@ -172,7 +172,7 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         <span className="font-mono text-xs text-green-700 font-semibold">
-                          {payout.order?.reference ?? '—'}
+                          {payout.order?.reference ?? '-'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right font-medium text-sand-700">

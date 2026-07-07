@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Leaf, Mail, MessageCircle, ShieldCheck } from 'lucide-react'
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -13,18 +14,24 @@ export function Footer() {
           {/* Brand column */}
           <div className="lg:col-span-2">
             {/* Logo */}
-            <Link href="/" className="inline-flex items-center gap-2.5 group mb-4">
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                <Leaf className="w-5 h-5 text-white" />
+            <Link href="/" className="inline-flex items-center gap-3 group mb-4">
+              <div className="rounded-xl bg-white px-2.5 py-1.5 group-hover:scale-105 transition-transform">
+                <Image
+                  src="/images/swk-logo.png"
+                  alt="SWK: Sustainability with Koomson"
+                  width={69}
+                  height={36}
+                  className="h-9 w-auto"
+                />
               </div>
               <div>
-                <div className="text-base font-display font-semibold text-white leading-tight">SWK Marketplace</div>
+                <div className="text-base font-display font-bold text-white leading-tight">SWK Marketplace</div>
                 <div className="text-[10px] font-medium text-green-200 leading-tight tracking-widest uppercase">swkghana.org</div>
               </div>
             </Link>
 
             <p className="text-sm text-green-100 leading-relaxed max-w-xs">
-              Connecting eco-conscious buyers with verified youth-led green entrepreneurs across Ghana and Africa. Every purchase supports SDG 12 — Responsible Consumption and Production.
+              Connecting eco-conscious buyers with verified youth-led green entrepreneurs across Ghana and Africa. Every purchase supports SDG 12, Responsible Consumption and Production.
             </p>
 
             {/* SDG 12 badge */}
