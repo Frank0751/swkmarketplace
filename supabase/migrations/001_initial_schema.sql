@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════
--- SWK Marketplace — Full Database Schema
+-- SWK Marketplace: Full Database Schema
 -- ═══════════════════════════════════════════════════════════════
 
 -- Enable UUID extension

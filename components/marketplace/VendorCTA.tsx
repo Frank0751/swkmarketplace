@@ -64,8 +64,25 @@ export function VendorCTA() {
             ))}
           </div>
 
-          {/* Divider */}
-          <div className="w-24 h-px bg-white/20 mx-auto mb-10" aria-hidden="true" />
+          {/* Commission split infographic: where every sale goes */}
+          <div className="max-w-xl mx-auto mb-10 text-left">
+            <p className="text-xs font-bold uppercase tracking-wider text-white/60 mb-2 text-center">
+              Where every GHS 100 sale goes
+            </p>
+            <div className="flex h-12 rounded-xl overflow-hidden shadow-card-lg" role="img" aria-label="Commission split: 85 cedis to the vendor, 15 cedis reinvested in youth programmes">
+              <div className="flex items-center justify-center gap-1.5 bg-white text-green-800" style={{ width: '85%' }}>
+                <span className="text-lg font-bold">GHS 85</span>
+                <span className="text-[11px] font-semibold opacity-70 hidden sm:inline">to you, the vendor</span>
+              </div>
+              <div className="flex items-center justify-center bg-gold-400 text-white" style={{ width: '15%' }}>
+                <span className="text-sm font-bold">15</span>
+              </div>
+            </div>
+            <div className="flex justify-between mt-1.5 text-[11px] text-white/60 font-medium">
+              <span>Paid straight to your account</span>
+              <span>Reinvested in youth programmes</span>
+            </div>
+          </div>
 
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

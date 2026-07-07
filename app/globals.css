@@ -36,7 +36,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight;
+    @apply font-display font-bold tracking-tight;
   }
 
   /* Focus visible only on keyboard nav */
@@ -52,6 +52,24 @@
 
   /* Selection */
   ::selection { @apply bg-green-100 text-green-800; }
+}
+
+/* ─── Motion graphics ───────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
 }
 
 /* ─── Components ────────────────────────────────────────────────── */

@@ -9,6 +9,9 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
+    // This machine has 8GB RAM; a single build worker keeps peak memory low
+    cpus: 1,
+    workerThreads: false,
   },
 }
 
