@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+import { GoogleButton, AuthDivider } from '@/components/auth/GoogleButton'
 import { cn } from '@/lib/utils'
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
@@ -90,7 +91,18 @@ export default function LoginForm() {
     router.refresh()
   }
 
+  const oauthFailed = searchParams.get('error') === 'oauth'
+
   return (
+    <div>
+      <GoogleButton redirect={searchParams.get('redirect')} label="Sign in with Google" />
+      {oauthFailed && (
+        <div className="mt-3 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          Google sign-in did not complete. Please try again, or use your email and password.
+        </div>
+      )}
+      <AuthDivider />
+
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
       {/* Email */}
       <div>
@@ -174,5 +186,6 @@ export default function LoginForm() {
         )}
       </button>
     </form>
+    </div>
   )
 }

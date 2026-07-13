@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { Eye, EyeOff, ShoppingBag, Store } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+import { GoogleButton, AuthDivider } from '@/components/auth/GoogleButton'
 import { cn } from '@/lib/utils'
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
@@ -120,6 +121,13 @@ export default function SignupForm() {
   }
 
   return (
+    <div>
+      <GoogleButton label="Sign up with Google" />
+      <p className="mt-2 text-center text-xs text-sand-400">
+        Google accounts join as buyers. Want to sell? You can apply as a vendor right after.
+      </p>
+      <AuthDivider />
+
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
       {/* Full name */}
       <div>
@@ -380,5 +388,6 @@ export default function SignupForm() {
         )}
       </button>
     </form>
+    </div>
   )
 }
