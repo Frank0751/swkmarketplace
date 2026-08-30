@@ -51,6 +51,7 @@ export function Footer() {
                 { href: '/marketplace',    label: 'Shop all products' },
                 { href: '/how-it-works',   label: 'How it works' },
                 { href: '/vendor/apply',   label: 'Become a vendor' },
+                { href: '/contact',        label: 'Contact us' },
                 { href: 'https://swkghana.org', label: 'About SWK Ghana', external: true },
               ].map(({ href, label, external }) => (
                 <li key={href}>

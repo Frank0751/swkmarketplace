@@ -6,7 +6,12 @@ const SENDER_NAME = process.env.BREVO_SENDER_NAME ?? 'SWK Marketplace'
 const REPLY_TO = 'info@swkghana.org'
 const MARKETPLACE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://marketplace.swkghana.org'
 
-async function sendEmail(to: string, subject: string, html: string) {
+async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+  replyTo: { email: string; name?: string } = { email: REPLY_TO },
+) {
   const apiKey = process.env.BREVO_API_KEY
   if (!apiKey || apiKey === 'your_brevo_api_key') {
     console.warn(`[Brevo] BREVO_API_KEY not configured, skipping email "${subject}" to ${to}`)
@@ -23,7 +28,7 @@ async function sendEmail(to: string, subject: string, html: string) {
     body: JSON.stringify({
       sender: { name: SENDER_NAME, email: SENDER_EMAIL },
       to: [{ email: to }],
-      replyTo: { email: REPLY_TO },
+      replyTo,
       subject,
       htmlContent: html,
     }),
@@ -73,7 +78,7 @@ function baseTemplate(title: string, bodyHtml: string): string {
   <div class="wrapper">
     <div class="card">
       <div class="header">
-        <div class="header-logo">🌿 SWK Marketplace</div>
+        <div class="header-logo">SWK Marketplace</div>
         <div class="header-tagline">Sustainable goods from Ghana's youth entrepreneurs</div>
       </div>
       <div class="body">
@@ -101,9 +106,9 @@ export async function sendOrderConfirmation(
     buyer_name: string
   },
 ) {
-  const subject = `Order confirmed, ${order.reference}`
+  const subject = `Order confirmed: ${order.reference}`
   const body = `
-    <h1>Your order is confirmed! 🎉</h1>
+    <h1>Your order is confirmed</h1>
     <p>Hi ${order.buyer_name}, thank you for your purchase. Your payment is securely held in escrow and will be released to the vendor only after you confirm delivery.</p>
     <div class="detail-box">
       <div class="detail-row"><span class="detail-label">Order reference</span><span class="detail-value">${order.reference}</span></div>
@@ -111,7 +116,7 @@ export async function sendOrderConfirmation(
       <div class="detail-row"><span class="detail-label">Vendor</span><span class="detail-value">${order.vendor_name}</span></div>
       <div class="detail-row"><span class="detail-label">Total paid</span><span class="detail-value">${formatCurrency(order.total_amount)}</span></div>
     </div>
-    <div class="trust-badge">🛡️ Payment securely held in escrow</div>
+    <div class="trust-badge">Payment securely held in escrow</div>
     <p>You can track your order progress in your buyer dashboard.</p>
     <a href="${MARKETPLACE_URL}/buyer/orders" class="cta-btn">View my order</a>
     <p style="font-size:13px;color:#888580;">Need help? Reply to this email or contact us at info@swkghana.org</p>
@@ -131,10 +136,10 @@ export async function sendVendorOrderNotification(
     buyer_name: string
   },
 ) {
-  const subject = `New order received, ${order.reference}`
+  const subject = `New order received: ${order.reference}`
   const body = `
-    <h1>You have a new order! 🛒</h1>
-    <p>Great news! A buyer has placed an order for one of your products. Please confirm the order within 24 hours.</p>
+    <h1>You have a new order</h1>
+    <p>A buyer has placed an order for one of your products. Please confirm the order within 24 hours.</p>
     <div class="detail-box">
       <div class="detail-row"><span class="detail-label">Order reference</span><span class="detail-value">${order.reference}</span></div>
       <div class="detail-row"><span class="detail-label">Product</span><span class="detail-value">${order.product_title}</span></div>
@@ -160,7 +165,7 @@ export async function sendOrderDispatched(
 ) {
   const subject = `Your order is on its way, ${order.reference}`
   const body = `
-    <h1>Your order has been dispatched! 🚚</h1>
+    <h1>Your order is on its way</h1>
     <p>Your vendor has marked your order as dispatched. It should be arriving soon.</p>
     <div class="detail-box">
       <div class="detail-row"><span class="detail-label">Order reference</span><span class="detail-value">${order.reference}</span></div>
@@ -183,9 +188,9 @@ export async function sendDeliveryConfirmed(
     net_amount: number
   },
 ) {
-  const subject = `Delivery confirmed, payout pending, ${order.reference}`
+  const subject = `Delivery confirmed for ${order.reference}, payout in progress`
   const body = `
-    <h1>Delivery confirmed! Payout is being processed 🎉</h1>
+    <h1>Delivery confirmed, payout in progress</h1>
     <p>The buyer has confirmed delivery for order ${order.reference}. Your payout is now pending admin approval.</p>
     <div class="detail-box">
       <div class="detail-row"><span class="detail-label">Order reference</span><span class="detail-value">${order.reference}</span></div>
@@ -208,13 +213,13 @@ export async function sendPayoutReleased(
 ) {
   const subject = `Your payout has been released, ${payout.order_reference}`
   const body = `
-    <h1>Your payout is on its way! 💰</h1>
+    <h1>Your payout has been released</h1>
     <p>SWK Ghana has released your payout for order ${payout.order_reference}. The funds will arrive in your account within 1–3 business days depending on your bank.</p>
     <div class="detail-box">
       <div class="detail-row"><span class="detail-label">Order reference</span><span class="detail-value">${payout.order_reference}</span></div>
       <div class="detail-row"><span class="detail-label">Net payout (after 15% SWK fee)</span><span class="detail-value">${formatCurrency(payout.net_amount)}</span></div>
     </div>
-    <p>Thank you for being a verified green entrepreneur on SWK Marketplace. Keep up the amazing work!</p>
+    <p>Thank you for being a verified green entrepreneur on SWK Marketplace.</p>
     <a href="${MARKETPLACE_URL}/vendor/dashboard" class="cta-btn">View my earnings</a>
   `
   return sendEmail(to, subject, baseTemplate(subject, body))
@@ -226,11 +231,11 @@ export async function sendVendorApproved(
   to: string,
   vendor: { business_name: string },
 ) {
-  const subject = `Congratulations! Your vendor account is approved, SWK Marketplace`
+  const subject = `Your vendor account is approved | SWK Marketplace`
   const body = `
-    <h1>Welcome to SWK Marketplace, ${vendor.business_name}! 🌿</h1>
+    <h1>Welcome to SWK Marketplace, ${vendor.business_name}</h1>
     <p>Your vendor application has been reviewed and <strong>approved</strong> by the SWK Ghana team. You are now a verified green entrepreneur on our platform.</p>
-    <div class="trust-badge">✅ SDG 12 Verified Vendor</div>
+    <div class="trust-badge">SDG 12 Verified Vendor</div>
     <p>You can now start listing your sustainable products. Remember:</p>
     <ul style="margin: 0 0 16px 20px; font-size:14px; color:#4A4743; line-height:1.8;">
       <li>All listings go through a quick review before going live</li>
@@ -269,14 +274,61 @@ export async function sendListingApproved(
   to: string,
   listing: { title: string },
 ) {
-  const subject = `Your listing "${listing.title}" is now live!`
+  const subject = `Your listing "${listing.title}" is now live`
   const body = `
-    <h1>Your product is live on SWK Marketplace! 🎊</h1>
-    <p>Great news! Your listing <strong>"${listing.title}"</strong> has been reviewed and approved. It is now visible to buyers across Ghana and Africa.</p>
-    <div class="trust-badge">🌿 SDG 12 Verified Listing</div>
+    <h1>Your product is live on SWK Marketplace</h1>
+    <p>Your listing <strong>"${listing.title}"</strong> has been reviewed and approved. It is now visible to buyers across Ghana and Africa.</p>
+    <div class="trust-badge">SDG 12 Verified Listing</div>
     <p>Share your listing with your network to drive more sales. You can view and manage all your listings from your vendor dashboard.</p>
     <a href="${MARKETPLACE_URL}/vendor/listings" class="cta-btn">View my listings</a>
     <p style="font-size:13px;color:#888580;">Remember: you'll be notified as soon as an order comes in.</p>
   `
   return sendEmail(to, subject, baseTemplate(subject, body))
+}
+
+// ─── 9. Contact form message (to the SWK team) ────────────────────────────────
+
+/** Escape user-supplied text so it can't inject markup into the email body. */
+function escapeHtml(input: string): string {
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+export async function sendContactMessage(message: {
+  name: string
+  email: string
+  subject: string
+  message: string
+}) {
+  const subject = `[Contact] ${message.subject}`
+  const body = `
+    <h1>New message from the website</h1>
+    <div class="detail-box">
+      <div class="detail-row">
+        <span class="detail-label">From</span>
+        <span class="detail-value">${escapeHtml(message.name)}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Email</span>
+        <span class="detail-value">${escapeHtml(message.email)}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Subject</span>
+        <span class="detail-value">${escapeHtml(message.subject)}</span>
+      </div>
+    </div>
+    <p style="white-space:pre-wrap;">${escapeHtml(message.message)}</p>
+    <p style="font-size:13px;color:#888580;">Reply directly to this email to respond to ${escapeHtml(message.name)}.</p>
+  `
+  // replyTo is the sender, so hitting "Reply" answers the person who wrote in
+  return sendEmail(
+    REPLY_TO,
+    subject,
+    baseTemplate(subject, body),
+    { email: message.email, name: message.name },
+  )
 }

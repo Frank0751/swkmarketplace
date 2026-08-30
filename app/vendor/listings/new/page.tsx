@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import toast from 'react-hot-toast'
@@ -17,6 +17,7 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { ImageUploader } from '@/components/vendor/ImageUploader'
 import { Navbar } from '@/components/layout/Navbar'
 import { cn } from '@/lib/utils'
 import {
@@ -89,10 +90,18 @@ export default function NewListingPage() {
     },
   })
 
-  const { fields: imageFields, append: addImage, remove: removeImage } = useFieldArray({
-    control,
-    name: 'images',
-  })
+  // ImageUploader works with a plain URL list; the form field stays as
+  // {url}[] so the schema and submit payload below are unchanged.
+  const imageUrls = (watch('images') ?? [])
+    .map(img => img.url.trim())
+    .filter(url => url.length > 0)
+
+  function setImageUrls(urls: string[]) {
+    setValue('images', urls.length ? urls.map(url => ({ url })) : [{ url: '' }], {
+      shouldValidate: true,
+      shouldDirty: true,
+    })
+  }
 
   const shortDescLen = watch('short_description')?.length ?? 0
   const watchedSdg   = watch('sdg_tags')
@@ -320,7 +329,7 @@ export default function NewListingPage() {
                 <option value="">Select a category</option>
                 {(Object.keys(CATEGORY_META) as ProductCategory[]).map(cat => (
                   <option key={cat} value={cat}>
-                    {CATEGORY_META[cat].emoji} {CATEGORY_META[cat].label}
+                    {CATEGORY_META[cat].label}
                   </option>
                 ))}
               </select>
@@ -470,7 +479,7 @@ export default function NewListingPage() {
                         : 'bg-white text-sand-600 border-sand-200 hover:border-green-200 hover:text-green-700',
                     )}
                   >
-                    <span>{meta.icon}</span> {meta.label}
+                    {meta.label}
                   </button>
                 )
               })}
@@ -481,49 +490,21 @@ export default function NewListingPage() {
           <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-base font-display font-semibold text-sand-900">Product Images</h2>
-              <span className="text-xs text-sand-400">{imageFields.length}/5</span>
+              <span className="text-xs text-sand-400">{imageUrls.length}/5</span>
             </div>
             <p className="text-xs text-sand-400 mb-4">
-              Enter image URLs (Cloudinary, Google Drive, etc.). The first image is the primary listing photo.
+              Upload photos from your device, or paste image links. The first image is the primary listing photo.
             </p>
-            <div className="space-y-3">
-              {imageFields.map((field, index) => (
-                <div key={field.id} className="flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-400" />
-                    <input
-                      {...register(`images.${index}.url`)}
-                      className="form-input pl-9"
-                      placeholder={index === 0 ? 'Primary image URL (required)' : `Image ${index + 1} URL`}
-                    />
-                  </div>
-                  {imageFields.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              ))}
-              {errors.images && (
-                <p className="form-error">
-                  {Array.isArray(errors.images)
-                    ? errors.images.find(e => e?.url)?.url?.message
-                    : (errors.images as any)?.message}
-                </p>
-              )}
-            </div>
-            {imageFields.length < 5 && (
-              <button
-                type="button"
-                onClick={() => addImage({ url: '' })}
-                className="mt-3 flex items-center gap-2 text-sm text-green-600 hover:text-green-700 font-medium transition-colors"
-              >
-                <PlusCircle className="w-4 h-4" /> Add another image
-              </button>
+            <ImageUploader
+              value={imageUrls}
+              onChange={setImageUrls}
+            />
+            {errors.images && (
+              <p className="form-error mt-2">
+                {Array.isArray(errors.images)
+                  ? errors.images.find(e => e?.url)?.url?.message
+                  : (errors.images as { message?: string })?.message}
+              </p>
             )}
           </section>
 

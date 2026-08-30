@@ -52,6 +52,7 @@ export default function SignupForm() {
   const [showPassword,        setShowPassword]        = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [serverError,         setServerError]         = useState<string | null>(null)
+  const [confirmEmailSentTo,  setConfirmEmailSentTo]  = useState<string | null>(null)
 
   const {
     register,
@@ -95,6 +96,15 @@ export default function SignupForm() {
       return
     }
 
+    // If email confirmation is required, Supabase returns a user but no session.
+    // There's no session to insert the profile row or reach a protected route with,
+    // so stop here and tell the user to confirm their email instead of pretending
+    // signup finished.
+    if (!authData.session) {
+      setConfirmEmailSentTo(data.email)
+      return
+    }
+
     // 2. Insert into users table
     const { error: profileError } = await supabase.from('users').insert({
       id:        authData.user.id,
@@ -105,7 +115,7 @@ export default function SignupForm() {
     })
 
     if (profileError) {
-      // Not fatal, the trigger may have already created the row, or email confirmation is pending
+      // Not fatal, the trigger may have already created the row
       console.warn('Profile insert warning:', profileError.message)
     }
 
@@ -118,6 +128,25 @@ export default function SignupForm() {
       router.push('/buyer/dashboard')
     }
     router.refresh()
+  }
+
+  if (confirmEmailSentTo) {
+    return (
+      <div className="text-center py-4">
+        <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+          <svg className="w-6 h-6 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h2 className="font-display text-lg font-semibold text-sand-900 mb-1">
+          Check your inbox
+        </h2>
+        <p className="text-sm text-sand-500 max-w-xs mx-auto">
+          We sent a confirmation link to <span className="font-medium text-sand-700">{confirmEmailSentTo}</span>.
+          Click it to activate your account, then sign in.
+        </p>
+      </div>
+    )
   }
 
   return (
