@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { ChevronDown, ChevronUp, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn, formatCurrency, formatDate, formatRelativeTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
@@ -118,14 +118,14 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-sand-200 bg-sand-50">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Reference</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Buyer</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Vendor</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden xl:table-cell">Product</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Total</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Date</th>
-                  <th className="px-4 py-3 w-8" />
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Reference</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Buyer</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Vendor</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden xl:table-cell">Product</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Total</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Status</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Date</th>
+                  <th scope="col" className="px-4 py-3 w-8"><span className="sr-only">Details</span></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-sand-100">
@@ -134,9 +134,11 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                   const transitions = ADMIN_STATUS_TRANSITIONS[order.status] ?? []
 
                   return (
-                    <>
+                    /* Keyed Fragment: the key was on the inner <tr>, so React
+                       reconciled these by index and expanded-row state could
+                       attach to the wrong order after a filter change. */
+                    <Fragment key={order.id}>
                       <tr
-                        key={order.id}
                         className="hover:bg-sand-50 transition-colors cursor-pointer"
                         onClick={() => setExpandedId(isExpanded ? null : order.id)}
                       >
@@ -170,9 +172,26 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                           {formatRelativeTime(order.created_at)}
                         </td>
                         <td className="px-4 py-3 text-sand-600">
-                          {isExpanded
-                            ? <ChevronUp className="w-4 h-4" />
-                            : <ChevronDown className="w-4 h-4" />}
+                          {/* A real button: the row's onClick alone left the
+                              status controls in the expanded row unreachable
+                              by keyboard, so an admin could not change any
+                              order status without a mouse. */}
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation()
+                              setExpandedId(isExpanded ? null : order.id)
+                            }}
+                            aria-expanded={isExpanded}
+                            className="w-11 h-11 -m-3 flex items-center justify-center rounded-lg hover:bg-sand-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+                          >
+                            {isExpanded
+                              ? <ChevronUp className="w-4 h-4" aria-hidden="true" />
+                              : <ChevronDown className="w-4 h-4" aria-hidden="true" />}
+                            <span className="sr-only">
+                              {isExpanded ? 'Hide' : 'Show'} details for order {order.reference}
+                            </span>
+                          </button>
                         </td>
                       </tr>
 
@@ -314,7 +333,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                           </td>
                         </tr>
                       )}
-                    </>
+                    </Fragment>
                   )
                 })}
               </tbody>

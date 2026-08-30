@@ -23,9 +23,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </Link>
 
       {/* Card */}
-      <div className="w-full max-w-md bg-white rounded-2xl border border-sand-200 shadow-card-lg p-8">
+      <main id="main" className="w-full max-w-md bg-white rounded-2xl border border-sand-200 shadow-card-lg p-8">
         {children}
-      </div>
+      </main>
 
       {/* Footer */}
       <p className="mt-6 text-sm text-sand-600 text-center">

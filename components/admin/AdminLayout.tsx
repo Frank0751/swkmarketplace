@@ -99,7 +99,7 @@ export async function AdminLayout({ children, title }: AdminLayoutProps) {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto min-w-0">
+        <main id="main" className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto min-w-0">
           {/* Mobile nav. The sidebar above is `hidden md:flex` with no fallback,
               so on a phone an admin could not reach Vendors, Listings, Orders
               or Payouts at all. */}

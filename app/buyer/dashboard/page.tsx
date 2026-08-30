@@ -20,7 +20,7 @@ export const metadata = { title: 'My Dashboard | SWK Marketplace' }
 const BUYER_NAV = [
   { href: '/buyer/dashboard', label: 'Dashboard',    icon: LayoutDashboard },
   { href: '/buyer/orders',    label: 'My Orders',    icon: ShoppingBag },
-  { href: '/buyer/profile',   label: 'My Profile',   icon: User },
+  { href: '/buyer/settings',  label: 'Account settings', icon: User },
 ]
 
 export default async function BuyerDashboardPage() {
@@ -63,8 +63,10 @@ export default async function BuyerDashboardPage() {
   const recent        = (recentOrders ?? []) as unknown as Order[]
   const totalOrders   = orders.length
   const activeOrders  = orders.filter(o => ['paid', 'confirmed', 'dispatched'].includes(o.status)).length
+  // 'pending' orders are awaiting payment, so counting them as spent overstated
+  // the figure. Cancelled and refunded money is likewise not spent.
   const totalSpent    = orders
-    .filter(o => !['cancelled', 'refunded'].includes(o.status))
+    .filter(o => !['pending', 'cancelled', 'refunded'].includes(o.status))
     .reduce((sum, o) => sum + (o.total_amount ?? 0), 0)
 
   return (
@@ -101,7 +103,7 @@ export default async function BuyerDashboardPage() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 p-6 md:p-8 min-w-0">
+        <main id="main" className="flex-1 p-6 md:p-8 min-w-0">
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-2xl font-display font-bold text-sand-900">

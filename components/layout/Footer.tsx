@@ -61,7 +61,7 @@ export function Footer() {
                     href={href}
                     target={external ? '_blank' : undefined}
                     rel={external ? 'noopener noreferrer' : undefined}
-                    className="text-sm text-green-50 hover:text-white transition-colors inline-flex items-center gap-1 group"
+                    className="text-sm text-green-50 hover:text-white transition-colors inline-flex items-center gap-1 min-h-[44px] group"
                   >
                     {label}
                     {external && (
@@ -82,7 +82,7 @@ export function Footer() {
               <li>
                 <a
                   href="mailto:info@swkghana.org"
-                  className="inline-flex items-center gap-2 text-sm text-green-50 hover:text-white transition-colors"
+                  className="inline-flex items-center gap-2 min-h-[44px] text-sm text-green-50 hover:text-white transition-colors"
                 >
                   <Mail className="w-4 h-4 flex-shrink-0" />
                   info@swkghana.org
@@ -93,7 +93,7 @@ export function Footer() {
                   href="https://chat.whatsapp.com/LrSVJrNFHGY6kdPnW8xoTu"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-green-50 hover:text-white transition-colors"
+                  className="inline-flex items-center gap-2 min-h-[44px] text-sm text-green-50 hover:text-white transition-colors"
                 >
                   <MessageCircle className="w-4 h-4 flex-shrink-0" />
                   WhatsApp Community

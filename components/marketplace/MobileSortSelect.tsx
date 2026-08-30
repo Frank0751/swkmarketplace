@@ -15,7 +15,7 @@ export function MobileSortSelect({ sort }: { sort: string }) {
 
   return (
     <select
-      className="form-input py-2 text-sm max-w-40"
+      className="form-input min-h-[44px] py-2 text-sm max-w-40"
       value={sort}
       onChange={handleChange}
       aria-label="Sort products"

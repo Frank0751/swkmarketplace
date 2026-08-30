@@ -110,8 +110,10 @@ export default async function AdminDashboardPage() {
     acc[o.status] = (acc[o.status] ?? 0) + 1
     return acc
   }, {})
+  // Refunded money left the platform, so it is not revenue. Disputed orders
+  // are unresolved and could still be refunded, so they are excluded too.
   const totalRevenue = orderStats
-    .filter(o => !['pending', 'cancelled'].includes(o.status))
+    .filter(o => !['pending', 'cancelled', 'refunded', 'disputed'].includes(o.status))
     .reduce((sum, o) => sum + (o.total_amount ?? 0), 0)
 
   // Payout totals

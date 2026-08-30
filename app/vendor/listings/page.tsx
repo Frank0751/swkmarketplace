@@ -24,7 +24,6 @@ const VENDOR_NAV = [
   { href: '/vendor/listings',     label: 'My Listings',  icon: Package },
   { href: '/vendor/listings/new', label: 'Add Listing',  icon: PlusCircle },
   { href: '/vendor/orders',       label: 'Orders',       icon: ShoppingBag },
-  { href: '/vendor/profile',      label: 'Profile',      icon: User },
 ]
 
 type TabKey = 'all' | 'approved' | 'pending_review' | 'draft' | 'rejected'
@@ -125,7 +124,7 @@ export default async function VendorListingsPage({ searchParams }: Props) {
         </aside>
 
         {/* Main */}
-        <main className="flex-1 p-6 md:p-8 min-w-0">
+        <main id="main" className="flex-1 p-6 md:p-8 min-w-0">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>

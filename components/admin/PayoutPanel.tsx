@@ -149,14 +149,14 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-sand-200 bg-sand-50">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Vendor</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Order Ref</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Gross</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Commission (15%)</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Net Payout</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Date</th>
-                  <th className="px-4 py-3" />
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Vendor</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Order Ref</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Gross</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Commission (15%)</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Net Payout</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Status</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Date</th>
+                  <th scope="col" className="px-4 py-3"><span className="sr-only">Action</span></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-sand-100">

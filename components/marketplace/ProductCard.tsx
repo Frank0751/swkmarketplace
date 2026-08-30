@@ -1,19 +1,12 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { MapPin, ShoppingBag } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatCurrency } from '@/lib/utils'
 import { isDemoId } from '@/lib/demo/data'
 import { Product, CATEGORY_META, VALUE_TAG_META, ValueTag } from '@/types'
 
 interface ProductCardProps {
   product: Product
-}
-
-function formatPrice(price: number): string {
-  return `GHS ${price.toLocaleString('en-GH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`
 }
 
 export function ProductCard({ product }: ProductCardProps) {
@@ -30,7 +23,9 @@ export function ProductCard({ product }: ProductCardProps) {
     <Link
       href={`/marketplace/${product.slug}`}
       className="product-card group block"
-      aria-label={`View ${product.title}`}
+      // No aria-label: it replaced the accessible name, so a screen reader
+      // skimming the grid heard only "View <title>" with no vendor, price or
+      // stock. Letting the card's own content name the link restores all of it.
     >
       {/* Image container */}
       <div className="relative w-full overflow-hidden rounded-lg bg-sand-100"
@@ -84,8 +79,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Category pill, bottom left */}
         <div className="absolute bottom-2 left-2">
-          <span className="px-2 py-0.5 text-[10px] font-medium bg-white/90 backdrop-blur-sm text-sand-700 rounded-full flex items-center gap-1 shadow-card">
-            
+          <span className="px-2 py-0.5 text-[10px] font-medium bg-white/90 backdrop-blur-sm text-sand-700 rounded-full flex items-center shadow-card">
             <span>{categoryMeta?.label}</span>
           </span>
         </div>
@@ -120,7 +114,6 @@ export function ProductCard({ product }: ProductCardProps) {
               const meta = VALUE_TAG_META[tag]
               return meta ? (
                 <span key={tag} className="value-tag text-[10px] px-1.5 py-0.5 pointer-events-none">
-                  
                   {meta.label}
                 </span>
               ) : null
@@ -129,10 +122,13 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
 
         {/* Price row */}
+        {/* min-w-0 + truncate on the price, flex-shrink-0 on the pill: at 360px
+            a card is ~156px wide and a long price plus unit pushed the pill
+            past the card's overflow-hidden, clipping it. */}
         <div className="flex items-center justify-between gap-2 mt-auto">
-          <div>
+          <div className="min-w-0 truncate">
             <span className="text-base font-bold text-sand-900">
-              {formatPrice(product.price_ghs)}
+              {formatCurrency(product.price_ghs)}
             </span>
             {product.unit && (
               <span className="text-[11px] text-sand-600 ml-1">{product.unit}</span>
@@ -141,14 +137,15 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <span
             className={cn(
-              'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all',
+              'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex-shrink-0',
               isOutOfStock
                 ? 'bg-sand-100 text-sand-600 cursor-not-allowed'
                 : 'bg-green-600 text-white group-hover:bg-green-700 shadow-card'
             )}
-            aria-hidden="true"
           >
-            <ShoppingBag className="w-3 h-3" />
+            <ShoppingBag className="w-3 h-3" aria-hidden="true" />
+            {/* Not aria-hidden: "Unavailable" is the only signal that an
+                out-of-stock card cannot be ordered. */}
             {isOutOfStock ? 'Unavailable' : 'View'}
           </span>
         </div>

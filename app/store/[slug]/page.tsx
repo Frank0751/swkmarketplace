@@ -163,7 +163,7 @@ export default async function StorePage({ params }: StorePageProps) {
       />
       <Navbar />
 
-      <main className="pb-24 md:pb-0">
+      <main id="main" className="pb-24 md:pb-0">
         {/* ── Banner ─────────────────────────────────────────────── */}
         <div className="relative h-52 md:h-72 bg-sand-100">
           <Image

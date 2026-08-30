@@ -19,7 +19,7 @@ export default function HomePage() {
       <AnnouncementBar />
       <Navbar />
 
-      <main>
+      <main id="main">
         <HeroSection />
         <BrandMarquee />
         <CategoryShowcase />

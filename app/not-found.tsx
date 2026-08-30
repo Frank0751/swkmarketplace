@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <>
       <Navbar />
-      <main className="min-h-[70vh] flex items-center justify-center px-4">
+      <main id="main" className="min-h-[70vh] flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <div className="mx-auto mb-6 w-20 h-20 rounded-3xl bg-green-50 flex items-center justify-center">
             <Leaf className="w-10 h-10 text-green-600" />

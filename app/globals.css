@@ -26,8 +26,12 @@
   * { @apply border-sand-200; }
 
   html {
-    scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smooth scrolling is a vestibular trigger, so opt in rather than out */
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
   }
 
   body {
@@ -68,8 +72,25 @@
   animation-play-state: paused;
 }
 
+/* Reduced motion previously covered only the marquee, leaving the skeleton
+   shimmer, pulses, spinners and every entrance animation running. */
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee { animation: none; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Spinners still need to convey "working", so keep them turning slowly
+     rather than freezing on an arbitrary frame. */
+  .animate-spin {
+    animation: spin 1.5s linear infinite !important;
+  }
 }
 
 /* ─── Components ────────────────────────────────────────────────── */
@@ -95,7 +116,9 @@
 
   /* Category pill */
   .category-pill {
-    @apply flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium;
+    /* 44px is the tappable minimum on a phone. Tailwind v3 has no numeric
+       minHeight scale, so this needs the arbitrary value. */
+    @apply flex-shrink-0 flex items-center gap-2 min-h-[44px] px-4 py-2 rounded-full text-sm font-medium;
     @apply bg-white border border-sand-200 text-sand-700;
     @apply transition-all duration-150 hover:border-green-200 hover:text-green-700 hover:bg-green-50;
   }
@@ -105,9 +128,12 @@
 
   /* Value tag */
   .value-tag {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1 min-h-[44px] px-3 py-1 rounded-full text-xs font-medium;
     @apply bg-sand-100 text-sand-600 border border-sand-200;
     @apply transition-all duration-150 cursor-pointer hover:bg-green-50 hover:text-green-700 hover:border-green-200;
+  }
+  .value-tag.pointer-events-none {
+    @apply min-h-0 px-1.5 py-0.5;
   }
   .value-tag.active {
     @apply bg-green-50 text-green-700 border-green-200;

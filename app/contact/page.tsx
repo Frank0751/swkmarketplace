@@ -28,7 +28,7 @@ export default function ContactPage() {
       <AnnouncementBar />
       <Navbar />
 
-      <main>
+      <main id="main">
         <section className="section">
           <div className="container-app max-w-5xl">
             <div className="text-center mb-12">

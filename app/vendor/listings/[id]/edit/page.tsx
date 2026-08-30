@@ -507,12 +507,13 @@ export default function EditListingPage() {
                   >
                     <input
                       type="checkbox"
-                      className="sr-only"
+                      className="peer sr-only"
                       checked={checked}
                       onChange={() => toggleArrayValue('sdg_tags', sdg.value)}
                     />
                     <div className={cn(
                       'w-5 h-5 rounded flex items-center justify-center flex-shrink-0 border',
+                      'peer-focus-visible:ring-2 peer-focus-visible:ring-green-600 peer-focus-visible:ring-offset-2',
                       checked ? 'bg-current border-current' : 'border-sand-300 bg-white',
                     )}>
                       {checked && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}

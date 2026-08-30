@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, Fragment } from 'react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -184,13 +184,13 @@ export function AdminListingsClient({ initialProducts }: AdminListingsClientProp
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-sand-200 bg-sand-50">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Listing</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Vendor</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Category</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Price</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Submitted</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-sand-600 uppercase tracking-wider">Actions</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Listing</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Vendor</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Category</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Price</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Status</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Submitted</th>
+                  <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-sand-600 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-sand-100">
@@ -199,8 +199,10 @@ export function AdminListingsClient({ initialProducts }: AdminListingsClientProp
                   const isRejecting = rejectingId === product.id
 
                   return (
-                    <>
-                      <tr key={product.id} className="hover:bg-sand-50 transition-colors">
+                    /* Keyed Fragment: the key was on the inner <tr>, so React reconciled
+                       by index and reject-form state could attach to the wrong listing. */
+                    <Fragment key={product.id}>
+                      <tr className="hover:bg-sand-50 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             {product.images?.[0] ? (
@@ -313,7 +315,7 @@ export function AdminListingsClient({ initialProducts }: AdminListingsClientProp
                           </td>
                         </tr>
                       )}
-                    </>
+                    </Fragment>
                   )
                 })}
               </tbody>

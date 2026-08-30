@@ -47,6 +47,7 @@ export default function VendorOrdersPage() {
   const router = useRouter()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [tab, setTab] = useState<TabValue>('all')
   const [updating, setUpdating] = useState<string | null>(null)
 
@@ -70,7 +71,7 @@ export default function VendorOrdersPage() {
       return
     }
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('orders')
       .select(`
         *,
@@ -80,7 +81,15 @@ export default function VendorOrdersPage() {
       .eq('vendor_id', (vendor as VendorProfile).id)
       .order('created_at', { ascending: false })
 
-    setOrders((data ?? []) as unknown as Order[])
+    // Distinguish "the query failed" from "you have no orders": swallowing the
+    // error told a vendor with 20 orders that they had none.
+    if (error) {
+      console.error('[VendorOrders] Failed to load orders:', error.message)
+      setLoadError(true)
+    } else {
+      setLoadError(false)
+      setOrders((data ?? []) as unknown as Order[])
+    }
     setLoading(false)
   }, [router])
 
@@ -119,7 +128,7 @@ export default function VendorOrdersPage() {
     <div className="min-h-screen bg-sand-50">
       <Navbar />
 
-      <main className="container-app py-8 max-w-4xl">
+      <main id="main" className="container-app py-8 max-w-4xl">
         {/* Header */}
         <div className="mb-6">
           <Link
@@ -170,8 +179,26 @@ export default function VendorOrdersPage() {
 
         {/* List */}
         {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
+          <div role="status" className="flex items-center justify-center py-24">
+            <Loader2 className="w-8 h-8 text-green-600 animate-spin" aria-hidden="true" />
+            <span className="sr-only">Loading your orders…</span>
+          </div>
+        ) : loadError ? (
+          <div className="bg-white rounded-xl border border-red-200 p-14 text-center">
+            <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-3">
+              <PackageOpen className="w-7 h-7 text-red-600" aria-hidden="true" />
+            </div>
+            <p className="text-sm font-semibold text-sand-900 mb-1">Couldn&rsquo;t load your orders</p>
+            <p className="text-xs text-sand-600 max-w-xs mx-auto mb-4">
+              This is a connection problem on our side, not an empty account. Your orders are safe.
+            </p>
+            <button
+              type="button"
+              onClick={() => fetchOrders()}
+              className="inline-flex items-center justify-center min-h-[44px] px-4 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            >
+              Try again
+            </button>
           </div>
         ) : visible.length === 0 ? (
           <div className="bg-white rounded-xl border border-sand-200 p-14 text-center">

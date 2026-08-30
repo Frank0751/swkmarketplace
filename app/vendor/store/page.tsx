@@ -152,7 +152,7 @@ export default function VendorStoreProfilePage() {
     <div className="min-h-screen bg-sand-50">
       <Navbar />
 
-      <main className="container-app py-8 max-w-3xl">
+      <main id="main" className="container-app py-8 max-w-3xl">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-3 mb-8">
           <div>

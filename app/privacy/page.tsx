@@ -24,7 +24,7 @@ export default function PrivacyPage() {
   return (
     <>
       <Navbar />
-      <main className="container-app section">
+      <main id="main" className="container-app section">
         <div className="max-w-3xl mx-auto">
           <p className="text-sm font-semibold text-green-600 uppercase tracking-wide mb-2">Legal</p>
           <h1 className="font-display text-3xl md:text-4xl font-bold text-sand-900 mb-3">

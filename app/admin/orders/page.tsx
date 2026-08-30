@@ -32,8 +32,12 @@ async function getOrderData() {
 export default async function AdminOrdersPage() {
   const { orders } = await getOrderData()
 
-  // Compute summary stats
-  const escrowStatuses = ['paid', 'confirmed', 'dispatched']
+  // Compute summary stats.
+  // 'delivered' belongs here: the buyer has confirmed but the admin has not
+  // released yet, so the money is still held. Omitting it made this figure
+  // disagree with the escrow total on the admin dashboard, which derives the
+  // same number from payouts (held + pending_release).
+  const escrowStatuses = ['paid', 'confirmed', 'dispatched', 'delivered']
   const escrowBalance = orders
     .filter(o => escrowStatuses.includes(o.status))
     .reduce((sum, o) => sum + o.total_amount, 0)

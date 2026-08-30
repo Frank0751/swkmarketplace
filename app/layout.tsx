@@ -51,6 +51,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`}>
       <body className="min-h-screen bg-sand-50 font-sans antialiased">
+        {/* Lets keyboard users jump the marquee, logo, nav links, search and
+            filter pills that precede content on every page. */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:inline-flex focus:items-center focus:min-h-[44px] focus:px-4 focus:rounded-xl focus:bg-green-600 focus:text-white focus:text-sm focus:font-semibold focus:shadow-card-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-green-600"
+        >
+          Skip to main content
+        </a>
         <JsonLd
           data={{
             '@context': 'https://schema.org',

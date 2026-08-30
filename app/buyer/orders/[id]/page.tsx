@@ -225,14 +225,22 @@ export default function BuyerOrderDetailPage() {
           {/* ── Left column (timeline + details) ── */}
           <div className="lg:col-span-3 space-y-6">
 
-            {/* Status banner */}
-            {order.status === 'paid' && (
+            {/* Escrow reassurance, shown for the whole time the money is held.
+                It used to appear only on 'paid', so through 'confirmed' and
+                'dispatched' (the longest wait) nothing on screen told the buyer
+                their money was still protected. */}
+            {['paid', 'confirmed', 'dispatched'].includes(order.status) && (
               <div className="flex items-start gap-3 p-4 bg-teal-50 border border-teal-100 rounded-xl text-teal-700">
-                <ShieldCheck className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <ShieldCheck className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <p className="text-sm font-semibold">Funds in escrow</p>
-                  <p className="text-xs mt-0.5 opacity-80">
-                    Your payment is securely held by SWK Ghana. The vendor is preparing your order.
+                  <p className="text-sm font-semibold">Your money is held safely</p>
+                  <p className="text-xs mt-0.5 opacity-90">
+                    {order.status === 'paid' &&
+                      'SWK Ghana is holding your payment. The vendor is preparing your order and does not have the money yet.'}
+                    {order.status === 'confirmed' &&
+                      'The vendor has accepted your order and is getting it ready. SWK Ghana still holds your payment.'}
+                    {order.status === 'dispatched' &&
+                      'Your order is on its way. SWK Ghana still holds your payment, and only releases it to the vendor once you confirm delivery.'}
                   </p>
                 </div>
               </div>
@@ -281,6 +289,30 @@ export default function BuyerOrderDetailPage() {
                     You can reach us at{' '}
                     <a href="mailto:info@swkghana.org" className="underline">info@swkghana.org</a>.
                   </p>
+                </div>
+              </div>
+            )}
+
+            {/* A buyer whose goods never arrive previously had no in-app route
+                to raise a problem: the dispute banner only appears once a
+                dispute already exists, and buyers can only move an order to
+                'delivered'. This gives them the escalation path. */}
+            {['confirmed', 'dispatched', 'paid'].includes(order.status) && (
+              <div className="flex items-start gap-3 p-4 bg-sand-100 border border-sand-200 rounded-xl">
+                <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5 text-sand-600" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-sand-900">Problem with this order?</p>
+                  <p className="text-xs text-sand-600 mt-0.5 leading-relaxed">
+                    Your payment is still held in escrow and has not gone to the vendor.
+                    If your order is late, damaged, or not what you expected, contact us before
+                    confirming delivery and we&rsquo;ll look into it.
+                  </p>
+                  <a
+                    href={`mailto:info@swkghana.org?subject=${encodeURIComponent(`Problem with order ${order.reference}`)}&body=${encodeURIComponent(`Order reference: ${order.reference}\nVendor: ${vendor?.business_name ?? ''}\n\nWhat went wrong:\n`)}`}
+                    className="inline-flex items-center min-h-[44px] mt-2 text-sm font-semibold text-green-700 hover:text-green-800 underline underline-offset-2"
+                  >
+                    Report a problem
+                  </a>
                 </div>
               </div>
             )}

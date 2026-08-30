@@ -107,7 +107,7 @@ export default function HowItWorksPage() {
       <AnnouncementBar />
       <Navbar />
 
-      <main>
+      <main id="main">
 
         {/* ── Hero ─────────────────────────────────────────────────── */}
         <section className="relative overflow-hidden bg-green-600 py-20 md:py-28">

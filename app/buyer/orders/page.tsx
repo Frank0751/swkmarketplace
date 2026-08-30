@@ -16,7 +16,7 @@ export const metadata = { title: 'My Orders | SWK Marketplace' }
 const BUYER_NAV = [
   { href: '/buyer/dashboard', label: 'Dashboard',  icon: LayoutDashboard },
   { href: '/buyer/orders',    label: 'My Orders',  icon: ShoppingBag },
-  { href: '/buyer/profile',   label: 'My Profile', icon: User },
+  { href: '/buyer/settings',  label: 'Account settings', icon: User },
 ]
 
 type TabKey = 'all' | 'active' | 'delivered' | 'cancelled'
@@ -120,7 +120,7 @@ export default async function BuyerOrdersPage({ searchParams }: Props) {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 p-6 md:p-8 min-w-0">
+        <main id="main" className="flex-1 p-6 md:p-8 min-w-0">
           <div className="mb-6">
             <h1 className="text-2xl font-display font-bold text-sand-900">My Orders</h1>
             <p className="text-sand-600 text-sm mt-1">Track and manage all your purchases.</p>

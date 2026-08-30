@@ -170,7 +170,7 @@ export default async function MarketplacePage({
       <CategoryStrip />
       <ValueFilterStrip />
 
-      <div className="container-app py-6 pb-24 md:pb-6">
+      <main id="main" className="container-app py-6 pb-24 md:pb-6">
         <div className="flex gap-6">
 
           {/* ── Desktop filter sidebar ─────────────────────────────── */}
@@ -394,7 +394,7 @@ export default async function MarketplacePage({
             )}
           </div>
         </div>
-      </div>
+      </main>
 
       <Footer />
       <MobileBottomNav />

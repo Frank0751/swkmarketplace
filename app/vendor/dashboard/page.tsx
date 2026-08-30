@@ -67,10 +67,12 @@ export default async function VendorDashboardPage() {
   // Fetch stats (only if approved)
   let recentOrders: Order[] = []
   let pendingPayouts = 0
+  let pendingGross   = 0
+  let orderCount     = 0
   let productCounts = { total: 0, approved: 0, pending: 0 }
 
   if (vendor.status === 'approved') {
-    const [ordersRes, productsRes, payoutsRes] = await Promise.all([
+    const [ordersRes, productsRes, payoutsRes, orderCountRes] = await Promise.all([
       supabase
         .from('orders')
         .select(`
@@ -89,9 +91,16 @@ export default async function VendorDashboardPage() {
 
       supabase
         .from('payouts')
-        .select('net_amount, status')
+        .select('net_amount, gross_amount, status')
         .eq('vendor_id', vendor.id)
         .in('status', ['held', 'pending_release']),
+
+      // The orders query above is limited to 5 for the recent list, so the
+      // total is counted separately rather than shown as a placeholder.
+      supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('vendor_id', vendor.id),
     ])
 
     recentOrders = (ordersRes.data ?? []) as unknown as Order[]
@@ -102,6 +111,8 @@ export default async function VendorDashboardPage() {
       pending:  products.filter(p => p.status === 'pending_review').length,
     }
     pendingPayouts = (payoutsRes.data ?? []).reduce((sum, p) => sum + (p.net_amount ?? 0), 0)
+    pendingGross   = (payoutsRes.data ?? []).reduce((sum, p) => sum + (p.gross_amount ?? 0), 0)
+    orderCount     = orderCountRes.count ?? 0
   }
 
   return (
@@ -136,7 +147,7 @@ export default async function VendorDashboardPage() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 p-6 md:p-8 min-w-0">
+        <main id="main" className="flex-1 p-6 md:p-8 min-w-0">
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-display font-bold text-sand-900">
@@ -284,17 +295,24 @@ export default async function VendorDashboardPage() {
                       <BarChart3 className="w-4 h-4 text-gold-600" />
                     </div>
                   </div>
-                  <p className="text-3xl font-display font-bold text-sand-900">{vendor.total_sales > 0 ? '-' : 0}</p>
+                  <p className="text-3xl font-display font-bold text-sand-900">{orderCount}</p>
                 </div>
 
                 <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Pending Payout</span>
                     <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
-                      <Clock className="w-4 h-4 text-green-600" />
+                      <Clock className="w-4 h-4 text-green-600" aria-hidden="true" />
                     </div>
                   </div>
                   <p className="text-2xl font-display font-bold text-sand-900">{formatCurrency(pendingPayouts)}</p>
+                  {/* Total Sales is gross and this figure is net, so state the
+                      deduction rather than leaving an unexplained 15% gap. */}
+                  <p className="mt-1 text-xs text-sand-600">
+                    {pendingGross > 0
+                      ? `From ${formatCurrency(pendingGross)} in sales, after the 15% platform fee`
+                      : 'Your share after the 15% platform fee'}
+                  </p>
                 </div>
               </div>
 

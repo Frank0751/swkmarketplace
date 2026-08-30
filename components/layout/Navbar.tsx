@@ -146,7 +146,7 @@ export function Navbar() {
             <div className="flex items-center gap-2 ml-auto">
               {/* Mobile search toggle */}
               <button
-                className="md:hidden p-2 rounded-lg text-sand-600 hover:bg-sand-100"
+                className="md:hidden w-11 h-11 flex items-center justify-center rounded-lg text-sand-600 hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
                 onClick={() => setSearchOpen(o => !o)}
                 aria-label="Search"
               >
@@ -226,7 +226,7 @@ export function Navbar() {
 
               {/* Mobile menu toggle */}
               <button
-                className="md:hidden p-2 rounded-lg text-sand-600 hover:bg-sand-100"
+                className="md:hidden w-11 h-11 flex items-center justify-center rounded-lg text-sand-600 hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
                 onClick={() => setMenuOpen(o => !o)}
                 aria-label="Menu"
               >

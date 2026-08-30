@@ -46,10 +46,16 @@ export default function AccountSettingsPage() {
         router.push('/login?redirect=/buyer/settings')
         return
       }
-      const { data } = await supabase.from('users').select('*').eq('id', user.id).maybeSingle()
+      const { data, error } = await supabase.from('users').select('*').eq('id', user.id).maybeSingle()
       if (data) {
         setProfile(data as User)
         profileForm.reset({ full_name: data.full_name ?? '', phone: data.phone ?? '' })
+      } else {
+        // Without this the page rendered normally but saveProfile's `if
+        // (!profile) return` silently swallowed every submit: the user typed,
+        // clicked Save, and got no toast, no error and no change.
+        console.error('[Settings] Could not load profile:', error?.message)
+        toast.error('Could not load your details. Please refresh and try again.')
       }
       setLoading(false)
     }
@@ -99,7 +105,7 @@ export default function AccountSettingsPage() {
     <div className="min-h-screen bg-sand-50">
       <Navbar />
 
-      <main className="container-app py-8 max-w-2xl">
+      <main id="main" className="container-app py-8 max-w-2xl">
         <Link
           href="/buyer/dashboard"
           className="inline-flex items-center gap-1.5 text-sm text-sand-600 hover:text-sand-900 transition-colors mb-3"

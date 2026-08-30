@@ -107,7 +107,7 @@ export default async function VendorProfilePage({ params }: VendorProfilePagePro
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
 
-      <main className="flex-1">
+      <main id="main" className="flex-1">
         <div className="container-app">
           {/* Profile header */}
           <div className="relative -mt-16 md:-mt-20 mb-8">
