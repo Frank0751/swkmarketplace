@@ -23,6 +23,7 @@ import { Footer } from '@/components/layout/Footer'
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { ProductCard } from '@/components/marketplace/ProductCard'
 import { ShareStoreLink } from '@/components/vendor/ShareStoreLink'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { FadeIn, Stagger, StaggerItem } from '@/components/ui/motion'
 import { demoEnabled, getDemoVendor, getDemoProducts, isDemoId } from '@/lib/demo/data'
 import { CATEGORY_META, type Product, type VendorProfile } from '@/types'
@@ -86,7 +87,7 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
   const vendor = await fetchVendor(params.slug)
   if (!vendor) return { title: 'Store not found' }
 
-  const title = `${vendor.business_name} | SWK Marketplace`
+  const title = vendor.business_name
   const description =
     vendor.business_description ||
     `Shop sustainable products from ${vendor.business_name}, a verified green business on SWK Marketplace.`
@@ -133,6 +134,33 @@ export default async function StorePage({ params }: StorePageProps) {
 
   return (
     <>
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'LocalBusiness',
+          name: vendor.business_name,
+          description: vendor.business_description,
+          url: `https://marketplace.swkghana.org/store/${slug}`,
+          image: vendor.banner_url || vendor.logo_url || undefined,
+          telephone: vendor.phone || undefined,
+          foundingDate: vendor.year_founded ? String(vendor.year_founded) : undefined,
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: vendor.location,
+            addressRegion: vendor.region,
+            addressCountry: 'GH',
+          },
+          ...(vendor.review_count > 0
+            ? {
+                aggregateRating: {
+                  '@type': 'AggregateRating',
+                  ratingValue: vendor.rating,
+                  reviewCount: vendor.review_count,
+                },
+              }
+            : {}),
+        }}
+      />
       <Navbar />
 
       <main className="pb-24 md:pb-0">
@@ -179,7 +207,7 @@ export default async function StorePage({ params }: StorePageProps) {
 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-sand-500 mb-3">
                   <span className="flex items-center gap-1">
-                    <span role="img" aria-hidden="true">{catMeta?.emoji}</span> {catMeta?.label}
+                    {catMeta?.label}
                   </span>
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5" /> {vendor.location}, {vendor.region}

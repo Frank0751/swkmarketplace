@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Search, ArrowRight, ShieldCheck, Star } from 'lucide-react'
+import { Search, ArrowRight, ShieldCheck } from 'lucide-react'
 import { CountUp } from '@/components/ui/motion'
 
 const HERO_TAGS = ['Organic produce', 'Recycled crafts', 'Agribusiness', 'Handmade goods']
@@ -108,7 +108,7 @@ export function HeroSection() {
             {/* Stats row */}
             <motion.div {...enter(0.36)} className="flex flex-wrap items-center gap-6 mt-10 pt-8 border-t border-sand-200">
               {[
-                { end: 230, suffix: '+', label: 'Youth empowered' },
+                { end: 236, suffix: '+', label: 'Youth empowered' },
                 { end: 9, suffix: '+', label: 'Countries reached' },
                 { end: 100, suffix: '%', label: 'Escrow-protected' },
               ].map(stat => (
@@ -163,40 +163,6 @@ export function HeroSection() {
               </div>
             </motion.div>
 
-            {/* Floating vendor mini-card */}
-            <motion.div
-              initial={reduce ? { opacity: 1 } : { opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.75 }}
-              className="absolute bottom-14 -right-8 bg-white rounded-2xl shadow-card-lg border border-sand-200 px-4 py-3 max-w-[220px]"
-            >
-              <div className="flex items-center gap-2 mb-1.5">
-                <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                  <Image src="/images/prod-honey.jpg" alt="" fill sizes="32px" className="object-cover" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-xs font-bold text-sand-900 truncate">GreenHarvest Farms</div>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 text-gold-400 fill-gold-400" />
-                    <span className="text-[11px] text-sand-500">4.9 · Kumasi</span>
-                  </div>
-                </div>
-              </div>
-              <div className="text-[11px] text-sand-500 leading-snug">
-                &ldquo;Every jar of honey funds our apiary school for young beekeepers.&rdquo;
-              </div>
-            </motion.div>
-
-            {/* Floating SDG chip */}
-            <motion.div
-              initial={reduce ? { opacity: 1 } : { opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.95 }}
-              className="absolute -bottom-4 left-10 bg-green-600 text-white rounded-xl shadow-card-lg px-4 py-2.5 flex items-center gap-2"
-            >
-              <span className="text-base" role="img">🌿</span>
-              <span className="text-xs font-bold">UN SDG 12 · Responsible Consumption</span>
-            </motion.div>
           </div>
         </div>
       </div>

@@ -293,7 +293,7 @@ export default function VendorApplyPage() {
                     <option value="">Select a category</option>
                     {(Object.keys(CATEGORY_META) as ProductCategory[]).map(cat => (
                       <option key={cat} value={cat}>
-                        {CATEGORY_META[cat].emoji} {CATEGORY_META[cat].label}
+                        {CATEGORY_META[cat].label}
                       </option>
                     ))}
                   </select>

@@ -225,7 +225,7 @@ export function AdminListingsClient({ initialProducts }: AdminListingsClientProp
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <span className="inline-flex items-center gap-1 text-xs text-sand-600">
-                            {catMeta?.emoji} {catMeta?.label}
+                            {catMeta?.label}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right font-semibold text-sand-900">

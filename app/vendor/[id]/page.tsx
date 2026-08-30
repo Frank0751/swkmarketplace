@@ -148,7 +148,7 @@ export default async function VendorProfilePage({ params }: VendorProfilePagePro
                   {/* Meta */}
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 text-sm text-sand-500">
                     <span className="inline-flex items-center gap-1.5">
-                      <span className="text-base">{catMeta?.emoji}</span>
+                      
                       {catMeta?.label}
                     </span>
                     <span className="inline-flex items-center gap-1.5">

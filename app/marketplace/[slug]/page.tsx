@@ -31,6 +31,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { ReviewSection } from '@/components/marketplace/ReviewSection'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { formatCurrency } from '@/lib/utils'
 import {
   CATEGORY_META,
@@ -477,6 +478,28 @@ export default function ProductDetailPage() {
 
   return (
     <>
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.title,
+          description: product.short_description || product.description,
+          image: product.images?.length ? product.images : undefined,
+          category: categoryMeta?.label,
+          brand: vendor?.business_name
+            ? { '@type': 'Brand', name: vendor.business_name }
+            : undefined,
+          offers: {
+            '@type': 'Offer',
+            price: product.price_ghs,
+            priceCurrency: 'GHS',
+            availability: isOutOfStock
+              ? 'https://schema.org/OutOfStock'
+              : 'https://schema.org/InStock',
+            url: `https://marketplace.swkghana.org/marketplace/${product.slug}`,
+          },
+        }}
+      />
       <Navbar />
 
       <div className="container-app py-6 pb-28 md:pb-8">
@@ -507,7 +530,7 @@ export default function ProductDetailPage() {
             <div className="flex flex-wrap gap-2">
               {categoryMeta && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sand-100 text-sand-700 text-xs font-medium border border-sand-200">
-                  {categoryMeta.emoji} {categoryMeta.label}
+                  {categoryMeta.label}
                 </span>
               )}
               {hasSDG12 && (
@@ -569,7 +592,7 @@ export default function ProductDetailPage() {
                       href={`/marketplace?values=${tag}`}
                       className="value-tag text-xs"
                     >
-                      <span role="img" aria-hidden="true">{meta.icon}</span>
+                      
                       {meta.label}
                     </Link>
                   ) : null

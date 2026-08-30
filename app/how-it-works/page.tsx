@@ -16,6 +16,10 @@ import {
   Globe,
   Users,
   BadgeCheck,
+  Wheat,
+  Recycle,
+  Hand,
+  Salad,
 } from 'lucide-react'
 import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
 import { Navbar } from '@/components/layout/Navbar'
@@ -458,16 +462,18 @@ export default function HowItWorksPage() {
                 {/* SDG categories grid */}
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { emoji: '🌾', label: 'Agribusiness', desc: 'Sustainable crops and farm produce' },
-                    { emoji: '♻️', label: 'Recycled & Upcycled', desc: 'Products from reclaimed materials' },
-                    { emoji: '🖐️', label: 'Handmade Crafts', desc: 'Artisan goods with natural materials' },
-                    { emoji: '🥦', label: 'Organic Produce', desc: 'Chemical-free food products' },
-                  ].map(({ emoji, label, desc }) => (
+                    { icon: Wheat, label: 'Agribusiness', desc: 'Sustainable crops and farm produce' },
+                    { icon: Recycle, label: 'Recycled & Upcycled', desc: 'Products from reclaimed materials' },
+                    { icon: Hand, label: 'Handmade Crafts', desc: 'Artisan goods with natural materials' },
+                    { icon: Salad, label: 'Organic Produce', desc: 'Chemical-free food products' },
+                  ].map(({ icon: Icon, label, desc }) => (
                     <div
                       key={label}
                       className="bg-white rounded-xl border border-sand-200 p-4 hover:border-green-200 hover:shadow-card transition-all"
                     >
-                      <div className="text-2xl mb-2">{emoji}</div>
+                      <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center mb-2">
+                        <Icon className="w-5 h-5 text-green-600" />
+                      </div>
                       <div className="text-sm font-semibold text-sand-900 mb-1">{label}</div>
                       <div className="text-xs text-sand-400 leading-relaxed">{desc}</div>
                     </div>
@@ -532,7 +538,9 @@ export default function HowItWorksPage() {
         <section className="section bg-green-600">
           <div className="container-app text-center">
             <div className="max-w-xl mx-auto">
-              <div className="text-4xl mb-5" aria-hidden="true">🌿</div>
+              <div className="mx-auto mb-5 w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center" aria-hidden="true">
+                <Leaf className="w-7 h-7 text-white" />
+              </div>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4 text-balance">
                 Ready to shop sustainably?
               </h2>

@@ -33,7 +33,7 @@ export default function SignupPage() {
           </Link>
         </p>
         <p className="text-sand-400 text-xs">
-          By signing up, you agree to shop sustainably 🌿
+          By signing up, you agree to shop sustainably.
         </p>
       </div>
     </div>

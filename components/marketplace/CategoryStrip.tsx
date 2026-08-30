@@ -55,7 +55,7 @@ function CategoryStripInner() {
               )}
               aria-pressed={activeCategory === key}
             >
-              <span role="img" aria-hidden="true">{meta.emoji}</span>
+              
               {meta.label}
             </button>
           ))}

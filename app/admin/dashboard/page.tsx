@@ -228,7 +228,7 @@ export default async function AdminDashboardPage() {
                 return (
                   <div key={vendor.id} className="px-5 py-3 flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0 text-base">
-                      {catMeta?.emoji}
+                      
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-sand-900 truncate">{vendor.business_name}</div>
@@ -338,7 +338,7 @@ export default async function AdminDashboardPage() {
                       />
                     ) : (
                       <div className="w-10 h-10 rounded-lg bg-sand-100 flex items-center justify-center flex-shrink-0 text-base">
-                        {catMeta?.emoji}
+                        
                       </div>
                     )}
                     <div className="flex-1 min-w-0">

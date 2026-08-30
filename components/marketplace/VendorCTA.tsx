@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, ExternalLink } from 'lucide-react'
+import { ArrowRight, ExternalLink, Sprout } from 'lucide-react'
 import { FadeIn } from '@/components/ui/motion'
 
 const STATS = [
@@ -38,7 +38,7 @@ export function VendorCTA() {
         <FadeIn className="max-w-3xl mx-auto text-center">
           {/* Pre-headline */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 mb-6">
-            <span role="img" aria-hidden="true" className="text-sm">🌱</span>
+            <Sprout className="w-4 h-4 text-green-200" aria-hidden="true" />
             <span className="text-xs font-semibold text-white/90">
               Youth-Led · Sustainable · Ghana &amp; Africa
             </span>
@@ -51,7 +51,9 @@ export function VendorCTA() {
 
           {/* Subtext */}
           <p className="text-base md:text-lg text-white/80 leading-relaxed mb-10 max-w-2xl mx-auto">
-            Join <span className="font-semibold text-white">230+ verified youth vendors</span> selling sustainable products across Ghana and Africa. We provide escrow-protected sales, SDG-aligned exposure, and a community that cares about the planet.
+            Sell on a marketplace run by SWK Ghana, a youth nonprofit whose programmes have
+            reached <span className="font-semibold text-white">236+ young people across 9 countries</span>.
+            You get escrow-protected sales, SDG-aligned exposure, and your own shareable store page.
           </p>
 
           {/* Stats row */}

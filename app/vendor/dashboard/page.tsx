@@ -5,6 +5,7 @@ import {
   Package,
   PlusCircle,
   Store,
+  ShoppingBag,
   DollarSign,
   BarChart3,
   Clock,
@@ -25,6 +26,7 @@ export const metadata = { title: 'Vendor Dashboard | SWK Marketplace' }
 
 const VENDOR_NAV = [
   { href: '/vendor/dashboard',  label: 'Dashboard',    icon: LayoutDashboard },
+  { href: '/vendor/orders',     label: 'Orders',       icon: ShoppingBag },
   { href: '/vendor/listings',   label: 'My Listings',  icon: Package },
   { href: '/vendor/listings/new', label: 'Add Listing', icon: PlusCircle },
   { href: '/vendor/store',      label: 'My Store Page', icon: Store },

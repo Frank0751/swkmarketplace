@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Search, Menu, X, ShoppingBag, User, ChevronDown, Leaf } from 'lucide-react'
+import { Search, Menu, X, ShoppingBag, User, ChevronDown, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { User as UserType } from '@/types'
 import { clsx } from 'clsx'
@@ -142,6 +142,9 @@ export function Navbar() {
                     <Link href={getDashboardLink()} className="flex items-center gap-2 px-3 py-2 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
                       <User className="w-4 h-4" /> Dashboard
                     </Link>
+                    <Link href="/buyer/settings" className="flex items-center gap-2 px-3 py-2 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
+                      <Settings className="w-4 h-4" /> Account settings
+                    </Link>
                     {user.role === 'vendor' && (
                       <Link href="/vendor/listings" className="flex items-center gap-2 px-3 py-2 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
                         <ShoppingBag className="w-4 h-4" /> My Listings
@@ -211,9 +214,9 @@ export function Navbar() {
           <div className="md:hidden border-t border-sand-200 bg-white">
             <div className="px-4 py-3 space-y-1">
               {[
-                { href: '/marketplace',   label: '🛍️  Shop all products' },
-                { href: '/how-it-works',  label: '🤝  How it works' },
-                { href: '/vendor/apply',  label: '🌿  Become a vendor' },
+                { href: '/marketplace',   label: 'Shop all products' },
+                { href: '/how-it-works',  label: 'How it works' },
+                { href: '/vendor/apply',  label: 'Become a vendor' },
               ].map(link => (
                 <Link
                   key={link.href}

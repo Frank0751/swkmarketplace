@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Ubuntu } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
+import { JsonLd } from '@/components/seo/JsonLd'
 import './globals.css'
 
 // Brand font: Ubuntu everywhere (body + display)
@@ -50,6 +51,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`}>
       <body className="min-h-screen bg-sand-50 font-sans antialiased">
+        <JsonLd
+          data={{
+            '@context': 'https://schema.org',
+            '@type': 'OnlineStore',
+            name: 'SWK Marketplace',
+            url: 'https://marketplace.swkghana.org',
+            logo: 'https://marketplace.swkghana.org/images/swk-logo.png',
+            description:
+              'A curated, SDG 12-aligned marketplace connecting eco-conscious buyers with verified youth-led green entrepreneurs across Ghana and Africa.',
+            parentOrganization: {
+              '@type': 'NGO',
+              name: 'SWK Ghana',
+              url: 'https://swkghana.org',
+              email: 'info@swkghana.org',
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: 'Accra',
+                addressRegion: 'Greater Accra',
+                addressCountry: 'GH',
+              },
+            },
+          }}
+        />
         {children}
         <Toaster
           position="top-center"

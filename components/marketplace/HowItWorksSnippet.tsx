@@ -1,25 +1,25 @@
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ShoppingBag, Lock, PackageCheck } from 'lucide-react'
 import { FadeIn, Stagger, StaggerItem } from '@/components/ui/motion'
 
 const STEPS = [
   {
     number: 1,
-    emoji: '🛍️',
+    icon: ShoppingBag,
     title: 'Browse & Choose',
     description:
       'Find SDG-verified products from young Ghanaian entrepreneurs. Filter by category, values, or region.',
   },
   {
     number: 2,
-    emoji: '🔒',
+    icon: Lock,
     title: 'Pay Securely',
     description:
       'Your payment is processed via Paystack and held in escrow by SWK Ghana, completely safe until delivery.',
   },
   {
     number: 3,
-    emoji: '✅',
+    icon: PackageCheck,
     title: 'Confirm & Deliver',
     description:
       'Once your order arrives, confirm delivery to release payment to the vendor. Dispute if anything goes wrong.',
@@ -69,8 +69,8 @@ export function HowItWorksSnippet() {
                 </div>
               )}
 
-              <div className="text-3xl mb-3" role="img" aria-hidden="true">
-                {step.emoji}
+              <div className="w-14 h-14 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center mb-3" aria-hidden="true">
+                <step.icon className="w-6 h-6 text-green-600" />
               </div>
 
               <h3 className="text-lg font-semibold text-sand-900 mb-2">

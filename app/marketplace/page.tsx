@@ -304,7 +304,7 @@ export default async function MarketplacePage({
                     href={buildUrl({ category: '', page: '1' })}
                     className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-xs font-medium hover:bg-green-100 transition-colors"
                   >
-                    {CATEGORY_META[category as ProductCategory]?.emoji}{' '}
+                    
                     {CATEGORY_META[category as ProductCategory]?.label}
                     <span className="ml-0.5 opacity-60">×</span>
                   </Link>
@@ -314,7 +314,7 @@ export default async function MarketplacePage({
                     href={buildUrl({ region: '', page: '1' })}
                     className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-xs font-medium hover:bg-green-100 transition-colors"
                   >
-                    📍 {region}
+                    {region}
                     <span className="ml-0.5 opacity-60">×</span>
                   </Link>
                 )}

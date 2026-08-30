@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { ShoppingCart, ShieldCheck, PackageCheck, Banknote, ArrowDown } from 'lucide-react'
+import { ShoppingCart, ShieldCheck, PackageCheck, Banknote, ArrowDown, Lock, Lightbulb, BadgeCheck, Globe } from 'lucide-react'
 import { FadeIn, Stagger, StaggerItem, CountUp } from '@/components/ui/motion'
 
 // ─── Escrow flow (infographic) ─────────────────────────────────────────────────
@@ -47,7 +47,7 @@ export function TrustSection() {
         {/* Headline */}
         <FadeIn className="text-center mb-12">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-100 text-teal-700 text-xs font-semibold mb-4">
-            <span role="img" aria-hidden="true">🔒</span>
+            <Lock className="w-3.5 h-3.5" aria-hidden="true" />
             How your money stays safe
           </span>
           <h2 className="text-3xl md:text-4xl font-display font-semibold text-sand-900 text-balance">
@@ -115,7 +115,7 @@ export function TrustSection() {
               {/* Stats side */}
               <div className="relative p-8 md:p-10">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-semibold mb-4">
-                  <span role="img" aria-hidden="true">💡</span>
+                  <Lightbulb className="w-3.5 h-3.5" aria-hidden="true" />
                   Did you know?
                 </span>
                 <h3 className="text-2xl md:text-3xl font-display font-semibold text-white mb-2 text-balance">
@@ -147,15 +147,15 @@ export function TrustSection() {
         {/* Trust badge row */}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
           <span className="trust-badge">
-            <span role="img" aria-hidden="true">🔒</span>
+            <Lock className="w-3.5 h-3.5" aria-hidden="true" />
             100% Escrow Protected
           </span>
           <span className="trust-badge">
-            <span role="img" aria-hidden="true">✅</span>
+            <BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" />
             SDG 12 Verified Listings
           </span>
           <span className="trust-badge">
-            <span role="img" aria-hidden="true">🌍</span>
+            <Globe className="w-3.5 h-3.5" aria-hidden="true" />
             Youth-Led Vendors
           </span>
         </div>

@@ -85,7 +85,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Category pill, bottom left */}
         <div className="absolute bottom-2 left-2">
           <span className="px-2 py-0.5 text-[10px] font-medium bg-white/90 backdrop-blur-sm text-sand-700 rounded-full flex items-center gap-1 shadow-card">
-            <span role="img" aria-hidden="true">{categoryMeta?.emoji}</span>
+            
             <span>{categoryMeta?.label}</span>
           </span>
         </div>
@@ -120,8 +120,8 @@ export function ProductCard({ product }: ProductCardProps) {
               const meta = VALUE_TAG_META[tag]
               return meta ? (
                 <span key={tag} className="value-tag text-[10px] px-1.5 py-0.5 pointer-events-none">
-                  <span role="img" aria-hidden="true">{meta.icon}</span>
-                  {' '}{meta.label}
+                  
+                  {meta.label}
                 </span>
               ) : null
             })}

@@ -122,7 +122,7 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
           {/* Category + applied */}
           <div className="flex flex-wrap items-center gap-2 mt-2">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-sand-100 rounded-full text-xs font-medium text-sand-700">
-              {catMeta?.emoji} {catMeta?.label ?? vendor.category}
+              {catMeta?.label ?? vendor.category}
             </span>
             <span className="text-xs text-sand-400">
               Applied {formatRelativeTime(vendor.created_at)}

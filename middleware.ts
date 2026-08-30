@@ -13,7 +13,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/vendor/dashboard') ||
     pathname.startsWith('/vendor/listings') ||
     pathname.startsWith('/vendor/apply') ||
-    pathname.startsWith('/vendor/store')
+    pathname.startsWith('/vendor/store') ||
+    pathname.startsWith('/vendor/orders')
   )
   if (!isProtected) return NextResponse.next({ request })
 
@@ -61,7 +62,8 @@ export async function middleware(request: NextRequest) {
       pathname.startsWith('/vendor/dashboard') ||
       pathname.startsWith('/vendor/listings') ||
       pathname.startsWith('/vendor/apply') ||
-      pathname.startsWith('/vendor/store')
+      pathname.startsWith('/vendor/store') ||
+      pathname.startsWith('/vendor/orders')
     ) {
       if (role !== 'vendor' && role !== 'admin') {
         return NextResponse.redirect(new URL('/buyer/dashboard', request.url))
