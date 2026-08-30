@@ -30,7 +30,7 @@ export default function PrivacyPage() {
           <h1 className="font-display text-3xl md:text-4xl font-bold text-sand-900 mb-3">
             Privacy Policy
           </h1>
-          <p className="text-sand-500 mb-10">
+          <p className="text-sand-600 mb-10">
             Last updated: July 2026 · SWK Ghana is committed to protecting the privacy of every buyer
             and vendor on SWK Marketplace.
           </p>

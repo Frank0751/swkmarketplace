@@ -14,7 +14,7 @@ export default function SignupPage() {
         <h1 className="font-display text-2xl font-semibold text-sand-900 mb-1">
           Join SWK Marketplace
         </h1>
-        <p className="text-sm text-sand-500">
+        <p className="text-sm text-sand-600">
           Create your account to start shopping sustainably
         </p>
       </div>
@@ -23,7 +23,7 @@ export default function SignupPage() {
 
       {/* Links */}
       <div className="mt-5 space-y-3 text-center text-sm">
-        <p className="text-sand-500">
+        <p className="text-sand-600">
           Already have an account?{' '}
           <Link
             href="/login"
@@ -32,7 +32,7 @@ export default function SignupPage() {
             Sign in
           </Link>
         </p>
-        <p className="text-sand-400 text-xs">
+        <p className="text-sand-600 text-xs">
           By signing up, you agree to shop sustainably.
         </p>
       </div>

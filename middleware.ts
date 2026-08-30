@@ -6,13 +6,15 @@ type CookieToSet = { name: string; value: string; options: CookieOptions }
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Only intercept role-gated routes; everything else passes through
+  // /vendor/apply is deliberately NOT role-gated: it is how a buyer becomes a
+  // vendor, so gating it on role === 'vendor' would lock out every applicant.
+  // The page itself sends anonymous users to /login and existing vendors to
+  // their dashboard.
   const isProtected = (
     pathname.startsWith('/admin') ||
     pathname.startsWith('/buyer') ||
     pathname.startsWith('/vendor/dashboard') ||
     pathname.startsWith('/vendor/listings') ||
-    pathname.startsWith('/vendor/apply') ||
     pathname.startsWith('/vendor/store') ||
     pathname.startsWith('/vendor/orders')
   )
@@ -61,7 +63,6 @@ export async function middleware(request: NextRequest) {
     if (
       pathname.startsWith('/vendor/dashboard') ||
       pathname.startsWith('/vendor/listings') ||
-      pathname.startsWith('/vendor/apply') ||
       pathname.startsWith('/vendor/store') ||
       pathname.startsWith('/vendor/orders')
     ) {

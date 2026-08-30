@@ -209,7 +209,7 @@ export function ImageUploader({ value, onChange }: ImageUploaderProps) {
               <p className="text-sm text-sand-700 font-medium">
                 Tap to upload, or drag photos here
               </p>
-              <p className="text-xs text-sand-400">
+              <p className="text-xs text-sand-600">
                 JPG, PNG, WebP or AVIF · up to 10MB · {remaining} slot{remaining === 1 ? '' : 's'} left
               </p>
             </>
@@ -232,10 +232,10 @@ export function ImageUploader({ value, onChange }: ImageUploaderProps) {
       {/* Paste a link instead */}
       {remaining > 0 && (
         <div>
-          <p className="text-xs text-sand-400 mb-1.5">Or paste an image link</p>
+          <p className="text-xs text-sand-600 mb-1.5">Or paste an image link</p>
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-400" />
+              <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-600" />
               <input
                 type="url"
                 value={urlDraft}
@@ -259,7 +259,7 @@ export function ImageUploader({ value, onChange }: ImageUploaderProps) {
       )}
 
       {value.length === 0 && (
-        <p className="text-xs text-sand-400">
+        <p className="text-xs text-sand-600">
           At least one image is required. The first image is your primary listing photo.
         </p>
       )}

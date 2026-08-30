@@ -159,7 +159,7 @@ export default function VendorStoreProfilePage() {
             <h1 className="text-2xl font-display font-bold text-sand-900 flex items-center gap-2">
               <Store className="w-6 h-6 text-green-600" /> My Store Page
             </h1>
-            <p className="text-sm text-sand-500 mt-1 max-w-lg">
+            <p className="text-sm text-sand-600 mt-1 max-w-lg">
               This is your mini-website. Everything here appears on your public store page, the
               link you share with customers, even if you don&rsquo;t have a website of your own.
             </p>
@@ -176,7 +176,7 @@ export default function VendorStoreProfilePage() {
           {/* ── Story ── */}
           <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
             <h2 className="text-base font-display font-semibold text-sand-900 mb-1">Your story</h2>
-            <p className="text-xs text-sand-400 mb-4">
+            <p className="text-xs text-sand-600 mb-4">
               How did the business start? What do you make, and why does it matter? Buyers love
               knowing who they&rsquo;re supporting. (Blank lines create paragraphs.)
             </p>
@@ -208,9 +208,9 @@ export default function VendorStoreProfilePage() {
               <h2 className="text-base font-display font-semibold text-sand-900 flex items-center gap-2">
                 <Users className="w-4 h-4 text-green-600" /> Founders &amp; team
               </h2>
-              <span className="text-xs text-sand-400">{fields.length}/8</span>
+              <span className="text-xs text-sand-600">{fields.length}/8</span>
             </div>
-            <p className="text-xs text-sand-400 mb-4">
+            <p className="text-xs text-sand-600 mb-4">
               Add the people behind the business, founders, makers, farm leads. Shown as
               &ldquo;Meet the people behind it&rdquo; on your store page.
             </p>
@@ -270,7 +270,7 @@ export default function VendorStoreProfilePage() {
           {/* ── Links ── */}
           <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
             <h2 className="text-base font-display font-semibold text-sand-900 mb-1">Website &amp; socials</h2>
-            <p className="text-xs text-sand-400 mb-4">
+            <p className="text-xs text-sand-600 mb-4">
               Shown in the contact section of your store page. All optional.
             </p>
             <div className="space-y-3">
@@ -283,7 +283,7 @@ export default function VendorStoreProfilePage() {
                 <div key={name}>
                   <label className="form-label" htmlFor={name}>{label}</label>
                   <div className="relative">
-                    <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-400" />
+                    <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-600" />
                     <input id={name} {...register(name)} className="form-input pl-9" placeholder={placeholder} />
                   </div>
                   {errors[name] && <p className="form-error">{errors[name]?.message}</p>}

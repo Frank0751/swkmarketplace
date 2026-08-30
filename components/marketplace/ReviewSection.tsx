@@ -101,7 +101,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
           <div className="flex items-center gap-2 text-sm text-sand-600">
             <StarRow rating={Math.round(average)} />
             <span className="font-semibold text-sand-900">{average.toFixed(1)}</span>
-            <span className="text-sand-400">({reviews.length})</span>
+            <span className="text-sand-600">({reviews.length})</span>
           </div>
         )}
       </div>
@@ -171,7 +171,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
       ) : reviews.length === 0 ? (
         <div className="bg-white rounded-xl border border-sand-200 p-8 text-center">
           <Star className="w-8 h-8 text-sand-300 mx-auto mb-3" />
-          <p className="text-sm text-sand-400">
+          <p className="text-sm text-sand-600">
             No reviews yet. Be the first to review this product after delivery!
           </p>
         </div>
@@ -188,7 +188,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                     <p className="text-sm font-semibold text-sand-900">
                       {review.buyer?.full_name ?? 'Verified buyer'}
                     </p>
-                    <p className="text-xs text-sand-400">{formatRelativeTime(review.created_at)}</p>
+                    <p className="text-xs text-sand-600">{formatRelativeTime(review.created_at)}</p>
                   </div>
                 </div>
                 <StarRow rating={review.rating} />

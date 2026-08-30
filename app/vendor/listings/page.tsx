@@ -99,7 +99,7 @@ export default async function VendorListingsPage({ searchParams }: Props) {
       <div className="flex">
         {/* Sidebar */}
         <aside className="hidden md:flex flex-col w-64 min-h-[calc(100vh-64px)] bg-white border-r border-sand-200 p-4 gap-1 sticky top-16 self-start">
-          <p className="text-xs font-semibold text-sand-400 uppercase tracking-widest px-3 mb-2">
+          <p className="text-xs font-semibold text-sand-600 uppercase tracking-widest px-3 mb-2">
             Vendor Menu
           </p>
           {VENDOR_NAV.map(item => {
@@ -130,7 +130,7 @@ export default async function VendorListingsPage({ searchParams }: Props) {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-2xl font-display font-bold text-sand-900">My Listings</h1>
-              <p className="text-sand-500 text-sm mt-1">Manage your products and inventory.</p>
+              <p className="text-sand-600 text-sm mt-1">Manage your products and inventory.</p>
             </div>
             <Link
               href="/vendor/listings/new"
@@ -173,12 +173,12 @@ export default async function VendorListingsPage({ searchParams }: Props) {
             <div className="bg-white rounded-xl border border-sand-200 shadow-card">
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                 <div className="w-16 h-16 rounded-full bg-sand-100 flex items-center justify-center mb-4">
-                  <PackageOpen className="w-8 h-8 text-sand-400" />
+                  <PackageOpen className="w-8 h-8 text-sand-600" />
                 </div>
                 <h3 className="text-base font-semibold text-sand-700 mb-1">
                   {activeTab === 'all' ? 'No listings yet' : `No ${TABS.find(t => t.key === activeTab)?.label.toLowerCase()} listings`}
                 </h3>
-                <p className="text-sm text-sand-400 mb-6 max-w-xs">
+                <p className="text-sm text-sand-600 mb-6 max-w-xs">
                   {activeTab === 'all'
                     ? 'Create your first product listing and start selling on SWK Marketplace.'
                     : `You don't have any listings with this status.`}
@@ -241,7 +241,7 @@ export default async function VendorListingsPage({ searchParams }: Props) {
                       )}
 
                       {/* Stats row */}
-                      <div className="flex items-center gap-3 mt-auto pt-2 border-t border-sand-100 text-xs text-sand-400">
+                      <div className="flex items-center gap-3 mt-auto pt-2 border-t border-sand-100 text-xs text-sand-600">
                         <span className="flex items-center gap-1">
                           <Eye className="w-3.5 h-3.5" /> {product.views ?? 0} views
                         </span>

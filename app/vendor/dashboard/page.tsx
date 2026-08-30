@@ -111,7 +111,7 @@ export default async function VendorDashboardPage() {
       <div className="flex">
         {/* Sidebar */}
         <aside className="hidden md:flex flex-col w-64 min-h-[calc(100vh-64px)] bg-white border-r border-sand-200 p-4 gap-1 sticky top-16 self-start">
-          <p className="text-xs font-semibold text-sand-400 uppercase tracking-widest px-3 mb-2">
+          <p className="text-xs font-semibold text-sand-600 uppercase tracking-widest px-3 mb-2">
             Vendor Menu
           </p>
           {VENDOR_NAV.map(item => {
@@ -144,7 +144,7 @@ export default async function VendorDashboardPage() {
                 ? `Welcome back, ${vendor.business_name}!`
                 : `Hello, ${vendor.business_name}`}
             </h1>
-            <p className="text-sand-500 text-sm mt-1">
+            <p className="text-sand-600 text-sm mt-1">
               {vendor.status === 'approved'
                 ? "Here's what's happening with your store today."
                 : 'Your vendor application status is shown below.'}
@@ -181,7 +181,7 @@ export default async function VendorDashboardPage() {
                             'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2',
                             s.done && !s.active && 'bg-gold-400 border-gold-400 text-white',
                             s.active  && 'bg-white border-gold-400 text-gold-600 ring-2 ring-gold-200',
-                            !s.done   && 'bg-sand-100 border-sand-200 text-sand-400',
+                            !s.done   && 'bg-sand-100 border-sand-200 text-sand-600',
                           )}>
                             {s.done && !s.active ? <CheckCircle2 className="w-3.5 h-3.5" /> : i + 1}
                           </div>
@@ -233,7 +233,7 @@ export default async function VendorDashboardPage() {
           {vendor.status === 'suspended' && (
             <div className="bg-sand-100 border border-sand-200 rounded-xl p-6 mb-6">
               <div className="flex items-start gap-4">
-                <AlertTriangle className="w-8 h-8 text-sand-500 flex-shrink-0" />
+                <AlertTriangle className="w-8 h-8 text-sand-600 flex-shrink-0" />
                 <div>
                   <h2 className="text-base font-display font-semibold text-sand-800 mb-1">Account Suspended</h2>
                   <p className="text-sm text-sand-600 mb-2">
@@ -257,7 +257,7 @@ export default async function VendorDashboardPage() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-medium text-sand-500 uppercase tracking-wide">Total Sales</span>
+                    <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Total Sales</span>
                     <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
                       <DollarSign className="w-4 h-4 text-green-600" />
                     </div>
@@ -269,7 +269,7 @@ export default async function VendorDashboardPage() {
 
                 <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-medium text-sand-500 uppercase tracking-wide">Active Listings</span>
+                    <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Active Listings</span>
                     <div className="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center">
                       <Package className="w-4 h-4 text-teal-600" />
                     </div>
@@ -279,7 +279,7 @@ export default async function VendorDashboardPage() {
 
                 <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-medium text-sand-500 uppercase tracking-wide">Total Orders</span>
+                    <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Total Orders</span>
                     <div className="w-9 h-9 rounded-lg bg-gold-50 flex items-center justify-center">
                       <BarChart3 className="w-4 h-4 text-gold-600" />
                     </div>
@@ -289,7 +289,7 @@ export default async function VendorDashboardPage() {
 
                 <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-medium text-sand-500 uppercase tracking-wide">Pending Payout</span>
+                    <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Pending Payout</span>
                     <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
                       <Clock className="w-4 h-4 text-green-600" />
                     </div>
@@ -332,7 +332,7 @@ export default async function VendorDashboardPage() {
                   businessName={vendor.business_name}
                   variant="card"
                 />
-                <p className="mt-2 text-xs text-sand-400">
+                <p className="mt-2 text-xs text-sand-600">
                   Want to add your story, founders and team to your store page?{' '}
                   <Link href="/vendor/store" className="text-green-600 font-semibold hover:underline">
                     Edit your store profile →
@@ -357,10 +357,10 @@ export default async function VendorDashboardPage() {
                 {recentOrders.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-14 px-6 text-center">
                     <div className="w-14 h-14 rounded-full bg-sand-100 flex items-center justify-center mb-3">
-                      <PackageOpen className="w-7 h-7 text-sand-400" />
+                      <PackageOpen className="w-7 h-7 text-sand-600" />
                     </div>
                     <p className="text-sm font-semibold text-sand-700 mb-1">No orders yet</p>
-                    <p className="text-xs text-sand-400">
+                    <p className="text-xs text-sand-600">
                       Orders will appear here once buyers purchase your products.
                     </p>
                   </div>
@@ -381,7 +381,7 @@ export default async function VendorDashboardPage() {
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
-                                <Package className="w-5 h-5 text-sand-400" />
+                                <Package className="w-5 h-5 text-sand-600" />
                               </div>
                             )}
                           </div>
@@ -392,9 +392,9 @@ export default async function VendorDashboardPage() {
                               {order.product?.title ?? 'Product'}
                             </p>
                             <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-xs text-sand-400 font-mono">{order.reference}</span>
+                              <span className="text-xs text-sand-600 font-mono">{order.reference}</span>
                               <span className="text-sand-200">·</span>
-                              <span className="text-xs text-sand-400">{formatRelativeTime(order.created_at)}</span>
+                              <span className="text-xs text-sand-600">{formatRelativeTime(order.created_at)}</span>
                             </div>
                           </div>
 

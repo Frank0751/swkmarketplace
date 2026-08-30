@@ -96,7 +96,7 @@ export function Navbar() {
             {/* Search bar, desktop */}
             <div className="hidden md:flex flex-1 max-w-sm mx-4">
               <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-600" />
                 <input
                   type="search"
                   placeholder="Search eco-friendly products..."
@@ -130,14 +130,14 @@ export function Navbar() {
                       {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                     <span className="hidden sm:block max-w-24 truncate">{user.full_name?.split(' ')[0]}</span>
-                    <ChevronDown className="w-3.5 h-3.5 text-sand-400 hidden sm:block" />
+                    <ChevronDown className="w-3.5 h-3.5 text-sand-600 hidden sm:block" />
                   </button>
 
                   {/* Dropdown */}
                   <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl shadow-card-lg border border-sand-200 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
                     <div className="px-3 py-2 border-b border-sand-100">
                       <div className="text-xs font-medium text-sand-900 truncate">{user.full_name}</div>
-                      <div className="text-xs text-sand-400 truncate">{user.email}</div>
+                      <div className="text-xs text-sand-600 truncate">{user.email}</div>
                     </div>
                     <Link href={getDashboardLink()} className="flex items-center gap-2 px-3 py-2 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
                       <User className="w-4 h-4" /> Dashboard
@@ -191,7 +191,7 @@ export function Navbar() {
         {searchOpen && (
           <div className="md:hidden border-t border-sand-200 px-4 py-3 bg-white">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-600" />
               <input
                 autoFocus
                 type="search"

@@ -53,7 +53,7 @@ export function TrustSection() {
           <h2 className="text-3xl md:text-4xl font-display font-semibold text-sand-900 text-balance">
             Escrow protection, from checkout to doorstep
           </h2>
-          <p className="mt-3 text-base text-sand-500 max-w-2xl mx-auto">
+          <p className="mt-3 text-base text-sand-600 max-w-2xl mx-auto">
             SWK Ghana acts as your trusted intermediary on every single order. The vendor is only
             paid after you confirm your delivery arrived as described.
           </p>
@@ -81,7 +81,7 @@ export function TrustSection() {
                       </span>
                     </div>
                     <h3 className="text-sm font-bold text-sand-900 mb-1.5">{step.title}</h3>
-                    <p className="text-xs text-sand-500 leading-relaxed">{step.description}</p>
+                    <p className="text-xs text-sand-600 leading-relaxed">{step.description}</p>
                   </div>
                   {/* Mobile connector */}
                   {idx < ESCROW_STEPS.length - 1 && (

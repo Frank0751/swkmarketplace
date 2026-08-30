@@ -38,7 +38,7 @@ export function HowItWorksSnippet() {
           <h2 className="text-3xl md:text-4xl font-display font-semibold text-sand-900">
             How it works
           </h2>
-          <p className="mt-3 text-base text-sand-500 max-w-xl mx-auto">
+          <p className="mt-3 text-base text-sand-600 max-w-xl mx-auto">
             Three easy steps from discovery to delivery, backed by our escrow guarantee.
           </p>
         </FadeIn>
@@ -76,7 +76,7 @@ export function HowItWorksSnippet() {
               <h3 className="text-lg font-semibold text-sand-900 mb-2">
                 {step.title}
               </h3>
-              <p className="text-sm text-sand-500 leading-relaxed max-w-xs mx-auto">
+              <p className="text-sm text-sand-600 leading-relaxed max-w-xs mx-auto">
                 {step.description}
               </p>
             </StaggerItem>

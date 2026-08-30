@@ -164,10 +164,10 @@ export default function VendorApplyPage() {
           <h1 className="text-3xl font-display font-bold text-sand-900 mb-3">
             Application Submitted!
           </h1>
-          <p className="text-sand-500 text-base mb-2">
+          <p className="text-sand-600 text-base mb-2">
             Thank you for applying to become an SWK Marketplace vendor.
           </p>
-          <p className="text-sand-500 text-base mb-8">
+          <p className="text-sand-600 text-base mb-8">
             Our team will review your application within <strong className="text-sand-700">2–3 business days</strong> and contact you at your registered email.
           </p>
           <div className="flex gap-3">
@@ -244,7 +244,7 @@ export default function VendorApplyPage() {
                     </span>
                     <div>
                       <p className="text-sm font-semibold text-sand-900">{s.label}</p>
-                      <p className="text-xs text-sand-400">{s.desc}</p>
+                      <p className="text-xs text-sand-600">{s.desc}</p>
                     </div>
                   </li>
                 ))}
@@ -306,7 +306,7 @@ export default function VendorApplyPage() {
                 <div>
                   <label className="form-label">
                     Business Description <span className="text-red-500">*</span>
-                    <span className="ml-1 text-sand-400 font-normal">(min 100 characters)</span>
+                    <span className="ml-1 text-sand-600 font-normal">(min 100 characters)</span>
                   </label>
                   <textarea
                     {...register('business_description')}
@@ -317,7 +317,7 @@ export default function VendorApplyPage() {
                     {errors.business_description ? (
                       <p className="form-error">{errors.business_description.message}</p>
                     ) : <span />}
-                    <span className={cn('text-xs', descLength < 100 ? 'text-sand-400' : 'text-green-600')}>
+                    <span className={cn('text-xs', descLength < 100 ? 'text-sand-600' : 'text-green-600')}>
                       {descLength}/100
                     </span>
                   </div>
@@ -375,7 +375,7 @@ export default function VendorApplyPage() {
                   <label className="form-label">
                     Sustainability Statement <span className="text-red-500">*</span>
                   </label>
-                  <p className="text-xs text-sand-400 mb-1.5">
+                  <p className="text-xs text-sand-600 mb-1.5">
                     Describe how your business supports SDG 12 (Responsible Consumption &amp; Production).
                   </p>
                   <textarea
@@ -387,7 +387,7 @@ export default function VendorApplyPage() {
                     {errors.sustainability_statement ? (
                       <p className="form-error">{errors.sustainability_statement.message}</p>
                     ) : <span />}
-                    <span className={cn('text-xs', stmtLength < 50 ? 'text-sand-400' : 'text-green-600')}>
+                    <span className={cn('text-xs', stmtLength < 50 ? 'text-sand-600' : 'text-green-600')}>
                       {stmtLength}/50
                     </span>
                   </div>
@@ -395,10 +395,10 @@ export default function VendorApplyPage() {
 
                 {/* Social links */}
                 <div>
-                  <label className="form-label">Social Links <span className="text-sand-400 font-normal">(optional)</span></label>
+                  <label className="form-label">Social Links <span className="text-sand-600 font-normal">(optional)</span></label>
                   <div className="space-y-3">
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-sand-400 font-medium">instagram.com/</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-sand-600 font-medium">instagram.com/</span>
                       <input
                         {...register('instagram')}
                         className="form-input pl-28"
@@ -406,7 +406,7 @@ export default function VendorApplyPage() {
                       />
                     </div>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-sand-400 font-medium">facebook.com/</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-sand-600 font-medium">facebook.com/</span>
                       <input
                         {...register('facebook')}
                         className="form-input pl-[5.5rem]"
@@ -437,7 +437,7 @@ export default function VendorApplyPage() {
                       <>Submit Application <ArrowRight className="w-4 h-4" /></>
                     )}
                   </button>
-                  <p className="text-xs text-sand-400 text-center mt-3">
+                  <p className="text-xs text-sand-600 text-center mt-3">
                     By submitting you agree to SWK Marketplace&apos;s{' '}
                     <Link href="/terms" className="text-green-600 hover:underline">Terms of Service</Link>
                     {' '}and{' '}

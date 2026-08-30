@@ -32,7 +32,7 @@ type ButtonProps = ButtonAsButton | ButtonAsAnchor
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:   'bg-green-600 text-white shadow-sm hover:bg-green-700 active:bg-green-800 focus-visible:ring-green-600 disabled:bg-green-300',
-  secondary: 'bg-white text-sand-900 border border-sand-300 shadow-sm hover:bg-sand-50 active:bg-sand-100 focus-visible:ring-sand-400 disabled:text-sand-400 disabled:border-sand-200',
+  secondary: 'bg-white text-sand-900 border border-sand-300 shadow-sm hover:bg-sand-50 active:bg-sand-100 focus-visible:ring-sand-400 disabled:text-sand-600 disabled:border-sand-200',
   ghost:     'bg-transparent text-sand-700 hover:bg-sand-100 active:bg-sand-200 focus-visible:ring-sand-400 disabled:text-sand-300',
   danger:    'bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500 disabled:bg-red-300',
 }
@@ -82,7 +82,7 @@ export const Button = React.forwardRef(function Button(
       {isLoading && (
         <Spinner
           size={spinnerSizes[size]}
-          className={variant === 'primary' || variant === 'danger' ? 'text-white/80' : 'text-sand-400'}
+          className={variant === 'primary' || variant === 'danger' ? 'text-white/80' : 'text-sand-600'}
         />
       )}
       {children}

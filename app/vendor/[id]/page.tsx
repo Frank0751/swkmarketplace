@@ -135,7 +135,7 @@ export default async function VendorProfilePage({ params }: VendorProfilePagePro
                       <h1 className="text-2xl md:text-3xl font-display font-bold text-sand-900">
                         {vendor.business_name}
                       </h1>
-                      <p className="text-sand-500 mt-0.5">{vendor.user?.full_name}</p>
+                      <p className="text-sand-600 mt-0.5">{vendor.user?.full_name}</p>
                     </div>
 
                     {/* SDG badge */}
@@ -146,7 +146,7 @@ export default async function VendorProfilePage({ params }: VendorProfilePagePro
                   </div>
 
                   {/* Meta */}
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 text-sm text-sand-500">
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 text-sm text-sand-600">
                     <span className="inline-flex items-center gap-1.5">
                       
                       {catMeta?.label}
@@ -220,8 +220,8 @@ export default async function VendorProfilePage({ params }: VendorProfilePagePro
                   return (
                     <div key={stat.label} className="text-center">
                       <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <Icon className="w-4 h-4 text-sand-400" />
-                        <span className="text-xs font-medium text-sand-500">{stat.label}</span>
+                        <Icon className="w-4 h-4 text-sand-600" />
+                        <span className="text-xs font-medium text-sand-600">{stat.label}</span>
                       </div>
                       <div className="text-xl font-bold text-sand-900">{stat.value}</div>
                     </div>
@@ -292,7 +292,7 @@ export default async function VendorProfilePage({ params }: VendorProfilePagePro
               </div>
 
               {products.length === 0 ? (
-                <div className="bg-white rounded-xl border border-sand-200 flex flex-col items-center justify-center py-16 text-sand-400">
+                <div className="bg-white rounded-xl border border-sand-200 flex flex-col items-center justify-center py-16 text-sand-600">
                   <Package className="w-10 h-10 mb-3" />
                   <p className="font-medium">No products yet</p>
                   <p className="text-sm mt-1">This vendor hasn't listed any products yet</p>

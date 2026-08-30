@@ -31,7 +31,7 @@ export default function TermsPage() {
           <h1 className="font-display text-3xl md:text-4xl font-bold text-sand-900 mb-3">
             Terms &amp; Conditions
           </h1>
-          <p className="text-sand-500 mb-10">
+          <p className="text-sand-600 mb-10">
             Last updated: July 2026 · These terms govern your use of SWK Marketplace,
             operated by SWK Ghana, a youth-focused nonprofit organisation based in Accra, Ghana.
           </p>

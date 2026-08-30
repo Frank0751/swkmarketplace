@@ -80,7 +80,7 @@ export function Modal({
                 {title}
               </Dialog.Title>
               {description && (
-                <Dialog.Description className="mt-1 text-sm text-sand-500 leading-relaxed">
+                <Dialog.Description className="mt-1 text-sm text-sand-600 leading-relaxed">
                   {description}
                 </Dialog.Description>
               )}
@@ -92,7 +92,7 @@ export function Modal({
                 onClick={onClose}
                 aria-label="Close dialog"
                 className={cn(
-                  'flex-shrink-0 rounded-lg p-1.5 text-sand-400',
+                  'flex-shrink-0 rounded-lg p-1.5 text-sand-600',
                   'hover:bg-sand-100 hover:text-sand-700',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600',
                   'transition-colors',

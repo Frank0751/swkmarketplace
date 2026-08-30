@@ -24,7 +24,7 @@ export default function GlobalError({
         <h1 className="font-display text-3xl font-bold text-sand-900 mb-3">
           Something went wrong
         </h1>
-        <p className="text-sand-500 mb-8">
+        <p className="text-sand-600 mb-8">
           An unexpected error occurred. You can try again, or head back home while
           we look into it.
         </p>

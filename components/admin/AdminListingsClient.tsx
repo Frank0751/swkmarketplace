@@ -169,7 +169,7 @@ export function AdminListingsClient({ initialProducts }: AdminListingsClientProp
       </div>
 
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-sand-400">
+        <div className="flex flex-col items-center justify-center py-20 text-sand-600">
           <Package className="w-10 h-10 mb-3" />
           <p className="text-base font-medium">No listings found</p>
           <p className="text-sm mt-1">
@@ -184,13 +184,13 @@ export function AdminListingsClient({ initialProducts }: AdminListingsClientProp
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-sand-200 bg-sand-50">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Listing</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider hidden md:table-cell">Vendor</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider hidden lg:table-cell">Category</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Price</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider hidden md:table-cell">Submitted</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-sand-500 uppercase tracking-wider">Actions</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Listing</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Vendor</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Category</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Price</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Status</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Submitted</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-sand-600 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-sand-100">
@@ -216,7 +216,7 @@ export function AdminListingsClient({ initialProducts }: AdminListingsClientProp
                             )}
                             <div className="min-w-0">
                               <div className="font-medium text-sand-900 truncate max-w-xs">{product.title}</div>
-                              <div className="text-xs text-sand-400 truncate max-w-xs">{product.short_description}</div>
+                              <div className="text-xs text-sand-600 truncate max-w-xs">{product.short_description}</div>
                             </div>
                           </div>
                         </td>
@@ -236,7 +236,7 @@ export function AdminListingsClient({ initialProducts }: AdminListingsClientProp
                             {STATUS_LABELS[product.status]}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-sand-400 hidden md:table-cell">
+                        <td className="px-4 py-3 text-xs text-sand-600 hidden md:table-cell">
                           {formatRelativeTime(product.created_at)}
                         </td>
                         <td className="px-4 py-3">
@@ -245,7 +245,7 @@ export function AdminListingsClient({ initialProducts }: AdminListingsClientProp
                               href={`/marketplace/${product.slug}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-1.5 text-sand-400 hover:text-sand-700 transition-colors"
+                              className="p-1.5 text-sand-600 hover:text-sand-700 transition-colors"
                               title="View listing"
                             >
                               <ExternalLink className="w-4 h-4" />

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Wallet, CheckCircle, Clock, AlertCircle, TrendingUp } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn, formatCurrency, formatDate, formatRelativeTime } from '@/lib/utils'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { Payout, PayoutStatus } from '@/types'
 
 interface PayoutPanelProps {
@@ -23,6 +24,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
   const [payouts, setPayouts]         = useState<Payout[]>(initialPayouts)
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
   const [loading, setLoading]         = useState<Record<string, boolean>>({})
+  // The payout awaiting confirmation, so the dialog can restate who gets paid
+  // what before an irreversible transfer.
+  const [pendingRelease, setPendingRelease] = useState<Payout | null>(null)
 
   const filtered = filterStatus === 'all'
     ? payouts
@@ -82,9 +86,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
             <Clock className="w-5 h-5 text-teal-600" />
           </div>
           <div>
-            <div className="text-xs font-medium text-sand-500">Total Held (Escrow)</div>
+            <div className="text-xs font-medium text-sand-600">Total Held (Escrow)</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalHeld)}</div>
-            <div className="text-xs text-sand-400 mt-0.5">
+            <div className="text-xs text-sand-600 mt-0.5">
               {payouts.filter(p => p.status === 'held' || p.status === 'pending_release').length} payouts
             </div>
           </div>
@@ -95,9 +99,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
             <CheckCircle className="w-5 h-5 text-green-600" />
           </div>
           <div>
-            <div className="text-xs font-medium text-sand-500">Total Released</div>
+            <div className="text-xs font-medium text-sand-600">Total Released</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalReleased)}</div>
-            <div className="text-xs text-sand-400 mt-0.5">
+            <div className="text-xs text-sand-600 mt-0.5">
               {payouts.filter(p => p.status === 'released').length} payouts
             </div>
           </div>
@@ -108,9 +112,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
             <TrendingUp className="w-5 h-5 text-gold-600" />
           </div>
           <div>
-            <div className="text-xs font-medium text-sand-500">Commission Earned</div>
+            <div className="text-xs font-medium text-sand-600">Commission Earned</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalCommission)}</div>
-            <div className="text-xs text-sand-400 mt-0.5">15% of released payouts</div>
+            <div className="text-xs text-sand-600 mt-0.5">15% of released payouts</div>
           </div>
         </div>
       </div>
@@ -136,7 +140,7 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
       {/* Payouts table */}
       <div className="bg-white rounded-xl border border-sand-200 overflow-hidden">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-sand-400">
+          <div className="flex flex-col items-center justify-center py-16 text-sand-600">
             <AlertCircle className="w-8 h-8 mb-2" />
             <p className="text-sm font-medium">No payouts found</p>
           </div>
@@ -145,13 +149,13 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-sand-200 bg-sand-50">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Vendor</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider hidden md:table-cell">Order Ref</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Gross</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider hidden lg:table-cell">Commission (15%)</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Net Payout</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider hidden md:table-cell">Date</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Vendor</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Order Ref</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Gross</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Commission (15%)</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Net Payout</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Status</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Date</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -166,7 +170,7 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                         <div className="font-medium text-sand-900">
                           {payout.vendor?.business_name ?? '-'}
                         </div>
-                        <div className="text-xs text-sand-400">
+                        <div className="text-xs text-sand-600">
                           {payout.vendor?.user?.email ?? ''}
                         </div>
                       </td>
@@ -178,7 +182,7 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                       <td className="px-4 py-3 text-right font-medium text-sand-700">
                         {formatCurrency(payout.gross_amount)}
                       </td>
-                      <td className="px-4 py-3 text-right text-sand-500 hidden lg:table-cell">
+                      <td className="px-4 py-3 text-right text-sand-600 hidden lg:table-cell">
                         -{formatCurrency(payout.commission_amount)}
                       </td>
                       <td className="px-4 py-3 text-right font-bold text-green-700">
@@ -194,7 +198,7 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                           {statusCfg.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-sand-400 hidden md:table-cell">
+                      <td className="px-4 py-3 text-xs text-sand-600 hidden md:table-cell">
                         {payout.released_at
                           ? formatDate(payout.released_at)
                           : formatRelativeTime(payout.created_at)}
@@ -202,11 +206,11 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                       <td className="px-4 py-3">
                         {canRelease && (
                           <button
-                            onClick={() => handleRelease(payout.id)}
+                            onClick={() => setPendingRelease(payout)}
                             disabled={loading[payout.id]}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition-colors whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 min-h-[44px] px-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                           >
-                            <Wallet className="w-3.5 h-3.5" />
+                            <Wallet className="w-3.5 h-3.5" aria-hidden="true" />
                             {loading[payout.id] ? 'Releasing…' : 'Release'}
                           </button>
                         )}
@@ -219,6 +223,24 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!pendingRelease}
+        onClose={() => setPendingRelease(null)}
+        onConfirm={async () => {
+          if (pendingRelease) await handleRelease(pendingRelease.id)
+        }}
+        title="Release this payout?"
+        description="This transfers the net amount to the vendor and closes the escrow for this order."
+        details={pendingRelease ? [
+          { label: 'Vendor',          value: pendingRelease.vendor?.business_name ?? '—' },
+          { label: 'Gross',           value: formatCurrency(pendingRelease.gross_amount) },
+          { label: 'Commission (15%)', value: `-${formatCurrency(pendingRelease.commission_amount)}` },
+          { label: 'Vendor receives', value: formatCurrency(pendingRelease.net_amount), emphasis: true },
+        ] : []}
+        warning="Releasing is final and cannot be reversed from the admin panel."
+        confirmLabel="Release payout"
+      />
     </div>
   )
 }

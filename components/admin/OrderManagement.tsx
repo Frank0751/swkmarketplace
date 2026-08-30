@@ -109,7 +109,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
       {/* Table */}
       <div className="bg-white rounded-xl border border-sand-200 overflow-hidden">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-sand-400">
+          <div className="flex flex-col items-center justify-center py-16 text-sand-600">
             <AlertCircle className="w-8 h-8 mb-2" />
             <p className="text-sm font-medium">No orders found</p>
           </div>
@@ -118,13 +118,13 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-sand-200 bg-sand-50">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Reference</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Buyer</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider hidden lg:table-cell">Vendor</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider hidden xl:table-cell">Product</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Total</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-500 uppercase tracking-wider hidden md:table-cell">Date</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Reference</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Buyer</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Vendor</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden xl:table-cell">Product</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Total</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Status</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Date</th>
                   <th className="px-4 py-3 w-8" />
                 </tr>
               </thead>
@@ -145,7 +145,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                         </td>
                         <td className="px-4 py-3 text-sand-700">
                           <div className="font-medium">{order.buyer?.full_name ?? '-'}</div>
-                          <div className="text-xs text-sand-400">{order.buyer?.email}</div>
+                          <div className="text-xs text-sand-600">{order.buyer?.email}</div>
                         </td>
                         <td className="px-4 py-3 text-sand-600 hidden lg:table-cell">
                           {order.vendor?.business_name ?? '-'}
@@ -166,10 +166,10 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                             {ORDER_STATUS_LABELS[order.status]}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-sand-400 hidden md:table-cell">
+                        <td className="px-4 py-3 text-xs text-sand-600 hidden md:table-cell">
                           {formatRelativeTime(order.created_at)}
                         </td>
-                        <td className="px-4 py-3 text-sand-400">
+                        <td className="px-4 py-3 text-sand-600">
                           {isExpanded
                             ? <ChevronUp className="w-4 h-4" />
                             : <ChevronDown className="w-4 h-4" />}
@@ -188,23 +188,23 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                 </h4>
                                 <div className="bg-white rounded-lg border border-sand-200 p-3 space-y-1.5 text-xs">
                                   <div className="flex justify-between">
-                                    <span className="text-sand-500">Order ID</span>
+                                    <span className="text-sand-600">Order ID</span>
                                     <span className="font-mono text-sand-700">{order.id.slice(0, 8)}…</span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-sand-500">Date placed</span>
+                                    <span className="text-sand-600">Date placed</span>
                                     <span className="text-sand-700">{formatDate(order.created_at)}</span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-sand-500">Quantity</span>
+                                    <span className="text-sand-600">Quantity</span>
                                     <span className="text-sand-700">{order.quantity}</span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-sand-500">Unit price</span>
+                                    <span className="text-sand-600">Unit price</span>
                                     <span className="text-sand-700">{formatCurrency(order.unit_price)}</span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-sand-500">Delivery fee</span>
+                                    <span className="text-sand-600">Delivery fee</span>
                                     <span className="text-sand-700">{formatCurrency(order.delivery_fee)}</span>
                                   </div>
                                   <div className="flex justify-between border-t border-sand-200 pt-1.5 font-semibold">
@@ -214,21 +214,21 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                 </div>
 
                                 <div className="bg-white rounded-lg border border-sand-200 p-3 space-y-1.5 text-xs">
-                                  <div className="text-sand-500 font-medium">Delivery address</div>
+                                  <div className="text-sand-600 font-medium">Delivery address</div>
                                   <div className="text-sand-700">{order.delivery_address}</div>
-                                  <div className="text-sand-500">{order.delivery_region}</div>
+                                  <div className="text-sand-600">{order.delivery_region}</div>
                                 </div>
 
                                 {order.buyer_notes && (
                                   <div className="bg-white rounded-lg border border-sand-200 p-3 text-xs">
-                                    <div className="text-sand-500 font-medium mb-1">Buyer notes</div>
+                                    <div className="text-sand-600 font-medium mb-1">Buyer notes</div>
                                     <div className="text-sand-700">{order.buyer_notes}</div>
                                   </div>
                                 )}
 
                                 {order.vendor_notes && (
                                   <div className="bg-white rounded-lg border border-sand-200 p-3 text-xs">
-                                    <div className="text-sand-500 font-medium mb-1">Vendor notes</div>
+                                    <div className="text-sand-600 font-medium mb-1">Vendor notes</div>
                                     <div className="text-sand-700">{order.vendor_notes}</div>
                                   </div>
                                 )}
@@ -292,7 +292,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                     </button>
                                   </div>
                                 ) : (
-                                  <div className="bg-sand-50 rounded-lg border border-sand-200 p-3 text-xs text-sand-500">
+                                  <div className="bg-sand-50 rounded-lg border border-sand-200 p-3 text-xs text-sand-600">
                                     No further status transitions available for this order.
                                   </div>
                                 )}
@@ -305,7 +305,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                 )}
 
                                 {order.paystack_reference && (
-                                  <div className="text-xs text-sand-400">
+                                  <div className="text-xs text-sand-600">
                                     Paystack ref: <span className="font-mono">{order.paystack_reference}</span>
                                   </div>
                                 )}

@@ -211,10 +211,10 @@ export default function NewListingPage() {
             <CheckCircle2 className="w-10 h-10 text-green-600" />
           </div>
           <h1 className="text-3xl font-display font-bold text-sand-900 mb-3">Listing Submitted!</h1>
-          <p className="text-sand-500 text-base mb-2">
+          <p className="text-sand-600 text-base mb-2">
             Your product is now under review by the SWK Ghana team.
           </p>
-          <p className="text-sand-500 text-base mb-8">
+          <p className="text-sand-600 text-base mb-8">
             We&rsquo;ll review for SDG 12 alignment and notify you within{' '}
             <strong className="text-sand-700">24–48 hours</strong>.
           </p>
@@ -245,14 +245,14 @@ export default function NewListingPage() {
         {/* Back */}
         <Link
           href="/vendor/listings"
-          className="inline-flex items-center gap-1.5 text-sm text-sand-500 hover:text-sand-900 transition-colors mb-6"
+          className="inline-flex items-center gap-1.5 text-sm text-sand-600 hover:text-sand-900 transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Listings
         </Link>
 
         <div className="mb-6">
           <h1 className="text-2xl font-display font-bold text-sand-900">Add New Listing</h1>
-          <p className="text-sand-500 text-sm mt-1">
+          <p className="text-sand-600 text-sm mt-1">
             Fill in the details below. Your listing will be reviewed before going live.
           </p>
         </div>
@@ -290,7 +290,7 @@ export default function NewListingPage() {
             <div>
               <label className="form-label">
                 Short Description <span className="text-red-500">*</span>
-                <span className="ml-1 text-sand-400 font-normal">(max 160 chars, shown on product cards)</span>
+                <span className="ml-1 text-sand-600 font-normal">(max 160 chars, shown on product cards)</span>
               </label>
               <input
                 {...register('short_description')}
@@ -301,7 +301,7 @@ export default function NewListingPage() {
                 {errors.short_description
                   ? <p className="form-error">{errors.short_description.message}</p>
                   : <span />}
-                <span className={cn('text-xs', shortDescLen > 160 ? 'text-red-500' : 'text-sand-400')}>
+                <span className={cn('text-xs', shortDescLen > 160 ? 'text-red-500' : 'text-sand-600')}>
                   {shortDescLen}/160
                 </span>
               </div>
@@ -348,7 +348,7 @@ export default function NewListingPage() {
                   Price (GHS) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-sand-400 font-medium">GHS</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-sand-600 font-medium">GHS</span>
                   <input
                     {...register('price_ghs')}
                     type="number"
@@ -376,7 +376,7 @@ export default function NewListingPage() {
 
               {/* Unit */}
               <div>
-                <label className="form-label">Unit <span className="text-sand-400 font-normal">(optional)</span></label>
+                <label className="form-label">Unit <span className="text-sand-600 font-normal">(optional)</span></label>
                 <input
                   {...register('unit')}
                   className="form-input"
@@ -428,7 +428,7 @@ export default function NewListingPage() {
           {/* ── SDG TAGS ── */}
           <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
             <h2 className="text-base font-display font-semibold text-sand-900 mb-1">SDG Alignment <span className="text-red-500">*</span></h2>
-            <p className="text-xs text-sand-400 mb-4">Select all Sustainable Development Goals your product supports.</p>
+            <p className="text-xs text-sand-600 mb-4">Select all Sustainable Development Goals your product supports.</p>
             <div className="space-y-2">
               {SDG_OPTIONS.map(sdg => {
                 const checked = watchedSdg?.includes(sdg.value)
@@ -463,7 +463,7 @@ export default function NewListingPage() {
           {/* ── VALUE TAGS ── */}
           <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
             <h2 className="text-base font-display font-semibold text-sand-900 mb-1">Value Tags</h2>
-            <p className="text-xs text-sand-400 mb-4">Help buyers find products that match their values.</p>
+            <p className="text-xs text-sand-600 mb-4">Help buyers find products that match their values.</p>
             <div className="flex flex-wrap gap-2">
               {(Object.entries(VALUE_TAG_META) as [ValueTag, { label: string; icon: string }][]).map(([key, meta]) => {
                 const checked = watchedVal?.includes(key)
@@ -490,9 +490,9 @@ export default function NewListingPage() {
           <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-base font-display font-semibold text-sand-900">Product Images</h2>
-              <span className="text-xs text-sand-400">{imageUrls.length}/5</span>
+              <span className="text-xs text-sand-600">{imageUrls.length}/5</span>
             </div>
-            <p className="text-xs text-sand-400 mb-4">
+            <p className="text-xs text-sand-600 mb-4">
               Upload photos from your device, or paste image links. The first image is the primary listing photo.
             </p>
             <ImageUploader

@@ -108,8 +108,8 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Location */}
         {product.location && (
           <div className="flex items-center gap-1 mb-2">
-            <MapPin className="w-3 h-3 text-sand-400 flex-shrink-0" />
-            <span className="text-[11px] text-sand-400 truncate">{product.location}</span>
+            <MapPin className="w-3 h-3 text-sand-600 flex-shrink-0" />
+            <span className="text-[11px] text-sand-600 truncate">{product.location}</span>
           </div>
         )}
 
@@ -135,7 +135,7 @@ export function ProductCard({ product }: ProductCardProps) {
               {formatPrice(product.price_ghs)}
             </span>
             {product.unit && (
-              <span className="text-[11px] text-sand-400 ml-1">{product.unit}</span>
+              <span className="text-[11px] text-sand-600 ml-1">{product.unit}</span>
             )}
           </div>
 
@@ -143,7 +143,7 @@ export function ProductCard({ product }: ProductCardProps) {
             className={cn(
               'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all',
               isOutOfStock
-                ? 'bg-sand-100 text-sand-400 cursor-not-allowed'
+                ? 'bg-sand-100 text-sand-600 cursor-not-allowed'
                 : 'bg-green-600 text-white group-hover:bg-green-700 shadow-card'
             )}
             aria-hidden="true"

@@ -17,6 +17,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { cn, formatDate, formatRelativeTime } from '@/lib/utils'
 import { CATEGORY_META } from '@/types'
 import type { VendorProfile, User } from '@/types'
@@ -44,10 +45,16 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
   const StatusIcon = statusCfg.icon
   const catMeta = CATEGORY_META[vendor.category]
 
+  // These callbacks throw on a failed request. Without a catch the rejection is
+  // unhandled and the admin sees the spinner stop with no other change, which
+  // reads as success, so surface the failure explicitly.
   const handleApprove = async () => {
     setLoading(true)
     try {
       await onApprove()
+    } catch (err) {
+      console.error('[VendorApprovalCard] Approve failed:', err)
+      toast.error(err instanceof Error ? err.message : 'Could not approve this vendor. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -60,6 +67,9 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
       await onReject(rejectReason.trim())
       setRejecting(false)
       setRejectReason('')
+    } catch (err) {
+      console.error('[VendorApprovalCard] Reject failed:', err)
+      toast.error(err instanceof Error ? err.message : 'Could not reject this vendor. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -91,7 +101,7 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
               <h3 className="font-semibold text-sand-900 text-base leading-tight">
                 {vendor.business_name}
               </h3>
-              <p className="text-sm text-sand-500 mt-0.5">{vendor.user?.full_name}</p>
+              <p className="text-sm text-sand-600 mt-0.5">{vendor.user?.full_name}</p>
             </div>
             <span
               className={cn(
@@ -105,7 +115,7 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
           </div>
 
           {/* Meta row */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-sand-500">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-sand-600">
             <span className="flex items-center gap-1">
               <Mail className="w-3.5 h-3.5" /> {vendor.user?.email}
             </span>
@@ -124,7 +134,7 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
             <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-sand-100 rounded-full text-xs font-medium text-sand-700">
               {catMeta?.label ?? vendor.category}
             </span>
-            <span className="text-xs text-sand-400">
+            <span className="text-xs text-sand-600">
               Applied {formatRelativeTime(vendor.created_at)}
             </span>
           </div>
@@ -145,7 +155,7 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
         <div className="px-5 py-4 border-t border-sand-200 space-y-4">
           {/* Business description */}
           <div>
-            <div className="text-xs font-semibold text-sand-400 uppercase tracking-wider mb-1">
+            <div className="text-xs font-semibold text-sand-600 uppercase tracking-wider mb-1">
               Business Description
             </div>
             <p className="text-sm text-sand-700 leading-relaxed">
@@ -155,7 +165,7 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
 
           {/* Sustainability statement */}
           <div>
-            <div className="text-xs font-semibold text-sand-400 uppercase tracking-wider mb-1">
+            <div className="text-xs font-semibold text-sand-600 uppercase tracking-wider mb-1">
               Sustainability Statement
             </div>
             <p className="text-sm text-sand-700 leading-relaxed bg-green-50 border border-green-200 rounded-lg p-3">
@@ -166,7 +176,7 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
           {/* Proof documents */}
           {vendor.proof_documents && vendor.proof_documents.length > 0 && (
             <div>
-              <div className="text-xs font-semibold text-sand-400 uppercase tracking-wider mb-2">
+              <div className="text-xs font-semibold text-sand-600 uppercase tracking-wider mb-2">
                 Proof Documents
               </div>
               <div className="flex flex-wrap gap-2">
@@ -190,7 +200,7 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
           {/* Social links */}
           {vendor.social_links && (
             <div>
-              <div className="text-xs font-semibold text-sand-400 uppercase tracking-wider mb-2">
+              <div className="text-xs font-semibold text-sand-600 uppercase tracking-wider mb-2">
                 Social Links
               </div>
               <div className="flex flex-wrap gap-2">
@@ -238,7 +248,7 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
 
           {/* Approval info */}
           {vendor.status === 'approved' && vendor.approved_at && (
-            <div className="text-xs text-sand-400">
+            <div className="text-xs text-sand-600">
               Approved on {formatDate(vendor.approved_at)}
             </div>
           )}

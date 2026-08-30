@@ -132,7 +132,7 @@
   /* Form input */
   .form-input {
     @apply w-full px-4 py-3 rounded-lg border border-sand-200 bg-white text-sand-900;
-    @apply placeholder:text-sand-400 text-sm;
+    @apply placeholder:text-sand-600 text-sm;
     @apply focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent;
     @apply transition-shadow duration-150;
   }
@@ -165,7 +165,7 @@
   }
   .timeline-dot.done    { @apply bg-green-600 text-white; }
   .timeline-dot.active  { @apply bg-gold-400 text-white ring-4 ring-gold-100; }
-  .timeline-dot.pending { @apply bg-sand-200 text-sand-400; }
+  .timeline-dot.pending { @apply bg-sand-200 text-sand-600; }
 }
 
 /* ─── Utilities ─────────────────────────────────────────────────── */

@@ -209,10 +209,10 @@ function OrderForm({
   if (isOutOfStock) {
     return (
       <div className="flex items-center gap-3 p-4 rounded-xl bg-sand-100 border border-sand-200">
-        <AlertCircle className="w-5 h-5 text-sand-400 flex-shrink-0" />
+        <AlertCircle className="w-5 h-5 text-sand-600 flex-shrink-0" />
         <div>
           <p className="text-sm font-semibold text-sand-700">Out of stock</p>
-          <p className="text-xs text-sand-400 mt-0.5">This product is temporarily unavailable.</p>
+          <p className="text-xs text-sand-600 mt-0.5">This product is temporarily unavailable.</p>
         </div>
       </div>
     )
@@ -242,7 +242,7 @@ function OrderForm({
             <Plus className="w-4 h-4" />
           </button>
           {product.minimum_order && product.minimum_order > 1 && (
-            <span className="text-xs text-sand-400">Min order: {product.minimum_order}</span>
+            <span className="text-xs text-sand-600">Min order: {product.minimum_order}</span>
           )}
         </div>
       </div>
@@ -280,7 +280,7 @@ function OrderForm({
 
       {/* Buyer notes */}
       <div>
-        <label htmlFor="notes" className="form-label">Notes to vendor <span className="text-sand-400 font-normal">(optional)</span></label>
+        <label htmlFor="notes" className="form-label">Notes to vendor <span className="text-sand-600 font-normal">(optional)</span></label>
         <textarea
           id="notes"
           className="form-input min-h-[60px] resize-none"
@@ -338,7 +338,7 @@ function OrderForm({
         )}
       </button>
 
-      <p className="text-center text-xs text-sand-400">
+      <p className="text-center text-xs text-sand-600">
         Secure payment powered by Paystack
       </p>
     </form>
@@ -438,7 +438,7 @@ export default function ProductDetailPage() {
             <Leaf className="w-8 h-8 text-sand-300" />
           </div>
           <h1 className="text-2xl font-display font-bold text-sand-900 mb-2">Product not found</h1>
-          <p className="text-sand-400 mb-6">This product may have been removed or is no longer available.</p>
+          <p className="text-sand-600 mb-6">This product may have been removed or is no longer available.</p>
           <Link href="/marketplace" className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors">
             <ChevronLeft className="w-4 h-4" />
             Back to marketplace
@@ -459,7 +459,7 @@ export default function ProductDetailPage() {
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
           <h1 className="text-2xl font-display font-bold text-sand-900 mb-2">Order placed!</h1>
-          <p className="text-sand-500 mb-6">Your order has been submitted. You'll be redirected to complete payment.</p>
+          <p className="text-sand-600 mb-6">Your order has been submitted. You'll be redirected to complete payment.</p>
           <Link href="/buyer/orders" className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors">
             View my orders
           </Link>
@@ -505,7 +505,7 @@ export default function ProductDetailPage() {
       <div className="container-app py-6 pb-28 md:pb-8">
 
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-xs text-sand-400 mb-6" aria-label="Breadcrumb">
+        <nav className="flex items-center gap-2 text-xs text-sand-600 mb-6" aria-label="Breadcrumb">
           <Link href="/marketplace" className="hover:text-green-600 transition-colors">Marketplace</Link>
           <span>›</span>
           <Link href={`/marketplace?category=${product.category}`} className="hover:text-green-600 transition-colors">
@@ -540,7 +540,7 @@ export default function ProductDetailPage() {
                 </span>
               )}
               {isOutOfStock && (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-sand-100 text-sand-500 text-xs font-medium border border-sand-200">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-sand-100 text-sand-600 text-xs font-medium border border-sand-200">
                   Out of stock
                 </span>
               )}
@@ -562,7 +562,7 @@ export default function ProductDetailPage() {
                 {formatCurrency(product.price_ghs)}
               </span>
               {product.unit && (
-                <span className="text-sm text-sand-400">{product.unit}</span>
+                <span className="text-sm text-sand-600">{product.unit}</span>
               )}
             </div>
 
@@ -575,7 +575,7 @@ export default function ProductDetailPage() {
 
             {/* Location */}
             {product.location && (
-              <div className="flex items-center gap-1.5 text-sm text-sand-400">
+              <div className="flex items-center gap-1.5 text-sm text-sand-600">
                 <MapPin className="w-4 h-4 flex-shrink-0" />
                 {product.location}{product.region ? `, ${product.region}` : ''}
               </div>
@@ -602,7 +602,7 @@ export default function ProductDetailPage() {
 
             {/* Min order info */}
             {product.minimum_order && product.minimum_order > 1 && (
-              <div className="flex items-center gap-2 text-xs text-sand-500">
+              <div className="flex items-center gap-2 text-xs text-sand-600">
                 <Package className="w-4 h-4" />
                 Minimum order: {product.minimum_order} {product.unit || 'units'}
               </div>
@@ -629,19 +629,19 @@ export default function ProductDetailPage() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-sand-400 font-medium mb-0.5">Sold by</p>
+                  <p className="text-xs text-sand-600 font-medium mb-0.5">Sold by</p>
                   <h3 className="text-sm font-semibold text-sand-900 truncate">{vendor.business_name}</h3>
                   {vendor.location && (
                     <div className="flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3 h-3 text-sand-400" />
-                      <span className="text-xs text-sand-400">{vendor.location}</span>
+                      <MapPin className="w-3 h-3 text-sand-600" />
+                      <span className="text-xs text-sand-600">{vendor.location}</span>
                     </div>
                   )}
                   {vendor.rating > 0 && (
                     <div className="flex items-center gap-1 mt-1">
                       <Star className="w-3.5 h-3.5 fill-gold-400 text-gold-400" />
                       <span className="text-xs font-medium text-sand-700">{vendor.rating.toFixed(1)}</span>
-                      <span className="text-xs text-sand-400">({vendor.review_count} reviews)</span>
+                      <span className="text-xs text-sand-600">({vendor.review_count} reviews)</span>
                     </div>
                   )}
                 </div>

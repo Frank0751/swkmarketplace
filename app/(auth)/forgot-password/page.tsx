@@ -53,13 +53,13 @@ export default function ForgotPasswordPage() {
         <h2 className="font-display text-xl font-semibold text-sand-900 mb-2">
           Check your email
         </h2>
-        <p className="text-sm text-sand-500 mb-1">
+        <p className="text-sm text-sand-600 mb-1">
           We sent a reset link to
         </p>
         <p className="text-sm font-medium text-sand-800 mb-6">
           {getValues('email')}
         </p>
-        <p className="text-xs text-sand-400 mb-6">
+        <p className="text-xs text-sand-600 mb-6">
           Didn&apos;t receive it? Check your spam folder or try again in a few minutes.
         </p>
         <Link
@@ -78,12 +78,12 @@ export default function ForgotPasswordPage() {
       {/* Heading */}
       <div className="mb-6 text-center">
         <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-sand-100 flex items-center justify-center">
-          <Mail className="w-6 h-6 text-sand-500" />
+          <Mail className="w-6 h-6 text-sand-600" />
         </div>
         <h1 className="font-display text-2xl font-semibold text-sand-900 mb-1">
           Forgot password?
         </h1>
-        <p className="text-sm text-sand-500">
+        <p className="text-sm text-sand-600">
           Enter your email and we&apos;ll send you a reset link
         </p>
       </div>
@@ -141,7 +141,7 @@ export default function ForgotPasswordPage() {
       <div className="mt-5 text-center">
         <Link
           href="/login"
-          className="inline-flex items-center gap-1.5 text-sm text-sand-400 hover:text-sand-600 hover:underline transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-sand-600 hover:text-sand-600 hover:underline transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to sign in

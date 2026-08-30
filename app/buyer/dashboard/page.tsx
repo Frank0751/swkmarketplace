@@ -74,7 +74,7 @@ export default async function BuyerDashboardPage() {
       <div className="flex">
         {/* Sidebar */}
         <aside className="hidden md:flex flex-col w-64 min-h-[calc(100vh-64px)] bg-white border-r border-sand-200 p-4 gap-1 sticky top-16 self-start">
-          <p className="text-xs font-semibold text-sand-400 uppercase tracking-widest px-3 mb-2">
+          <p className="text-xs font-semibold text-sand-600 uppercase tracking-widest px-3 mb-2">
             Buyer Menu
           </p>
           {BUYER_NAV.map(item => {
@@ -107,7 +107,7 @@ export default async function BuyerDashboardPage() {
             <h1 className="text-2xl font-display font-bold text-sand-900">
               Welcome back{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}!
             </h1>
-            <p className="text-sand-500 text-sm mt-1">
+            <p className="text-sand-600 text-sm mt-1">
               Here&rsquo;s a summary of your activity on SWK Marketplace.
             </p>
           </div>
@@ -116,7 +116,7 @@ export default async function BuyerDashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-sand-500 uppercase tracking-wide">Total Orders</span>
+                <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Total Orders</span>
                 <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
                   <ShoppingBag className="w-4 h-4 text-green-600" />
                 </div>
@@ -126,7 +126,7 @@ export default async function BuyerDashboardPage() {
 
             <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-sand-500 uppercase tracking-wide">Active Orders</span>
+                <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Active Orders</span>
                 <div className="w-9 h-9 rounded-lg bg-gold-50 flex items-center justify-center">
                   <Clock className="w-4 h-4 text-gold-600" />
                 </div>
@@ -136,7 +136,7 @@ export default async function BuyerDashboardPage() {
 
             <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-sand-500 uppercase tracking-wide">Total Spent</span>
+                <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Total Spent</span>
                 <div className="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center">
                   <DollarSign className="w-4 h-4 text-teal-600" />
                 </div>
@@ -162,10 +162,10 @@ export default async function BuyerDashboardPage() {
             {recent.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                 <div className="w-16 h-16 rounded-full bg-sand-100 flex items-center justify-center mb-4">
-                  <PackageOpen className="w-8 h-8 text-sand-400" />
+                  <PackageOpen className="w-8 h-8 text-sand-600" />
                 </div>
                 <h3 className="text-base font-semibold text-sand-700 mb-1">No orders yet</h3>
-                <p className="text-sm text-sand-400 mb-6 max-w-xs">
+                <p className="text-sm text-sand-600 mb-6 max-w-xs">
                   You haven&rsquo;t placed any orders yet. Start shopping for sustainable products.
                 </p>
                 <Link

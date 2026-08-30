@@ -33,7 +33,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Inp
 
       <div className="relative">
         {leftIcon && (
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sand-400">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sand-600">
             {leftIcon}
           </span>
         )}
@@ -56,7 +56,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Inp
         />
 
         {rightElement && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sand-400">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sand-600">
             {rightElement}
           </span>
         )}
@@ -68,7 +68,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Inp
         </p>
       )}
       {hint && !error && (
-        <p id={`${inputId}-hint`} className="mt-1 text-xs text-sand-500">
+        <p id={`${inputId}-hint`} className="mt-1 text-xs text-sand-600">
           {hint}
         </p>
       )}
@@ -127,7 +127,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(fun
         </p>
       )}
       {hint && !error && (
-        <p id={`${textareaId}-hint`} className="mt-1 text-xs text-sand-500">
+        <p id={`${textareaId}-hint`} className="mt-1 text-xs text-sand-600">
           {hint}
         </p>
       )}

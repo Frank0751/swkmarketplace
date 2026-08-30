@@ -119,7 +119,7 @@ export function AdminVendorsClient({ initialVendors }: AdminVendorsClientProps) 
       </div>
 
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-sand-400">
+        <div className="flex flex-col items-center justify-center py-20 text-sand-600">
           <Users className="w-10 h-10 mb-3" />
           <p className="text-base font-medium">No vendors in this category</p>
           <p className="text-sm mt-1">

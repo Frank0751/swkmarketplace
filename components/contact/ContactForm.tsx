@@ -63,7 +63,7 @@ export function ContactForm() {
         <h2 className="font-display text-xl font-semibold text-sand-900 mb-1">
           Message sent!
         </h2>
-        <p className="text-sm text-sand-500 max-w-sm mx-auto">
+        <p className="text-sm text-sand-600 max-w-sm mx-auto">
           Thanks for reaching out. The SWK Ghana team will get back to you shortly.
         </p>
         <button

@@ -15,7 +15,7 @@ export default function LoginPage() {
         <h1 className="font-display text-2xl font-semibold text-sand-900 mb-1">
           Welcome back
         </h1>
-        <p className="text-sm text-sand-500">Sign in to your SWK account</p>
+        <p className="text-sm text-sand-600">Sign in to your SWK account</p>
       </div>
 
       {/* useSearchParams (redirect param) requires a Suspense boundary for prerender */}
@@ -25,7 +25,7 @@ export default function LoginPage() {
 
       {/* Links */}
       <div className="mt-5 space-y-3 text-center text-sm">
-        <p className="text-sand-500">
+        <p className="text-sand-600">
           Don&apos;t have an account?{' '}
           <Link
             href="/signup"
@@ -36,7 +36,7 @@ export default function LoginPage() {
         </p>
         <Link
           href="/forgot-password"
-          className="block text-sand-400 hover:text-sand-600 hover:underline transition-colors"
+          className="block text-sand-600 hover:text-sand-600 hover:underline transition-colors"
         >
           Forgot your password?
         </Link>

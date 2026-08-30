@@ -100,7 +100,7 @@ export function ShareStoreLink({ slug, businessName, variant = 'row' }: ShareSto
         <Share2 className="w-4 h-4 text-green-600" />
         <h2 className="text-sm font-bold text-sand-900">Your store link</h2>
       </div>
-      <p className="text-xs text-sand-500 mb-3">
+      <p className="text-xs text-sand-600 mb-3">
         Share this link anywhere, WhatsApp, Instagram bio, business cards. Anyone can open it
         and see your full store, no login needed. It&rsquo;s your mini-website.
       </p>

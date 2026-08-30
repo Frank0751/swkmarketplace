@@ -18,7 +18,7 @@ export default function NotFound() {
           <h1 className="font-display text-3xl font-bold text-sand-900 mb-3">
             This page has gone off the grid
           </h1>
-          <p className="text-sand-500 mb-8">
+          <p className="text-sand-600 mb-8">
             The page you&rsquo;re looking for doesn&rsquo;t exist or may have been moved.
             Let&rsquo;s get you back to shopping sustainably.
           </p>

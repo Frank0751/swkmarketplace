@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
         <h2 className="font-display text-xl font-semibold text-sand-900 mb-2">
           Password updated
         </h2>
-        <p className="text-sm text-sand-500 mb-6">
+        <p className="text-sm text-sand-600 mb-6">
           Your password has been changed. Redirecting you to sign in…
         </p>
         <Link
@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
         <h2 className="font-display text-xl font-semibold text-sand-900 mb-2">
           Link expired or invalid
         </h2>
-        <p className="text-sm text-sand-500 mb-6">
+        <p className="text-sm text-sand-600 mb-6">
           This password reset link is no longer valid. Please request a new one.
         </p>
         <Link
@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
         <h1 className="font-display text-2xl font-semibold text-sand-900 mb-1">
           Set a new password
         </h1>
-        <p className="text-sm text-sand-500">
+        <p className="text-sm text-sand-600">
           Choose a strong password for your SWK account
         </p>
       </div>
@@ -126,7 +126,7 @@ export default function ResetPasswordPage() {
             New password
           </label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-400" />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-600" />
             <input
               id="password"
               type="password"
@@ -144,7 +144,7 @@ export default function ResetPasswordPage() {
             Confirm new password
           </label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-400" />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-600" />
             <input
               id="confirm_password"
               type="password"

@@ -28,7 +28,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       {/* Footer */}
-      <p className="mt-6 text-sm text-sand-400 text-center">
+      <p className="mt-6 text-sm text-sand-600 text-center">
         Protected by SWK Ghana · SDG 12 Verified
       </p>
     </div>

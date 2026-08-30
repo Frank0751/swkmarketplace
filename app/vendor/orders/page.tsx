@@ -124,12 +124,12 @@ export default function VendorOrdersPage() {
         <div className="mb-6">
           <Link
             href="/vendor/dashboard"
-            className="inline-flex items-center gap-1.5 text-sm text-sand-500 hover:text-sand-900 transition-colors mb-3"
+            className="inline-flex items-center gap-1.5 text-sm text-sand-600 hover:text-sand-900 transition-colors mb-3"
           >
             <ArrowLeft className="w-4 h-4" /> Dashboard
           </Link>
           <h1 className="text-2xl font-display font-bold text-sand-900">Orders</h1>
-          <p className="text-sm text-sand-500 mt-1">
+          <p className="text-sm text-sand-600 mt-1">
             Confirm new orders, dispatch them, and track their progress. Payouts release after
             the buyer confirms delivery.
           </p>
@@ -176,12 +176,12 @@ export default function VendorOrdersPage() {
         ) : visible.length === 0 ? (
           <div className="bg-white rounded-xl border border-sand-200 p-14 text-center">
             <div className="w-14 h-14 rounded-full bg-sand-100 flex items-center justify-center mx-auto mb-3">
-              <PackageOpen className="w-7 h-7 text-sand-400" />
+              <PackageOpen className="w-7 h-7 text-sand-600" />
             </div>
             <p className="text-sm font-semibold text-sand-700 mb-1">
               {tab === 'all' ? 'No orders yet' : 'Nothing here right now'}
             </p>
-            <p className="text-xs text-sand-400 max-w-xs mx-auto">
+            <p className="text-xs text-sand-600 max-w-xs mx-auto">
               {tab === 'all'
                 ? 'Orders appear here as soon as buyers purchase your products.'
                 : 'Orders will move into this tab as their status changes.'}
@@ -209,7 +209,7 @@ export default function VendorOrdersPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-6 h-6 text-sand-400" />
+                          <Package className="w-6 h-6 text-sand-600" />
                         </div>
                       )}
                     </div>
@@ -222,20 +222,20 @@ export default function VendorOrdersPage() {
                         </p>
                         <span className={cn('status-badge text-[11px]', statusColor)}>{statusLabel}</span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-sand-400">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-sand-600">
                         <span className="font-mono">{order.reference}</span>
                         <span>Qty {order.quantity}</span>
                         <span>{order.buyer?.full_name ?? 'Buyer'}</span>
                         <span>{formatRelativeTime(order.created_at)}</span>
                       </div>
-                      <div className="flex items-start gap-1.5 mt-2 text-xs text-sand-500">
-                        <MapPin className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-sand-400" />
+                      <div className="flex items-start gap-1.5 mt-2 text-xs text-sand-600">
+                        <MapPin className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-sand-600" />
                         <span className="line-clamp-2">
                           {order.delivery_address}, {order.delivery_region}
                         </span>
                       </div>
                       {order.buyer_notes && (
-                        <p className="mt-2 text-xs text-sand-500 bg-sand-50 border border-sand-100 rounded-lg px-3 py-2">
+                        <p className="mt-2 text-xs text-sand-600 bg-sand-50 border border-sand-100 rounded-lg px-3 py-2">
                           Buyer note: {order.buyer_notes}
                         </p>
                       )}
@@ -280,7 +280,7 @@ export default function VendorOrdersPage() {
                       )}
 
                       {order.status === 'dispatched' && (
-                        <p className="text-[11px] text-sand-400 text-right max-w-[150px]">
+                        <p className="text-[11px] text-sand-600 text-right max-w-[150px]">
                           Waiting for the buyer to confirm delivery
                         </p>
                       )}

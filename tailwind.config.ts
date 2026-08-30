@@ -56,7 +56,9 @@ const config: Config = {
           300: '#D6D0C0',
           400: '#BAB39F',
           500: '#9E9680',
-          600: '#7D7666',
+          // Darkened from #7D7666 (4.25:1 on sand-50, failed AA) so the muted
+          // text step passes 4.5:1 on white, sand-50 and sand-100.
+          600: '#6B6454',
           700: '#5F5A4E',
           800: '#444038',
           900: '#2A2823',

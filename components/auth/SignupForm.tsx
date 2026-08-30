@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Eye, EyeOff, ShoppingBag, Store } from 'lucide-react'
+import { Eye, EyeOff, ShoppingBag, Store, Check } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { GoogleButton, AuthDivider } from '@/components/auth/GoogleButton'
@@ -28,6 +28,13 @@ const schema = z
   })
 
 type FormValues = z.infer<typeof schema>
+
+// ─── Role options ─────────────────────────────────────────────────────────────
+
+const ROLE_OPTIONS = [
+  { value: 'buyer',  Icon: ShoppingBag, label: 'Shop', hint: 'Browse & buy' },
+  { value: 'vendor', Icon: Store,       label: 'Sell', hint: 'Apply as a vendor' },
+] as const
 
 // ─── Password strength ────────────────────────────────────────────────────────
 
@@ -141,7 +148,7 @@ export default function SignupForm() {
         <h2 className="font-display text-lg font-semibold text-sand-900 mb-1">
           Check your inbox
         </h2>
-        <p className="text-sm text-sand-500 max-w-xs mx-auto">
+        <p className="text-sm text-sand-600 max-w-xs mx-auto">
           We sent a confirmation link to <span className="font-medium text-sand-700">{confirmEmailSentTo}</span>.
           Click it to activate your account, then sign in.
         </p>
@@ -152,7 +159,7 @@ export default function SignupForm() {
   return (
     <div>
       <GoogleButton label="Sign up with Google" />
-      <p className="mt-2 text-center text-xs text-sand-400">
+      <p className="mt-2 text-center text-xs text-sand-600">
         Google accounts join as buyers. Want to sell? You can apply as a vendor right after.
       </p>
       <AuthDivider />
@@ -168,11 +175,13 @@ export default function SignupForm() {
           type="text"
           autoComplete="name"
           placeholder="Kwame Mensah"
+          aria-invalid={!!errors.full_name}
+          aria-describedby={errors.full_name ? 'full_name-error' : undefined}
           className={cn('form-input', errors.full_name && 'border-red-400 focus:ring-red-400/20')}
           {...register('full_name')}
         />
         {errors.full_name && (
-          <p className="form-error">{errors.full_name.message}</p>
+          <p id="full_name-error" role="alert" className="form-error">{errors.full_name.message}</p>
         )}
       </div>
 
@@ -186,11 +195,13 @@ export default function SignupForm() {
           type="email"
           autoComplete="email"
           placeholder="you@example.com"
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? 'email-error' : undefined}
           className={cn('form-input', errors.email && 'border-red-400 focus:ring-red-400/20')}
           {...register('email')}
         />
         {errors.email && (
-          <p className="form-error">{errors.email.message}</p>
+          <p id="email-error" role="alert" className="form-error">{errors.email.message}</p>
         )}
       </div>
 
@@ -198,7 +209,7 @@ export default function SignupForm() {
       <div>
         <label htmlFor="phone" className="form-label">
           Phone number{' '}
-          <span className="text-sand-400 font-normal">(optional)</span>
+          <span className="text-sand-600 font-normal">(optional)</span>
         </label>
         <input
           id="phone"
@@ -211,87 +222,79 @@ export default function SignupForm() {
       </div>
 
       {/* Role selector */}
-      <div>
-        <p className="form-label mb-2">I want to…</p>
+      {/* Real radios inside a fieldset: screen readers announce this as a
+          required group of two exclusive options, arrow keys move between them,
+          and selection no longer depends on colour alone. */}
+      <fieldset>
+        <legend className="form-label mb-2">I want to&hellip;</legend>
         <div className="grid grid-cols-2 gap-3">
-          {/* Buyer */}
-          <button
-            type="button"
-            onClick={() => setValue('role', 'buyer', { shouldValidate: true })}
-            className={cn(
-              'relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all duration-150 focus:outline-none',
-              selectedRole === 'buyer'
-                ? 'border-green-600 bg-green-50 shadow-glow-green'
-                : 'border-sand-200 bg-white hover:border-sand-300 hover:bg-sand-50',
-            )}
-          >
-            {selectedRole === 'buyer' && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-green-600" />
-            )}
-            <div className={cn(
-              'w-10 h-10 rounded-full flex items-center justify-center',
-              selectedRole === 'buyer' ? 'bg-green-100' : 'bg-sand-100',
-            )}>
-              <ShoppingBag className={cn(
-                'w-5 h-5',
-                selectedRole === 'buyer' ? 'text-green-600' : 'text-sand-400',
-              )} />
-            </div>
-            <div>
-              <p className={cn(
-                'text-sm font-semibold',
-                selectedRole === 'buyer' ? 'text-green-700' : 'text-sand-700',
-              )}>
-                Shop
-              </p>
-              <p className="text-xs text-sand-400 mt-0.5 leading-tight">
-                Browse &amp; buy
-              </p>
-            </div>
-          </button>
-
-          {/* Vendor */}
-          <button
-            type="button"
-            onClick={() => setValue('role', 'vendor', { shouldValidate: true })}
-            className={cn(
-              'relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all duration-150 focus:outline-none',
-              selectedRole === 'vendor'
-                ? 'border-green-600 bg-green-50 shadow-glow-green'
-                : 'border-sand-200 bg-white hover:border-sand-300 hover:bg-sand-50',
-            )}
-          >
-            {selectedRole === 'vendor' && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-green-600" />
-            )}
-            <div className={cn(
-              'w-10 h-10 rounded-full flex items-center justify-center',
-              selectedRole === 'vendor' ? 'bg-green-100' : 'bg-sand-100',
-            )}>
-              <Store className={cn(
-                'w-5 h-5',
-                selectedRole === 'vendor' ? 'text-green-600' : 'text-sand-400',
-              )} />
-            </div>
-            <div>
-              <p className={cn(
-                'text-sm font-semibold',
-                selectedRole === 'vendor' ? 'text-green-700' : 'text-sand-700',
-              )}>
-                Sell
-              </p>
-              <p className="text-xs text-sand-400 mt-0.5 leading-tight">
-                Verified green seller
-              </p>
-            </div>
-          </button>
+          {ROLE_OPTIONS.map(({ value, Icon, label, hint }) => {
+            const active = selectedRole === value
+            return (
+              <label key={value} className="relative cursor-pointer">
+                <input
+                  type="radio"
+                  value={value}
+                  {...register('role')}
+                  className="peer sr-only"
+                />
+                <span
+                  className={cn(
+                    'flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all duration-150',
+                    // Focus ring lives on the visual card, driven by the hidden input
+                    'peer-focus-visible:ring-2 peer-focus-visible:ring-green-600 peer-focus-visible:ring-offset-2',
+                    active
+                      ? 'border-green-600 bg-green-50 shadow-glow-green'
+                      : 'border-sand-200 bg-white hover:border-sand-300 hover:bg-sand-50',
+                  )}
+                >
+                  {/* Tick is the non-colour cue that this option is chosen */}
+                  {active && (
+                    <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-green-600 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                    </span>
+                  )}
+                  <span
+                    className={cn(
+                      'w-10 h-10 rounded-full flex items-center justify-center',
+                      active ? 'bg-green-100' : 'bg-sand-100',
+                    )}
+                  >
+                    <Icon
+                      className={cn('w-5 h-5', active ? 'text-green-700' : 'text-sand-600')}
+                      aria-hidden="true"
+                    />
+                  </span>
+                  <span className="block">
+                    <span
+                      className={cn(
+                        'block text-sm font-semibold',
+                        active ? 'text-green-700' : 'text-sand-700',
+                      )}
+                    >
+                      {label}
+                    </span>
+                    <span className="block text-xs text-sand-600 mt-0.5 leading-tight">
+                      {hint}
+                    </span>
+                  </span>
+                </span>
+              </label>
+            )
+          })}
         </div>
-        {selectedRole === 'vendor' && (
-          <p className="mt-2 text-xs text-teal-600 bg-teal-50 border border-teal-100 rounded-lg px-3 py-2">
-            You&apos;ll complete a short application after signing up to become a verified green entrepreneur.
-          </p>
-        )}
-      </div>
+
+        {/* Always rendered so the choice's consequence is visible before you pick,
+            not only after. aria-live announces it when the selection changes. */}
+        <p
+          aria-live="polite"
+          className="mt-2 text-xs text-teal-700 bg-teal-50 border border-teal-100 rounded-lg px-3 py-2"
+        >
+          {selectedRole === 'vendor'
+            ? 'Sellers complete a short application after signing up. You can browse and buy straight away, but listing products needs SWK Ghana approval first.'
+            : 'Buyers can order right away. You can apply to sell later from your dashboard.'}
+        </p>
+      </fieldset>
 
       {/* Password */}
       <div>
@@ -304,6 +307,8 @@ export default function SignupForm() {
             type={showPassword ? 'text' : 'password'}
             autoComplete="new-password"
             placeholder="Min. 8 characters"
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? 'password-error' : 'password-strength'}
             className={cn(
               'form-input pr-10',
               errors.password && 'border-red-400 focus:ring-red-400/20',
@@ -313,7 +318,7 @@ export default function SignupForm() {
           <button
             type="button"
             onClick={() => setShowPassword(v => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-sand-400 hover:text-sand-600 transition-colors focus:outline-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-sand-600 hover:text-sand-700 transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-1"
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -323,7 +328,9 @@ export default function SignupForm() {
         {/* Strength indicator */}
         {password && (
           <div className="mt-2">
-            <div className="flex gap-1 mb-1">
+            {/* Bars are decoration; the text below carries the same meaning for
+                screen readers and for anyone who can't distinguish the colours. */}
+            <div className="flex gap-1 mb-1" aria-hidden="true">
               {[1, 2, 3, 4, 5].map(i => (
                 <div
                   key={i}
@@ -334,13 +341,13 @@ export default function SignupForm() {
                 />
               ))}
             </div>
-            <p className="text-xs text-sand-400">
+            <p id="password-strength" aria-live="polite" className="text-xs text-sand-600">
               Strength:{' '}
               <span className={cn(
                 'font-medium',
-                strength.label === 'Weak'   && 'text-red-500',
-                strength.label === 'Medium' && 'text-gold-500',
-                strength.label === 'Strong' && 'text-green-600',
+                strength.label === 'Weak'   && 'text-red-600',
+                strength.label === 'Medium' && 'text-gold-600',
+                strength.label === 'Strong' && 'text-green-700',
               )}>
                 {strength.label}
               </span>
@@ -349,7 +356,7 @@ export default function SignupForm() {
         )}
 
         {errors.password && (
-          <p className="form-error">{errors.password.message}</p>
+          <p id="password-error" role="alert" className="form-error">{errors.password.message}</p>
         )}
       </div>
 
@@ -364,6 +371,8 @@ export default function SignupForm() {
             type={showConfirmPassword ? 'text' : 'password'}
             autoComplete="new-password"
             placeholder="Repeat your password"
+            aria-invalid={!!errors.confirm_password}
+            aria-describedby={errors.confirm_password ? 'confirm_password-error' : undefined}
             className={cn(
               'form-input pr-10',
               errors.confirm_password && 'border-red-400 focus:ring-red-400/20',
@@ -373,14 +382,14 @@ export default function SignupForm() {
           <button
             type="button"
             onClick={() => setShowConfirmPassword(v => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-sand-400 hover:text-sand-600 transition-colors focus:outline-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-sand-600 hover:text-sand-700 transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-1"
             aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
           >
             {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
         {errors.confirm_password && (
-          <p className="form-error">{errors.confirm_password.message}</p>
+          <p id="confirm_password-error" role="alert" className="form-error">{errors.confirm_password.message}</p>
         )}
       </div>
 

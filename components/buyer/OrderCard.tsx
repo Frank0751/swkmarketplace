@@ -41,10 +41,10 @@ export function OrderCard({ order }: Props) {
       <div className="flex-1 min-w-0">
         {/* Reference + date */}
         <div className="flex items-center justify-between gap-2 mb-1">
-          <span className="text-xs font-mono font-medium text-sand-500 bg-sand-100 px-2 py-0.5 rounded">
+          <span className="text-xs font-mono font-medium text-sand-600 bg-sand-100 px-2 py-0.5 rounded">
             {order.reference}
           </span>
-          <span className="text-xs text-sand-400 flex-shrink-0">
+          <span className="text-xs text-sand-600 flex-shrink-0">
             {formatRelativeTime(order.created_at)}
           </span>
         </div>
@@ -56,7 +56,7 @@ export function OrderCard({ order }: Props) {
 
         {/* Vendor name */}
         {vendor?.business_name && (
-          <p className="text-xs text-sand-500 mb-2">
+          <p className="text-xs text-sand-600 mb-2">
             by {vendor.business_name}
           </p>
         )}
@@ -68,7 +68,7 @@ export function OrderCard({ order }: Props) {
               {formatCurrency(order.total_amount)}
             </span>
             {order.quantity > 1 && (
-              <span className="text-xs text-sand-400">
+              <span className="text-xs text-sand-600">
                 × {order.quantity}
               </span>
             )}

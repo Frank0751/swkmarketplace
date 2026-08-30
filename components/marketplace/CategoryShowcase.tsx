@@ -22,7 +22,7 @@ export function CategoryShowcase() {
             <h2 className="text-2xl md:text-3xl font-display font-semibold text-sand-900">
               Shop by category
             </h2>
-            <p className="text-sand-500 text-sm mt-1">
+            <p className="text-sand-600 text-sm mt-1">
               Four ways to buy sustainably, every product SDG 12-verified
             </p>
           </div>

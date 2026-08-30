@@ -184,7 +184,7 @@ export default async function MarketplacePage({
                 {hasActiveFilters && (
                   <Link
                     href="/marketplace"
-                    className="text-xs text-sand-400 hover:text-sand-900 underline underline-offset-2 transition-colors"
+                    className="text-xs text-sand-600 hover:text-sand-900 underline underline-offset-2 transition-colors"
                   >
                     Clear all
                   </Link>
@@ -193,7 +193,7 @@ export default async function MarketplacePage({
 
               {/* Sort */}
               <div>
-                <p className="text-xs font-semibold text-sand-500 uppercase tracking-wide mb-2">Sort by</p>
+                <p className="text-xs font-semibold text-sand-600 uppercase tracking-wide mb-2">Sort by</p>
                 <div className="space-y-1">
                   {[
                     { value: 'newest', label: 'Newest first' },
@@ -218,7 +218,7 @@ export default async function MarketplacePage({
 
               {/* Region */}
               <div>
-                <p className="text-xs font-semibold text-sand-500 uppercase tracking-wide mb-2">Region</p>
+                <p className="text-xs font-semibold text-sand-600 uppercase tracking-wide mb-2">Region</p>
                 <div className="space-y-1 max-h-48 overflow-y-auto scrollbar-hide">
                   <Link
                     href={buildUrl({ region: '', page: '1' })}
@@ -244,7 +244,7 @@ export default async function MarketplacePage({
 
               {/* Price range */}
               <div>
-                <p className="text-xs font-semibold text-sand-500 uppercase tracking-wide mb-2">Price (GHS)</p>
+                <p className="text-xs font-semibold text-sand-600 uppercase tracking-wide mb-2">Price (GHS)</p>
                 <div className="space-y-1">
                   {[
                     { label: 'Under GHS 50', min: undefined, max: 50 },
@@ -283,7 +283,7 @@ export default async function MarketplacePage({
                 <h1 className="text-xl font-display font-bold text-sand-900">
                   {category ? CATEGORY_META[category as ProductCategory]?.label : 'All products'}
                 </h1>
-                <p className="text-sm text-sand-400 mt-0.5">
+                <p className="text-sm text-sand-600 mt-0.5">
                   {totalCount === 0
                     ? 'No products found'
                     : `Showing ${((page - 1) * LIMIT) + 1}–${Math.min(page * LIMIT, totalCount)} of ${totalCount} product${totalCount !== 1 ? 's' : ''}`}
@@ -372,7 +372,7 @@ export default async function MarketplacePage({
                   </span>
                 )}
 
-                <span className="text-sm text-sand-500">
+                <span className="text-sm text-sand-600">
                   Page {page} of {totalPages}
                 </span>
 

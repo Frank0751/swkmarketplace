@@ -19,6 +19,7 @@ import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/layout/Navbar'
 import { OrderTimeline } from '@/components/buyer/OrderTimeline'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import {
   formatCurrency,
   formatDate,
@@ -39,6 +40,7 @@ export default function BuyerOrderDetailPage() {
   const [order,       setOrder]       = useState<Order | null>(null)
   const [loading,     setLoading]     = useState(true)
   const [confirming,  setConfirming]  = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const [notFound,    setNotFound]    = useState(false)
 
   useEffect(() => {
@@ -137,10 +139,10 @@ export default function BuyerOrderDetailPage() {
         <Navbar />
         <div className="container-app py-16 text-center">
           <div className="w-16 h-16 rounded-full bg-sand-100 flex items-center justify-center mx-auto mb-4">
-            <Package className="w-8 h-8 text-sand-400" />
+            <Package className="w-8 h-8 text-sand-600" />
           </div>
           <h1 className="text-xl font-display font-bold text-sand-900 mb-2">Order not found</h1>
-          <p className="text-sand-500 text-sm mb-6">
+          <p className="text-sand-600 text-sm mb-6">
             This order doesn&rsquo;t exist or you don&rsquo;t have permission to view it.
           </p>
           <Link
@@ -174,7 +176,7 @@ export default function BuyerOrderDetailPage() {
         <div className="mb-6">
           <Link
             href="/buyer/orders"
-            className="inline-flex items-center gap-1.5 text-sm text-sand-500 hover:text-sand-900 transition-colors mb-4"
+            className="inline-flex items-center gap-1.5 text-sm text-sand-600 hover:text-sand-900 transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Orders
           </Link>
@@ -189,23 +191,30 @@ export default function BuyerOrderDetailPage() {
                   {statusLabel}
                 </span>
               </div>
-              <p className="text-sm text-sand-500">Placed on {formatDate(order.created_at)}</p>
+              <p className="text-sm text-sand-600">Placed on {formatDate(order.created_at)}</p>
             </div>
 
-            {/* Confirm delivery CTA */}
+            {/* Confirm delivery CTA. The consequence is stated here too, not
+                only in the mobile block, so desktop buyers see it before they
+                release the escrow. */}
             {order.status === 'dispatched' && (
-              <button
-                onClick={handleConfirmDelivery}
-                disabled={confirming}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 disabled:opacity-60 disabled:pointer-events-none transition-colors shadow-sm"
-              >
-                {confirming ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <CheckCircle2 className="w-4 h-4" />
-                )}
-                {confirming ? 'Confirming…' : 'Confirm Delivery'}
-              </button>
+              <div className="sm:text-right">
+                <button
+                  onClick={() => setConfirmOpen(true)}
+                  disabled={confirming}
+                  className="inline-flex items-center gap-2 min-h-[44px] px-5 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 disabled:opacity-60 disabled:pointer-events-none transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                >
+                  {confirming ? (
+                    <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+                  )}
+                  {confirming ? 'Confirming…' : 'Confirm delivery'}
+                </button>
+                <p className="mt-1.5 text-xs text-sand-600 max-w-xs sm:ml-auto">
+                  This releases your payment to the vendor and cannot be undone.
+                </p>
+              </div>
             )}
           </div>
         </div>
@@ -248,7 +257,7 @@ export default function BuyerOrderDetailPage() {
                   <Star className="w-5 h-5 text-gold-400 fill-gold-400 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-semibold text-sand-900">How was your order?</p>
-                    <p className="text-xs text-sand-500 mt-0.5">
+                    <p className="text-xs text-sand-600 mt-0.5">
                       Your review helps other buyers shop with confidence.
                     </p>
                   </div>
@@ -287,38 +296,38 @@ export default function BuyerOrderDetailPage() {
               <h2 className="text-base font-display font-semibold text-sand-900 mb-4">Order Details</h2>
               <dl className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
                 <div>
-                  <dt className="text-sand-400 text-xs mb-0.5">Order reference</dt>
+                  <dt className="text-sand-600 text-xs mb-0.5">Order reference</dt>
                   <dd className="font-mono font-medium text-sand-900">{order.reference}</dd>
                 </div>
                 <div>
-                  <dt className="text-sand-400 text-xs mb-0.5">Order date</dt>
+                  <dt className="text-sand-600 text-xs mb-0.5">Order date</dt>
                   <dd className="font-medium text-sand-900">{formatDate(order.created_at)}</dd>
                 </div>
                 <div>
-                  <dt className="text-sand-400 text-xs mb-0.5">Quantity</dt>
+                  <dt className="text-sand-600 text-xs mb-0.5">Quantity</dt>
                   <dd className="font-medium text-sand-900">{order.quantity}</dd>
                 </div>
                 {order.estimated_delivery && (
                   <div>
-                    <dt className="text-sand-400 text-xs mb-0.5">Estimated delivery</dt>
+                    <dt className="text-sand-600 text-xs mb-0.5">Estimated delivery</dt>
                     <dd className="font-medium text-sand-900">{formatDate(order.estimated_delivery)}</dd>
                   </div>
                 )}
                 {order.paystack_reference && (
                   <div className="col-span-2">
-                    <dt className="text-sand-400 text-xs mb-0.5">Payment reference</dt>
+                    <dt className="text-sand-600 text-xs mb-0.5">Payment reference</dt>
                     <dd className="font-mono text-xs text-sand-600 break-all">{order.paystack_reference}</dd>
                   </div>
                 )}
                 {order.dispatched_at && (
                   <div>
-                    <dt className="text-sand-400 text-xs mb-0.5">Dispatched at</dt>
+                    <dt className="text-sand-600 text-xs mb-0.5">Dispatched at</dt>
                     <dd className="font-medium text-sand-900">{formatDateTime(order.dispatched_at)}</dd>
                   </div>
                 )}
                 {order.delivered_at && (
                   <div>
-                    <dt className="text-sand-400 text-xs mb-0.5">Delivered at</dt>
+                    <dt className="text-sand-600 text-xs mb-0.5">Delivered at</dt>
                     <dd className="font-medium text-sand-900">{formatDateTime(order.delivered_at)}</dd>
                   </div>
                 )}
@@ -326,14 +335,14 @@ export default function BuyerOrderDetailPage() {
 
               {order.buyer_notes && (
                 <div className="mt-4 pt-4 border-t border-sand-100">
-                  <dt className="text-sand-400 text-xs mb-1">Your notes</dt>
+                  <dt className="text-sand-600 text-xs mb-1">Your notes</dt>
                   <dd className="text-sm text-sand-700">{order.buyer_notes}</dd>
                 </div>
               )}
 
               {order.vendor_notes && (
                 <div className="mt-3">
-                  <dt className="text-sand-400 text-xs mb-1">Vendor notes</dt>
+                  <dt className="text-sand-600 text-xs mb-1">Vendor notes</dt>
                   <dd className="text-sm text-sand-700">{order.vendor_notes}</dd>
                 </div>
               )}
@@ -342,11 +351,11 @@ export default function BuyerOrderDetailPage() {
             {/* Delivery address */}
             <div className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
               <div className="flex items-center gap-2 mb-3">
-                <MapPin className="w-4 h-4 text-sand-400" />
+                <MapPin className="w-4 h-4 text-sand-600" />
                 <h2 className="text-base font-display font-semibold text-sand-900">Delivery Address</h2>
               </div>
               <p className="text-sm text-sand-700">{order.delivery_address}</p>
-              <p className="text-sm text-sand-500 mt-1">{order.delivery_region}, Ghana</p>
+              <p className="text-sm text-sand-600 mt-1">{order.delivery_region}, Ghana</p>
             </div>
           </div>
 
@@ -375,7 +384,7 @@ export default function BuyerOrderDetailPage() {
                     <p className="text-sm font-semibold text-sand-900 line-clamp-2 group-hover:text-green-700 transition-colors">
                       {product.title}
                     </p>
-                    <p className="text-xs text-sand-400 mt-0.5">
+                    <p className="text-xs text-sand-600 mt-0.5">
                       {formatCurrency(order.unit_price)} × {order.quantity}
                     </p>
                   </div>
@@ -408,7 +417,7 @@ export default function BuyerOrderDetailPage() {
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-sand-500">Status</span>
+                    <span className="text-sand-600">Status</span>
                     <span className={cn(
                       'font-medium capitalize',
                       payout.status === 'held'           && 'text-gold-600',
@@ -424,12 +433,12 @@ export default function BuyerOrderDetailPage() {
                   </div>
                   {payout.released_at && (
                     <div className="flex justify-between">
-                      <span className="text-sand-500">Released</span>
+                      <span className="text-sand-600">Released</span>
                       <span className="font-medium text-sand-900">{formatDate(payout.released_at)}</span>
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-sand-400 mt-3">
+                <p className="text-xs text-sand-600 mt-3">
                   SWK Ghana holds your payment until you confirm delivery, protecting every transaction.
                 </p>
               </div>
@@ -439,7 +448,7 @@ export default function BuyerOrderDetailPage() {
             {vendor && (
               <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                 <div className="flex items-center gap-2 mb-3">
-                  <Store className="w-4 h-4 text-sand-400" />
+                  <Store className="w-4 h-4 text-sand-600" />
                   <h2 className="text-base font-display font-semibold text-sand-900">Sold By</h2>
                 </div>
                 <div className="flex items-center gap-3">
@@ -459,7 +468,7 @@ export default function BuyerOrderDetailPage() {
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-sand-900">{vendor.business_name}</p>
                     {vendor.location && (
-                      <p className="text-xs text-sand-400 mt-0.5">
+                      <p className="text-xs text-sand-600 mt-0.5">
                         {vendor.location}, {vendor.region}
                       </p>
                     )}
@@ -484,18 +493,34 @@ export default function BuyerOrderDetailPage() {
                   Confirming delivery releases the escrow payment to the vendor.
                 </p>
                 <button
-                  onClick={handleConfirmDelivery}
+                  onClick={() => setConfirmOpen(true)}
                   disabled={confirming}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 disabled:opacity-60 disabled:pointer-events-none transition-colors"
+                  className="w-full flex items-center justify-center gap-2 min-h-[44px] bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 disabled:opacity-60 disabled:pointer-events-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                 >
-                  {confirming ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                  {confirming ? 'Confirming…' : 'Confirm Delivery'}
+                  {confirming ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <CheckCircle2 className="w-4 h-4" aria-hidden="true" />}
+                  {confirming ? 'Confirming…' : 'Confirm delivery'}
                 </button>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmDelivery}
+        title="Confirm you received this order?"
+        description="SWK Ghana will release your payment from escrow to the vendor."
+        details={[
+          { label: 'Order',  value: order.reference },
+          { label: 'Vendor', value: vendor?.business_name ?? 'Vendor' },
+          { label: 'Amount released', value: formatCurrency(order.total_amount), emphasis: true },
+        ]}
+        warning="Only confirm once the goods are in your hands. This cannot be undone, and your escrow protection ends here."
+        confirmLabel="Yes, I received it"
+        cancelLabel="Not yet"
+      />
     </div>
   )
 }

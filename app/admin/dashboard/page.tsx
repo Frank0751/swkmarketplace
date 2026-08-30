@@ -189,9 +189,9 @@ export default async function AdminDashboardPage() {
                 <Icon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-sand-500">{card.label}</div>
+                <div className="text-xs font-medium text-sand-600">{card.label}</div>
                 <div className="text-2xl font-bold text-sand-900 mt-0.5 leading-tight">{card.value}</div>
-                <div className="text-xs text-sand-400 mt-1">{card.sub}</div>
+                <div className="text-xs text-sand-600 mt-1">{card.sub}</div>
               </div>
               <ArrowRight className="w-4 h-4 text-sand-300 group-hover:text-green-600 transition-colors flex-shrink-0 mt-1" />
             </Link>
@@ -218,7 +218,7 @@ export default async function AdminDashboardPage() {
           </div>
 
           {recentVendors.length === 0 ? (
-            <div className="px-5 py-8 text-center text-sm text-sand-400">
+            <div className="px-5 py-8 text-center text-sm text-sand-600">
               No pending applications
             </div>
           ) : (
@@ -232,9 +232,9 @@ export default async function AdminDashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-sand-900 truncate">{vendor.business_name}</div>
-                      <div className="text-xs text-sand-400 truncate">{vendor.user?.full_name} · {catMeta?.label}</div>
+                      <div className="text-xs text-sand-600 truncate">{vendor.user?.full_name} · {catMeta?.label}</div>
                     </div>
-                    <div className="text-xs text-sand-400 flex-shrink-0">
+                    <div className="text-xs text-sand-600 flex-shrink-0">
                       {formatRelativeTime(vendor.created_at)}
                     </div>
                   </div>
@@ -266,7 +266,7 @@ export default async function AdminDashboardPage() {
           </div>
 
           {recentOrders.length === 0 ? (
-            <div className="px-5 py-8 text-center text-sm text-sand-400">
+            <div className="px-5 py-8 text-center text-sm text-sand-600">
               No orders need attention
             </div>
           ) : (
@@ -280,7 +280,7 @@ export default async function AdminDashboardPage() {
                         {ORDER_STATUS_LABELS[order.status]}
                       </span>
                     </div>
-                    <div className="text-xs text-sand-400 truncate mt-0.5">
+                    <div className="text-xs text-sand-600 truncate mt-0.5">
                       {/* @ts-ignore - joined data */}
                       {order.buyer?.full_name} · {order.product?.title}
                     </div>
@@ -321,7 +321,7 @@ export default async function AdminDashboardPage() {
           </div>
 
           {pendingListings.length === 0 ? (
-            <div className="px-5 py-8 text-center text-sm text-sand-400">
+            <div className="px-5 py-8 text-center text-sm text-sand-600">
               No listings pending review
             </div>
           ) : (
@@ -343,7 +343,7 @@ export default async function AdminDashboardPage() {
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-sand-900 truncate">{listing.title}</div>
-                      <div className="text-xs text-sand-400 truncate">
+                      <div className="text-xs text-sand-600 truncate">
                         {/* @ts-ignore - joined data */}
                         {listing.vendor?.business_name} · {catMeta?.label}
                       </div>
@@ -351,7 +351,7 @@ export default async function AdminDashboardPage() {
                     <div className="text-sm font-semibold text-sand-900 flex-shrink-0">
                       {formatCurrency(listing.price_ghs)}
                     </div>
-                    <div className="text-xs text-sand-400 flex-shrink-0">
+                    <div className="text-xs text-sand-600 flex-shrink-0">
                       {formatRelativeTime(listing.created_at)}
                     </div>
                   </div>

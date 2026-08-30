@@ -35,7 +35,7 @@ export default function ContactPage() {
               <h1 className="font-display text-3xl md:text-4xl font-bold text-sand-900 mb-3">
                 Get in touch
               </h1>
-              <p className="text-sand-500 max-w-xl mx-auto">
+              <p className="text-sand-600 max-w-xl mx-auto">
                 Questions about an order, becoming a vendor, or anything else? Send us a message
                 and the SWK Ghana team will get back to you.
               </p>
@@ -58,7 +58,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-sand-900">Email us</p>
-                    <p className="text-sm text-sand-500">info@swkghana.org</p>
+                    <p className="text-sm text-sand-600">info@swkghana.org</p>
                   </div>
                 </a>
 
@@ -73,7 +73,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-sand-900">WhatsApp community</p>
-                    <p className="text-sm text-sand-500">Join the conversation</p>
+                    <p className="text-sm text-sand-600">Join the conversation</p>
                   </div>
                 </a>
 
@@ -83,7 +83,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-sand-900">SWK Ghana</p>
-                    <p className="text-sm text-sand-500">Ghana &amp; across Africa</p>
+                    <p className="text-sm text-sand-600">Ghana &amp; across Africa</p>
                   </div>
                 </div>
               </div>

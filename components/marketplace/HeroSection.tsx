@@ -65,7 +65,7 @@ export function HeroSection() {
               Build Africa.
             </motion.h1>
 
-            <motion.p {...enter(0.16)} className="text-lg md:text-xl text-sand-500 mb-8 leading-relaxed">
+            <motion.p {...enter(0.16)} className="text-lg md:text-xl text-sand-600 mb-8 leading-relaxed">
               A curated marketplace of eco-friendly products from verified young entrepreneurs across Ghana.
               Every purchase is escrow-protected.
             </motion.p>
@@ -73,7 +73,7 @@ export function HeroSection() {
             {/* Search */}
             <motion.form {...enter(0.24)} onSubmit={handleSearch} className="flex gap-2 mb-6 max-w-xl">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-sand-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-sand-600" />
                 <input
                   type="search"
                   placeholder="What are you looking for?"
@@ -93,7 +93,7 @@ export function HeroSection() {
 
             {/* Quick tags */}
             <motion.div {...enter(0.3)} className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-sand-400 font-medium">Popular:</span>
+              <span className="text-xs text-sand-600 font-medium">Popular:</span>
               {HERO_TAGS.map(tag => (
                 <button
                   key={tag}
@@ -116,12 +116,12 @@ export function HeroSection() {
                   <div className="text-xl font-display font-semibold text-sand-900">
                     <CountUp end={stat.end} suffix={stat.suffix} />
                   </div>
-                  <div className="text-xs text-sand-400 font-medium">{stat.label}</div>
+                  <div className="text-xs text-sand-600 font-medium">{stat.label}</div>
                 </div>
               ))}
               <div>
                 <div className="text-xl font-display font-semibold text-sand-900">SDG 12</div>
-                <div className="text-xs text-sand-400 font-medium">Verified listings</div>
+                <div className="text-xs text-sand-600 font-medium">Verified listings</div>
               </div>
             </motion.div>
           </div>
@@ -159,7 +159,7 @@ export function HeroSection() {
               </div>
               <div>
                 <div className="text-xs font-bold text-sand-900">Escrow protected</div>
-                <div className="text-[11px] text-sand-400">Money held until delivery</div>
+                <div className="text-[11px] text-sand-600">Money held until delivery</div>
               </div>
             </motion.div>
 

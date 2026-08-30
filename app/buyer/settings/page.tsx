@@ -102,12 +102,12 @@ export default function AccountSettingsPage() {
       <main className="container-app py-8 max-w-2xl">
         <Link
           href="/buyer/dashboard"
-          className="inline-flex items-center gap-1.5 text-sm text-sand-500 hover:text-sand-900 transition-colors mb-3"
+          className="inline-flex items-center gap-1.5 text-sm text-sand-600 hover:text-sand-900 transition-colors mb-3"
         >
           <ArrowLeft className="w-4 h-4" /> Dashboard
         </Link>
         <h1 className="text-2xl font-display font-bold text-sand-900 mb-1">Account settings</h1>
-        <p className="text-sm text-sand-500 mb-8">
+        <p className="text-sm text-sand-600 mb-8">
           Signed in as <span className="font-medium text-sand-700">{profile?.email}</span>
         </p>
 
@@ -126,7 +126,7 @@ export default function AccountSettingsPage() {
             </div>
             <div>
               <label className="form-label" htmlFor="phone">
-                Phone number <span className="text-sand-400 font-normal">(optional)</span>
+                Phone number <span className="text-sand-600 font-normal">(optional)</span>
               </label>
               <input id="phone" type="tel" {...profileForm.register('phone')} className="form-input" placeholder="+233 XX XXX XXXX" />
             </div>
@@ -169,7 +169,7 @@ export default function AccountSettingsPage() {
               {passwordForm.formState.isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               Update password
             </button>
-            <p className="text-xs text-sand-400">
+            <p className="text-xs text-sand-600">
               Signed in with Google? You can set a password here to also sign in by email.
             </p>
           </form>

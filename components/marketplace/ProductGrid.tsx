@@ -125,7 +125,7 @@ export async function ProductGrid(props: ProductGridProps) {
         <h3 className="text-lg font-semibold text-sand-800 mb-2">
           No products found yet
         </h3>
-        <p className="text-sm text-sand-400 max-w-xs">
+        <p className="text-sm text-sand-600 max-w-xs">
           {props.search
             ? `We couldn't find any products matching "${props.search}". Try a different search term or browse by category.`
             : 'No products match your current filters. Try adjusting or clearing your filters.'}

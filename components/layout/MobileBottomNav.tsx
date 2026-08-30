@@ -52,7 +52,7 @@ export function MobileBottomNav() {
                 <Icon
                   className={cn(
                     'w-5 h-5 transition-colors',
-                    active ? 'text-green-600' : 'text-sand-400',
+                    active ? 'text-green-600' : 'text-sand-600',
                   )}
                   strokeWidth={active ? 2.25 : 1.75}
                 />
@@ -61,7 +61,7 @@ export function MobileBottomNav() {
                 <span
                   className={cn(
                     'text-[10px] font-medium leading-none transition-colors',
-                    active ? 'text-green-600' : 'text-sand-400',
+                    active ? 'text-green-600' : 'text-sand-600',
                   )}
                 >
                   {label}

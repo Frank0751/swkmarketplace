@@ -156,7 +156,7 @@ export function OrderTimeline({ order }: Props) {
                   'text-sm font-semibold leading-none',
                   isDone    && 'text-green-700',
                   isActive  && 'text-gold-600',
-                  isPending && 'text-sand-400',
+                  isPending && 'text-sand-600',
                 )}>
                   {step.label}
                 </p>
@@ -164,14 +164,14 @@ export function OrderTimeline({ order }: Props) {
                 {(isDone || isActive) && (
                   <p className={cn(
                     'text-xs mt-1',
-                    isDone   ? 'text-sand-500' : 'text-sand-600',
+                    isDone   ? 'text-sand-600' : 'text-sand-600',
                   )}>
                     {step.description}
                   </p>
                 )}
 
                 {timestamp && (isDone || isActive) && (
-                  <p className="text-xs text-sand-400 mt-1">
+                  <p className="text-xs text-sand-600 mt-1">
                     {formatDateTime(timestamp)}
                   </p>
                 )}

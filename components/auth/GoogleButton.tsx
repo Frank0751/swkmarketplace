@@ -57,7 +57,7 @@ export function GoogleButton({ redirect, label = 'Continue with Google' }: Googl
       )}
     >
       {loading ? (
-        <svg className="animate-spin h-4 w-4 text-sand-500" viewBox="0 0 24 24" fill="none">
+        <svg className="animate-spin h-4 w-4 text-sand-600" viewBox="0 0 24 24" fill="none">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
         </svg>
@@ -80,7 +80,7 @@ export function AuthDivider({ text = 'or continue with email' }: { text?: string
   return (
     <div className="flex items-center gap-3 my-5" role="separator">
       <div className="h-px flex-1 bg-sand-200" />
-      <span className="text-xs text-sand-400 font-medium whitespace-nowrap">{text}</span>
+      <span className="text-xs text-sand-600 font-medium whitespace-nowrap">{text}</span>
       <div className="h-px flex-1 bg-sand-200" />
     </div>
   )

@@ -205,7 +205,7 @@ export default async function StorePage({ params }: StorePageProps) {
                   <span className="sdg-badge">SDG 12 Verified ✓</span>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-sand-500 mb-3">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-sand-600 mb-3">
                   <span className="flex items-center gap-1">
                     {catMeta?.label}
                   </span>
@@ -243,7 +243,7 @@ export default async function StorePage({ params }: StorePageProps) {
                       </div>
                       <div className="min-w-0">
                         <div className="text-sm font-bold text-sand-900 truncate">{fact.value}</div>
-                        <div className="text-[11px] text-sand-400 font-medium">{fact.label}</div>
+                        <div className="text-[11px] text-sand-600 font-medium">{fact.label}</div>
                       </div>
                     </div>
                   )
@@ -260,7 +260,7 @@ export default async function StorePage({ params }: StorePageProps) {
               <h2 className="text-xl md:text-2xl font-display font-bold text-sand-900">
                 Products from {vendor.business_name}
               </h2>
-              <p className="text-sm text-sand-400 mt-0.5">
+              <p className="text-sm text-sand-600 mt-0.5">
                 {products.length} product{products.length !== 1 ? 's' : ''} · every order escrow-protected by SWK Ghana
               </p>
             </div>
@@ -269,7 +269,7 @@ export default async function StorePage({ params }: StorePageProps) {
           {products.length === 0 ? (
             <div className="bg-white rounded-2xl border border-sand-200 p-12 text-center">
               <Leaf className="w-10 h-10 text-green-200 mx-auto mb-3" />
-              <p className="text-sm text-sand-400">No live products yet, check back soon.</p>
+              <p className="text-sm text-sand-600">No live products yet, check back soon.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -333,7 +333,7 @@ export default async function StorePage({ params }: StorePageProps) {
                           <h3 className="text-sm font-bold text-sand-900">{founder.name}</h3>
                           <p className="text-xs font-semibold text-green-600 mb-2">{founder.role}</p>
                           {founder.bio && (
-                            <p className="text-xs text-sand-500 leading-relaxed">{founder.bio}</p>
+                            <p className="text-xs text-sand-600 leading-relaxed">{founder.bio}</p>
                           )}
                         </div>
                       </StaggerItem>
@@ -350,12 +350,12 @@ export default async function StorePage({ params }: StorePageProps) {
 
                 <div className="space-y-3 mb-5">
                   <div className="flex items-start gap-2.5 text-sm text-sand-600">
-                    <MapPin className="w-4 h-4 text-sand-400 mt-0.5 flex-shrink-0" />
+                    <MapPin className="w-4 h-4 text-sand-600 mt-0.5 flex-shrink-0" />
                     <span>{vendor.location}, {vendor.region}, Ghana</span>
                   </div>
                   {vendor.phone && (
                     <div className="flex items-start gap-2.5 text-sm">
-                      <Phone className="w-4 h-4 text-sand-400 mt-0.5 flex-shrink-0" />
+                      <Phone className="w-4 h-4 text-sand-600 mt-0.5 flex-shrink-0" />
                       <div className="flex flex-col gap-0.5">
                         <a href={`tel:${vendor.phone}`} className="text-sand-600 hover:text-green-700 transition-colors">
                           {vendor.phone}
@@ -386,7 +386,7 @@ export default async function StorePage({ params }: StorePageProps) {
                           target="_blank"
                           rel="noopener noreferrer"
                           aria-label={s.label}
-                          className="w-9 h-9 rounded-lg bg-sand-50 border border-sand-200 flex items-center justify-center text-sand-500 hover:text-green-700 hover:border-green-300 transition-colors"
+                          className="w-9 h-9 rounded-lg bg-sand-50 border border-sand-200 flex items-center justify-center text-sand-600 hover:text-green-700 hover:border-green-300 transition-colors"
                         >
                           <Icon className="w-4 h-4" />
                         </a>
@@ -415,7 +415,7 @@ export default async function StorePage({ params }: StorePageProps) {
         {/* ── Powered by ─────────────────────────────────────────── */}
         <div className="container-app mt-14 mb-10">
           <div className="text-center border-t border-sand-200 pt-8">
-            <p className="text-xs text-sand-400 mb-2">
+            <p className="text-xs text-sand-600 mb-2">
               This store is powered by{' '}
               <Link href="/" className="text-green-600 font-semibold hover:underline">
                 SWK Marketplace

@@ -50,7 +50,7 @@ export default async function AdminOrdersPage() {
             <ShoppingCart className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <div className="text-xs font-medium text-sand-500">Total Orders</div>
+            <div className="text-xs font-medium text-sand-600">Total Orders</div>
             <div className="text-2xl font-bold text-sand-900">{totalOrders}</div>
           </div>
         </div>
@@ -60,9 +60,9 @@ export default async function AdminOrdersPage() {
             <Wallet className="w-5 h-5 text-teal-600" />
           </div>
           <div>
-            <div className="text-xs font-medium text-sand-500">Escrow Balance</div>
+            <div className="text-xs font-medium text-sand-600">Escrow Balance</div>
             <div className="text-2xl font-bold text-sand-900">{formatCurrency(escrowBalance)}</div>
-            <div className="text-xs text-sand-400 mt-0.5">Paid + confirmed + dispatched</div>
+            <div className="text-xs text-sand-600 mt-0.5">Paid + confirmed + dispatched</div>
           </div>
         </div>
 
@@ -71,7 +71,7 @@ export default async function AdminOrdersPage() {
             <AlertTriangle className="w-5 h-5 text-red-600" />
           </div>
           <div>
-            <div className="text-xs font-medium text-sand-500">Active Disputes</div>
+            <div className="text-xs font-medium text-sand-600">Active Disputes</div>
             <div className="text-2xl font-bold text-sand-900">{disputedCount}</div>
             {disputedCount > 0 && (
               <div className="text-xs text-red-500 mt-0.5">Requires immediate attention</div>

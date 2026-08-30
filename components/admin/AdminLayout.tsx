@@ -53,7 +53,7 @@ export async function AdminLayout({ children, title }: AdminLayoutProps) {
         {/* Sidebar */}
         <aside className="hidden md:flex flex-col w-64 min-h-[calc(100vh-64px)] bg-white border-r border-sand-200 sticky top-16">
           <div className="p-5 border-b border-sand-200">
-            <div className="text-xs font-semibold text-sand-400 uppercase tracking-widest mb-1">
+            <div className="text-xs font-semibold text-sand-600 uppercase tracking-widest mb-1">
               SWK Ghana
             </div>
             <div className="text-base font-display font-bold text-sand-900">
@@ -69,7 +69,7 @@ export async function AdminLayout({ children, title }: AdminLayoutProps) {
                 className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-sand-700 hover:bg-sand-50 hover:text-sand-900 transition-colors group"
               >
                 <span className="flex items-center gap-2.5">
-                  <Icon className="w-4 h-4 text-sand-400 group-hover:text-green-600 transition-colors" />
+                  <Icon className="w-4 h-4 text-sand-600 group-hover:text-green-600 transition-colors" />
                   {label}
                 </span>
                 {badge > 0 && (
@@ -83,7 +83,7 @@ export async function AdminLayout({ children, title }: AdminLayoutProps) {
             <div className="pt-3 mt-3 border-t border-sand-200">
               <Link
                 href="/"
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-sand-500 hover:bg-sand-50 hover:text-sand-700 transition-colors"
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-sand-600 hover:bg-sand-50 hover:text-sand-700 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to marketplace
@@ -92,7 +92,7 @@ export async function AdminLayout({ children, title }: AdminLayoutProps) {
           </nav>
 
           <div className="p-4 border-t border-sand-200">
-            <div className="text-xs text-sand-400 text-center">
+            <div className="text-xs text-sand-600 text-center">
               SWK Ghana Admin v1.0
             </div>
           </div>

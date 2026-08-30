@@ -274,10 +274,10 @@ export default function EditListingPage() {
         <Navbar />
         <div className="container-app py-16 text-center">
           <div className="w-16 h-16 rounded-full bg-sand-100 flex items-center justify-center mx-auto mb-4">
-            <AlertTriangle className="w-8 h-8 text-sand-400" />
+            <AlertTriangle className="w-8 h-8 text-sand-600" />
           </div>
           <h1 className="text-xl font-display font-bold text-sand-900 mb-2">Listing not found</h1>
-          <p className="text-sand-500 text-sm mb-6">
+          <p className="text-sand-600 text-sm mb-6">
             This listing doesn&rsquo;t exist or doesn&rsquo;t belong to your account.
           </p>
           <Link
@@ -300,7 +300,7 @@ export default function EditListingPage() {
             <CheckCircle2 className="w-10 h-10 text-green-600" />
           </div>
           <h1 className="text-3xl font-display font-bold text-sand-900 mb-3">Listing Updated!</h1>
-          <p className="text-sand-500 text-base mb-8">
+          <p className="text-sand-600 text-base mb-8">
             Your changes have been saved successfully.
           </p>
           <div className="flex gap-3 justify-center">
@@ -332,14 +332,14 @@ export default function EditListingPage() {
         {/* Back */}
         <Link
           href="/vendor/listings"
-          className="inline-flex items-center gap-1.5 text-sm text-sand-500 hover:text-sand-900 transition-colors mb-6"
+          className="inline-flex items-center gap-1.5 text-sm text-sand-600 hover:text-sand-900 transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Listings
         </Link>
 
         <div className="mb-6">
           <h1 className="text-2xl font-display font-bold text-sand-900">Edit Listing</h1>
-          <p className="text-sand-500 text-sm mt-1 line-clamp-1">{product?.title}</p>
+          <p className="text-sand-600 text-sm mt-1 line-clamp-1">{product?.title}</p>
         </div>
 
         {/* Content change warning for approved listings */}
@@ -385,7 +385,7 @@ export default function EditListingPage() {
             {product?.slug && (
               <div>
                 <label className="form-label">Product URL (cannot be changed)</label>
-                <div className="form-input bg-sand-50 text-sand-400 cursor-not-allowed text-xs font-mono">
+                <div className="form-input bg-sand-50 text-sand-600 cursor-not-allowed text-xs font-mono">
                   /marketplace/{product.slug}
                 </div>
               </div>
@@ -402,14 +402,14 @@ export default function EditListingPage() {
             <div>
               <label className="form-label">
                 Short Description <span className="text-red-500">*</span>
-                <span className="ml-1 text-sand-400 font-normal">(max 160 chars)</span>
+                <span className="ml-1 text-sand-600 font-normal">(max 160 chars)</span>
               </label>
               <input {...register('short_description')} className="form-input" />
               <div className="flex justify-between mt-1">
                 {errors.short_description
                   ? <p className="form-error">{errors.short_description.message}</p>
                   : <span />}
-                <span className={cn('text-xs', shortDescLen > 160 ? 'text-red-500' : 'text-sand-400')}>
+                <span className={cn('text-xs', shortDescLen > 160 ? 'text-red-500' : 'text-sand-600')}>
                   {shortDescLen}/160
                 </span>
               </div>
@@ -444,7 +444,7 @@ export default function EditListingPage() {
               <div>
                 <label className="form-label">Price (GHS) <span className="text-red-500">*</span></label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-sand-400 font-medium">GHS</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-sand-600 font-medium">GHS</span>
                   <input {...register('price_ghs')} type="number" step="0.01" min="0" className="form-input pl-12" />
                 </div>
                 {errors.price_ghs && <p className="form-error">{errors.price_ghs.message}</p>}
@@ -455,7 +455,7 @@ export default function EditListingPage() {
                 {errors.stock_quantity && <p className="form-error">{errors.stock_quantity.message}</p>}
               </div>
               <div>
-                <label className="form-label">Unit <span className="text-sand-400 font-normal">(optional)</span></label>
+                <label className="form-label">Unit <span className="text-sand-600 font-normal">(optional)</span></label>
                 <input {...register('unit')} className="form-input" placeholder="e.g. per kg, per dozen" />
               </div>
               <div>
@@ -493,7 +493,7 @@ export default function EditListingPage() {
             <h2 className="text-base font-display font-semibold text-sand-900 mb-1">
               SDG Alignment <span className="text-red-500">*</span>
             </h2>
-            <p className="text-xs text-sand-400 mb-4">Select all SDGs your product supports.</p>
+            <p className="text-xs text-sand-600 mb-4">Select all SDGs your product supports.</p>
             <div className="space-y-2">
               {SDG_OPTIONS.map(sdg => {
                 const checked = watchedSdg?.includes(sdg.value)
@@ -528,7 +528,7 @@ export default function EditListingPage() {
           {/* ── VALUE TAGS ── */}
           <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
             <h2 className="text-base font-display font-semibold text-sand-900 mb-1">Value Tags</h2>
-            <p className="text-xs text-sand-400 mb-4">Help buyers find products matching their values.</p>
+            <p className="text-xs text-sand-600 mb-4">Help buyers find products matching their values.</p>
             <div className="flex flex-wrap gap-2">
               {(Object.entries(VALUE_TAG_META) as [ValueTag, { label: string; icon: string }][]).map(([key, meta]) => {
                 const checked = watchedVal?.includes(key)
@@ -555,9 +555,9 @@ export default function EditListingPage() {
           <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-base font-display font-semibold text-sand-900">Product Images</h2>
-              <span className="text-xs text-sand-400">{imageUrls.length}/5</span>
+              <span className="text-xs text-sand-600">{imageUrls.length}/5</span>
             </div>
-            <p className="text-xs text-sand-400 mb-4">
+            <p className="text-xs text-sand-600 mb-4">
               Upload photos from your device, or paste image links. The first image is the primary listing photo.
             </p>
             <ImageUploader

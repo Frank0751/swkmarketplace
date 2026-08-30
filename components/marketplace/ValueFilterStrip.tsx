@@ -42,7 +42,7 @@ function ValueFilterStripInner() {
           role="group"
           aria-label="Filter by value"
         >
-          <span className="text-xs font-medium text-sand-400 flex-shrink-0 mr-1">
+          <span className="text-xs font-medium text-sand-600 flex-shrink-0 mr-1">
             Shop by values:
           </span>
           {VALUE_TAGS.map(([key, meta]) => {
@@ -73,7 +73,7 @@ function ValueFilterStripInner() {
                 params.delete('page')
                 router.push(`/marketplace?${params.toString()}`)
               }}
-              className="flex-shrink-0 text-xs text-sand-500 hover:text-sand-900 underline underline-offset-2 ml-1 transition-colors"
+              className="flex-shrink-0 text-xs text-sand-600 hover:text-sand-900 underline underline-offset-2 ml-1 transition-colors"
             >
               Clear
             </button>

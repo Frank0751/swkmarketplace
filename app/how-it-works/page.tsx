@@ -77,7 +77,7 @@ function StepCard({ step, icon, title, description, accent = 'green' }: StepCard
           <div className="mt-0.5 text-green-600">{icon}</div>
           <h3 className="text-base font-semibold text-sand-900 leading-snug">{title}</h3>
         </div>
-        <p className="text-sm text-sand-500 leading-relaxed ml-7">{description}</p>
+        <p className="text-sm text-sand-600 leading-relaxed ml-7">{description}</p>
       </div>
     </div>
   )
@@ -90,10 +90,10 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
     <details className="group border border-sand-200 rounded-xl overflow-hidden bg-white">
       <summary className="flex items-center justify-between px-5 py-4 cursor-pointer select-none list-none hover:bg-sand-50 transition-colors">
         <span className="text-sm font-semibold text-sand-900 pr-4">{question}</span>
-        <ChevronDown className="w-4 h-4 text-sand-400 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
+        <ChevronDown className="w-4 h-4 text-sand-600 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
       </summary>
       <div className="px-5 pb-5 pt-1">
-        <p className="text-sm text-sand-500 leading-relaxed">{answer}</p>
+        <p className="text-sm text-sand-600 leading-relaxed">{answer}</p>
       </div>
     </details>
   )
@@ -167,7 +167,7 @@ export default function HowItWorksPage() {
                 <div key={label} className="flex flex-col items-center gap-1.5">
                   {icon}
                   <div className="text-lg font-bold text-sand-900">{value}</div>
-                  <div className="text-xs text-sand-400">{label}</div>
+                  <div className="text-xs text-sand-600">{label}</div>
                 </div>
               ))}
             </div>
@@ -187,7 +187,7 @@ export default function HowItWorksPage() {
                 <h2 className="text-3xl md:text-4xl font-display font-bold text-sand-900 mb-4 text-balance">
                   Shop sustainably with confidence
                 </h2>
-                <p className="text-sand-500 text-sm leading-relaxed mb-8">
+                <p className="text-sand-600 text-sm leading-relaxed mb-8">
                   Every product on SWK Marketplace is reviewed for SDG 12 alignment before going live. Your payment is held in escrow and only released after you confirm delivery, you're always protected.
                 </p>
 
@@ -252,7 +252,7 @@ export default function HowItWorksPage() {
                       <div className="mt-0.5 flex-shrink-0">{icon}</div>
                       <div>
                         <p className="text-sm font-semibold text-sand-900">{title}</p>
-                        <p className="text-xs text-sand-400 mt-0.5">{desc}</p>
+                        <p className="text-xs text-sand-600 mt-0.5">{desc}</p>
                       </div>
                     </div>
                   ))}
@@ -280,7 +280,7 @@ export default function HowItWorksPage() {
               <h2 className="text-3xl md:text-4xl font-display font-bold text-sand-900 mb-4 text-balance">
                 Sell your sustainable products to the world
               </h2>
-              <p className="text-sand-500 text-sm max-w-lg mx-auto leading-relaxed">
+              <p className="text-sand-600 text-sm max-w-lg mx-auto leading-relaxed">
                 Join Ghana's leading sustainable marketplace. Get your products in front of eco-conscious buyers, receive secure payouts, and grow your green business.
               </p>
             </div>
@@ -334,12 +334,12 @@ export default function HowItWorksPage() {
                   key={step}
                   className="relative bg-sand-50 rounded-xl border border-sand-200 p-6 hover:border-green-200 hover:shadow-card transition-all"
                 >
-                  <div className="absolute top-4 right-4 w-7 h-7 rounded-full bg-sand-200 flex items-center justify-center text-xs font-bold text-sand-500">
+                  <div className="absolute top-4 right-4 w-7 h-7 rounded-full bg-sand-200 flex items-center justify-center text-xs font-bold text-sand-600">
                     {step}
                   </div>
                   <div className="mb-3">{icon}</div>
                   <h3 className="text-sm font-semibold text-sand-900 mb-2">{title}</h3>
-                  <p className="text-xs text-sand-500 leading-relaxed">{description}</p>
+                  <p className="text-xs text-sand-600 leading-relaxed">{description}</p>
                 </div>
               ))}
             </div>
@@ -356,12 +356,12 @@ export default function HowItWorksPage() {
               <div className="flex items-center justify-center gap-6 text-sm">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-700">85%</div>
-                  <div className="text-xs text-sand-400 mt-0.5">Goes to vendor</div>
+                  <div className="text-xs text-sand-600 mt-0.5">Goes to vendor</div>
                 </div>
                 <div className="w-px h-10 bg-sand-200" />
                 <div className="text-center">
                   <div className="text-2xl font-bold text-sand-700">15%</div>
-                  <div className="text-xs text-sand-400 mt-0.5">SWK platform fee</div>
+                  <div className="text-xs text-sand-600 mt-0.5">SWK platform fee</div>
                 </div>
               </div>
             </div>
@@ -437,10 +437,10 @@ export default function HowItWorksPage() {
                   <h2 className="text-3xl md:text-4xl font-display font-bold text-sand-900 mb-5 text-balance">
                     Why every product is SDG 12 verified
                   </h2>
-                  <p className="text-sand-500 text-sm leading-relaxed mb-5">
+                  <p className="text-sand-600 text-sm leading-relaxed mb-5">
                     SDG 12, Responsible Consumption and Production, is at the core of everything SWK Marketplace does. We believe commerce can be a force for good on the planet.
                   </p>
-                  <p className="text-sand-500 text-sm leading-relaxed mb-5">
+                  <p className="text-sand-600 text-sm leading-relaxed mb-5">
                     Every vendor application and product listing is reviewed by the SWK Ghana team against our SDG 12 criteria before being approved. This means buyers can trust that every purchase they make supports sustainable practices.
                   </p>
 
@@ -475,7 +475,7 @@ export default function HowItWorksPage() {
                         <Icon className="w-5 h-5 text-green-600" />
                       </div>
                       <div className="text-sm font-semibold text-sand-900 mb-1">{label}</div>
-                      <div className="text-xs text-sand-400 leading-relaxed">{desc}</div>
+                      <div className="text-xs text-sand-600 leading-relaxed">{desc}</div>
                     </div>
                   ))}
                 </div>
@@ -491,7 +491,7 @@ export default function HowItWorksPage() {
               <h2 className="text-3xl md:text-4xl font-display font-bold text-sand-900 mb-3 text-balance">
                 Frequently asked questions
               </h2>
-              <p className="text-sand-400 text-sm">Everything you need to know about SWK Marketplace.</p>
+              <p className="text-sand-600 text-sm">Everything you need to know about SWK Marketplace.</p>
             </div>
 
             <div className="space-y-3">
@@ -522,7 +522,7 @@ export default function HowItWorksPage() {
             </div>
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-sand-400 mb-3">Still have questions?</p>
+              <p className="text-sm text-sand-600 mb-3">Still have questions?</p>
               <a
                 href="mailto:info@swkghana.org"
                 className="inline-flex items-center gap-2 text-sm text-green-600 font-medium hover:text-green-700 transition-colors"
