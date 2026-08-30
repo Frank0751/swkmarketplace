@@ -2,6 +2,7 @@ import { AdminLayout } from '@/components/admin/AdminLayout'
 import { createClient } from '@/lib/supabase/server'
 import { formatCurrency, formatRelativeTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
 import { CATEGORY_META } from '@/types'
+import { HBarChart, SplitBar, TrendArea } from '@/components/admin/charts/Charts'
 import Link from 'next/link'
 import {
   Users,
@@ -32,18 +33,18 @@ async function getDashboardData() {
     { data: recentOrders },
     { data: pendingListings },
   ] = await Promise.all([
-    // Vendor stats
+    // Vendor stats. region drives the regional-spread chart.
     supabase
       .from('vendor_profiles')
-      .select('status'),
-    // Product stats
+      .select('status, region'),
+    // Product stats. category drives the category mix chart.
     supabase
       .from('products')
-      .select('status'),
-    // Order stats
+      .select('status, category'),
+    // Order stats. created_at drives the trend chart.
     supabase
       .from('orders')
-      .select('status, total_amount'),
+      .select('status, total_amount, created_at'),
     // Payout stats
     supabase
       .from('payouts')
@@ -124,6 +125,82 @@ export default async function AdminDashboardPage() {
     .filter(p => p.status === 'released')
     .reduce((sum, p) => sum + (p.commission_amount ?? 0), 0)
 
+  // ─── Chart data ─────────────────────────────────────────────────────────────
+
+  // Where orders are sitting right now. Ordered by lifecycle so a pile-up at one
+  // stage is visible as a bottleneck rather than just a number.
+  const PIPELINE: { key: string; label: string }[] = [
+    { key: 'paid',       label: 'Awaiting vendor' },
+    { key: 'confirmed',  label: 'Being prepared' },
+    { key: 'dispatched', label: 'Out for delivery' },
+    { key: 'delivered',  label: 'Awaiting payout' },
+    { key: 'released',   label: 'Completed' },
+  ]
+  const pipelineData = PIPELINE.map(({ key, label }) => ({
+    label,
+    value: orderCounts[key] ?? 0,
+  }))
+
+  // Money currently held versus already paid out, and the commission earned.
+  const releasedNet = payoutStats
+    .filter(p => p.status === 'released')
+    .reduce((s, p) => s + (p.net_amount ?? 0), 0)
+  const escrowParts = [
+    { label: 'Held in escrow', value: heldAmount,      display: formatCurrency(heldAmount),      color: '#3B6D11' },
+    { label: 'Paid to vendors', value: releasedNet,    display: formatCurrency(releasedNet),     color: '#BA7517' },
+    { label: 'SWK commission',  value: totalCommission, display: formatCurrency(totalCommission), color: '#6B6454' },
+  ]
+
+  // Orders per week over the last 8 weeks.
+  const WEEKS = 8
+  const now = Date.now()
+  const weekMs = 7 * 24 * 60 * 60 * 1000
+  const orderTimes = orderStats
+    .map(o => new Date(o.created_at as string).getTime())
+    .filter(t => !Number.isNaN(t))
+  const trendPoints = Array.from({ length: WEEKS }, (_, i) => {
+    // Bucket i is the week [start, end), oldest first, ending at now.
+    const start = now - (WEEKS - i) * weekMs
+    const end   = start + weekMs
+    const count = orderTimes.filter(t => t >= start && t < end).length
+    const d = new Date(start)
+    return { label: `${d.getDate()}/${d.getMonth() + 1}`, value: count }
+  })
+
+  // Listings by category, biggest first: a magnitude comparison, so one hue.
+  const categoryCounts = productStats.reduce((acc: Record<string, number>, p) => {
+    if (p.category) acc[p.category] = (acc[p.category] ?? 0) + 1
+    return acc
+  }, {})
+  const categoryData = Object.entries(categoryCounts)
+    .map(([key, value]) => ({
+      label: CATEGORY_META[key as keyof typeof CATEGORY_META]?.label ?? key,
+      value,
+    }))
+    .sort((a, b) => b.value - a.value)
+
+  // Vendors by region, to show whether the platform is reaching beyond Accra.
+  const regionCounts = vendorStats.reduce((acc: Record<string, number>, v) => {
+    if (v.region) acc[v.region] = (acc[v.region] ?? 0) + 1
+    return acc
+  }, {})
+  const regionData = Object.entries(regionCounts)
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 6)
+
+  // Application and review queues. Status, so colour always travels with a label.
+  const vendorPipeline = [
+    { label: 'Approved', value: vendorCounts.approved ?? 0, color: '#3B6D11' },
+    { label: 'Pending',  value: vendorCounts.pending  ?? 0, color: '#BA7517' },
+    { label: 'Rejected', value: vendorCounts.rejected ?? 0, color: '#DC2626' },
+  ]
+  const listingPipeline = [
+    { label: 'Approved',      value: productCounts.approved ?? 0,       color: '#3B6D11' },
+    { label: 'Pending review', value: productCounts.pending_review ?? 0, color: '#BA7517' },
+    { label: 'Rejected',      value: productCounts.rejected ?? 0,       color: '#DC2626' },
+  ]
+
   const statCards = [
     {
       label: 'Total Vendors',
@@ -200,6 +277,76 @@ export default async function AdminDashboardPage() {
           )
         })}
       </div>
+
+      {/* ── Analytics ── */}
+      <section aria-labelledby="analytics-heading" className="mb-8">
+        <h2 id="analytics-heading" className="text-lg font-display font-semibold text-sand-900 mb-1">
+          At a glance
+        </h2>
+        <p className="text-sm text-sand-600 mb-5">
+          Where orders and money are sitting right now, and how the marketplace is growing.
+        </p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+          <HBarChart
+            title="Order pipeline"
+            caption="Where every live order is right now. A build-up at one stage points to the bottleneck."
+            data={pipelineData}
+            ramp
+            unit="Orders"
+            emptyMessage="No orders yet. This fills in as buyers start purchasing."
+          />
+          <TrendArea
+            title="Orders per week"
+            caption="New orders placed over the last 8 weeks."
+            points={trendPoints}
+            emptyMessage="Not enough history yet. The trend appears once orders start coming in."
+          />
+        </div>
+
+        <div className="mb-5">
+          <SplitBar
+            title="Where the money is"
+            caption="Funds held in escrow versus already paid out, and the commission SWK Ghana has earned."
+            parts={escrowParts}
+            emptyMessage="No payments processed yet. This shows the escrow position once orders are paid."
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+          <HBarChart
+            title="Vendor applications"
+            caption="The approval queue. Pending applications are people waiting to start trading."
+            data={vendorPipeline}
+            unit="Vendors"
+            emptyMessage="No vendor applications yet."
+          />
+          <HBarChart
+            title="Listing reviews"
+            caption="Products awaiting an SDG 12 check before they can go live."
+            data={listingPipeline}
+            unit="Listings"
+            emptyMessage="No listings submitted yet."
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <HBarChart
+            title="Listings by category"
+            caption="What vendors are actually selling."
+            data={categoryData}
+            unit="Listings"
+            emptyMessage="No approved listings yet."
+          />
+          <HBarChart
+            title="Vendors by region"
+            caption="Top regions. Shows whether the platform is reaching beyond Greater Accra."
+            data={regionData}
+            unit="Vendors"
+            emptyMessage="No vendor regions recorded yet."
+          />
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Pending vendor applications */}
