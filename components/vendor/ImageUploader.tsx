@@ -154,24 +154,35 @@ export function ImageUploader({ value, onChange }: ImageUploaderProps) {
                 </span>
               )}
 
-              <div className="absolute inset-0 bg-sand-900/0 group-hover:bg-sand-900/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+              {/* Always visible on touch devices, which have no hover: these
+                  are the only way to remove a photo or change the primary one.
+                  Targets are 44px to stay tappable. */}
+              <div
+                className={cn(
+                  'absolute inset-0 flex items-end justify-end gap-1.5 p-1.5 transition-colors',
+                  'bg-gradient-to-t from-sand-900/55 to-transparent',
+                  'sm:bg-none sm:bg-sand-900/0 sm:opacity-0 sm:group-hover:bg-sand-900/40 sm:group-hover:opacity-100',
+                  'sm:items-center sm:justify-center sm:p-0 sm:gap-2',
+                  'sm:focus-within:opacity-100 sm:focus-within:bg-sand-900/40',
+                )}
+              >
                 {index !== 0 && (
                   <button
                     type="button"
                     onClick={() => makePrimary(index)}
-                    title="Make primary"
-                    className="p-2 rounded-lg bg-white/90 text-sand-700 hover:bg-white transition-colors"
+                    className="w-11 h-11 flex items-center justify-center rounded-lg bg-white/95 text-sand-700 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
                   >
-                    <Star className="w-4 h-4" />
+                    <Star className="w-4 h-4" aria-hidden="true" />
+                    <span className="sr-only">Make image {index + 1} the primary photo</span>
                   </button>
                 )}
                 <button
                   type="button"
                   onClick={() => removeAt(index)}
-                  title="Remove"
-                  className="p-2 rounded-lg bg-white/90 text-red-600 hover:bg-white transition-colors"
+                  className="w-11 h-11 flex items-center justify-center rounded-lg bg-white/95 text-red-600 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
+                  <span className="sr-only">Remove image {index + 1}</span>
                 </button>
               </div>
             </div>

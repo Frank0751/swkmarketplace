@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
@@ -15,7 +15,36 @@ export function Navbar() {
   const [scrolled, setScrolled]     = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [accountOpen, setAccountOpen] = useState(false)
+  const accountRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+
+  // Close the account menu on Escape or a click outside it
+  useEffect(() => {
+    if (!accountOpen) return
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAccountOpen(false)
+    }
+    const onPointer = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setAccountOpen(false)
+      }
+    }
+
+    document.addEventListener('keydown', onKey)
+    document.addEventListener('mousedown', onPointer)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.removeEventListener('mousedown', onPointer)
+    }
+  }, [accountOpen])
+
+  // Route changes should never leave a menu hanging open
+  useEffect(() => {
+    setAccountOpen(false)
+    setMenuOpen(false)
+  }, [pathname])
 
   useEffect(() => {
     const supabase = createClient()
@@ -99,6 +128,7 @@ export function Navbar() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-600" />
                 <input
                   type="search"
+                  aria-label="Search eco-friendly products"
                   placeholder="Search eco-friendly products..."
                   className="w-full pl-9 pr-4 py-2 text-sm bg-sand-100 border border-sand-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:bg-white transition-all"
                   value={searchQuery}
@@ -124,39 +154,58 @@ export function Navbar() {
               </button>
 
               {user ? (
-                <div className="relative group">
-                  <button className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-sand-700 hover:bg-sand-100 transition-colors">
+                /* Click-driven disclosure. This was hover-only with
+                   `invisible group-hover:visible`, which removed every item
+                   (including Sign out) from the tab order and left touch users
+                   with no way to open it at all. */
+                <div className="relative" ref={accountRef}>
+                  <button
+                    type="button"
+                    onClick={() => setAccountOpen(o => !o)}
+                    aria-expanded={accountOpen}
+                    aria-haspopup="menu"
+                    className="flex items-center gap-2 min-h-[44px] px-3 rounded-lg text-sm font-medium text-sand-700 hover:bg-sand-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  >
                     <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-xs font-semibold flex-shrink-0">
                       {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                     <span className="hidden sm:block max-w-24 truncate">{user.full_name?.split(' ')[0]}</span>
-                    <ChevronDown className="w-3.5 h-3.5 text-sand-600 hidden sm:block" />
+                    <ChevronDown
+                      className={clsx(
+                        'w-3.5 h-3.5 text-sand-600 hidden sm:block transition-transform',
+                        accountOpen && 'rotate-180',
+                      )}
+                      aria-hidden="true"
+                    />
+                    <span className="sr-only">Account menu</span>
                   </button>
 
                   {/* Dropdown */}
-                  <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl shadow-card-lg border border-sand-200 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-                    <div className="px-3 py-2 border-b border-sand-100">
-                      <div className="text-xs font-medium text-sand-900 truncate">{user.full_name}</div>
-                      <div className="text-xs text-sand-600 truncate">{user.email}</div>
-                    </div>
-                    <Link href={getDashboardLink()} className="flex items-center gap-2 px-3 py-2 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
-                      <User className="w-4 h-4" /> Dashboard
-                    </Link>
-                    <Link href="/buyer/settings" className="flex items-center gap-2 px-3 py-2 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
-                      <Settings className="w-4 h-4" /> Account settings
-                    </Link>
-                    {user.role === 'vendor' && (
-                      <Link href="/vendor/listings" className="flex items-center gap-2 px-3 py-2 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
-                        <ShoppingBag className="w-4 h-4" /> My Listings
+                  {accountOpen && (
+                    <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl shadow-card-lg border border-sand-200 py-1 z-50">
+                      <div className="px-3 py-2 border-b border-sand-100">
+                        <div className="text-xs font-medium text-sand-900 truncate">{user.full_name}</div>
+                        <div className="text-xs text-sand-600 truncate">{user.email}</div>
+                      </div>
+                      <Link href={getDashboardLink()} onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
+                        <User className="w-4 h-4" aria-hidden="true" /> Dashboard
                       </Link>
-                    )}
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                    >
-                      Sign out
-                    </button>
-                  </div>
+                      <Link href="/buyer/settings" onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
+                        <Settings className="w-4 h-4" aria-hidden="true" /> Account settings
+                      </Link>
+                      {user.role === 'vendor' && (
+                        <Link href="/vendor/listings" onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
+                          <ShoppingBag className="w-4 h-4" aria-hidden="true" /> My Listings
+                        </Link>
+                      )}
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
@@ -195,6 +244,7 @@ export function Navbar() {
               <input
                 autoFocus
                 type="search"
+                  aria-label="Search eco-friendly products"
                 placeholder="Search products..."
                 className="w-full pl-9 pr-4 py-2.5 text-sm bg-sand-100 border border-sand-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:bg-white"
                 value={searchQuery}
@@ -227,12 +277,51 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              {!user && (
+              {user ? (
+                /* Signed-in users previously had nothing here, and the desktop
+                   account menu is hover-only on touch, so there was no way to
+                   reach a dashboard or sign out from a phone at all. */
+                <div className="pt-2 mt-2 border-t border-sand-100 space-y-1">
+                  <div className="px-3 pb-1">
+                    <div className="text-xs font-medium text-sand-900 truncate">{user.full_name}</div>
+                    <div className="text-xs text-sand-600 truncate">{user.email}</div>
+                  </div>
+                  <Link
+                    href={getDashboardLink()}
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
+                  >
+                    <User className="w-4 h-4" aria-hidden="true" /> Dashboard
+                  </Link>
+                  <Link
+                    href="/buyer/settings"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
+                  >
+                    <Settings className="w-4 h-4" aria-hidden="true" /> Account settings
+                  </Link>
+                  {user.role === 'vendor' && (
+                    <Link
+                      href="/vendor/listings"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
+                    >
+                      <ShoppingBag className="w-4 h-4" aria-hidden="true" /> My Listings
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
                 <div className="pt-2 border-t border-sand-100 flex gap-2">
-                  <Link href="/login" className="flex-1 py-2.5 text-center text-sm font-medium text-sand-700 border border-sand-200 rounded-lg hover:bg-sand-50">
+                  <Link href="/login" className="flex-1 min-h-[44px] flex items-center justify-center text-sm font-medium text-sand-700 border border-sand-200 rounded-lg hover:bg-sand-50">
                     Log in
                   </Link>
-                  <Link href="/signup" className="flex-1 py-2.5 text-center text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700">
+                  <Link href="/signup" className="flex-1 min-h-[44px] flex items-center justify-center text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700">
                     Sign up
                   </Link>
                 </div>

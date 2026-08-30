@@ -275,11 +275,11 @@ export default function NewListingPage() {
 
             {/* Title */}
             <div>
-              <label className="form-label">
+              <label htmlFor="title" className="form-label">
                 Product Title <span className="text-red-500">*</span>
               </label>
               <input
-                {...register('title')}
+                id="title" {...register('title')}
                 className="form-input"
                 placeholder="e.g. Organic Shea Butter 200g"
               />
@@ -288,12 +288,12 @@ export default function NewListingPage() {
 
             {/* Short description */}
             <div>
-              <label className="form-label">
+              <label htmlFor="short_description" className="form-label">
                 Short Description <span className="text-red-500">*</span>
                 <span className="ml-1 text-sand-600 font-normal">(max 160 chars, shown on product cards)</span>
               </label>
               <input
-                {...register('short_description')}
+                id="short_description" {...register('short_description')}
                 className="form-input"
                 placeholder="A one-line summary of your product"
               />
@@ -309,11 +309,11 @@ export default function NewListingPage() {
 
             {/* Full description */}
             <div>
-              <label className="form-label">
+              <label htmlFor="description" className="form-label">
                 Full Description <span className="text-red-500">*</span>
               </label>
               <textarea
-                {...register('description')}
+                id="description" {...register('description')}
                 className="form-input min-h-[140px] resize-y"
                 placeholder="Describe your product in detail, ingredients, how it's made, benefits, etc."
               />
@@ -322,10 +322,10 @@ export default function NewListingPage() {
 
             {/* Category */}
             <div>
-              <label className="form-label">
+              <label htmlFor="category" className="form-label">
                 Category <span className="text-red-500">*</span>
               </label>
-              <select {...register('category')} className="form-input">
+              <select id="category" {...register('category')} className="form-input">
                 <option value="">Select a category</option>
                 {(Object.keys(CATEGORY_META) as ProductCategory[]).map(cat => (
                   <option key={cat} value={cat}>
@@ -344,13 +344,13 @@ export default function NewListingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Price */}
               <div>
-                <label className="form-label">
+                <label htmlFor="price_ghs" className="form-label">
                   Price (GHS) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-sand-600 font-medium">GHS</span>
                   <input
-                    {...register('price_ghs')}
+                    id="price_ghs" {...register('price_ghs')}
                     type="number"
                     step="0.01"
                     min="0"
@@ -363,9 +363,9 @@ export default function NewListingPage() {
 
               {/* Stock */}
               <div>
-                <label className="form-label">Stock Quantity</label>
+                <label htmlFor="stock_quantity" className="form-label">Stock Quantity</label>
                 <input
-                  {...register('stock_quantity')}
+                  id="stock_quantity" {...register('stock_quantity')}
                   type="number"
                   min="0"
                   className="form-input"
@@ -376,9 +376,9 @@ export default function NewListingPage() {
 
               {/* Unit */}
               <div>
-                <label className="form-label">Unit <span className="text-sand-600 font-normal">(optional)</span></label>
+                <label htmlFor="unit" className="form-label">Unit <span className="text-sand-600 font-normal">(optional)</span></label>
                 <input
-                  {...register('unit')}
+                  id="unit" {...register('unit')}
                   className="form-input"
                   placeholder="e.g. per kg, per dozen, per bag"
                 />
@@ -386,9 +386,9 @@ export default function NewListingPage() {
 
               {/* Minimum order */}
               <div>
-                <label className="form-label">Minimum Order</label>
+                <label htmlFor="minimum_order" className="form-label">Minimum Order</label>
                 <input
-                  {...register('minimum_order')}
+                  id="minimum_order" {...register('minimum_order')}
                   type="number"
                   min="1"
                   className="form-input"
@@ -404,17 +404,17 @@ export default function NewListingPage() {
             <h2 className="text-base font-display font-semibold text-sand-900">Location</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="form-label">City / Town <span className="text-red-500">*</span></label>
+                <label htmlFor="location" className="form-label">City / Town <span className="text-red-500">*</span></label>
                 <input
-                  {...register('location')}
+                  id="location" {...register('location')}
                   className="form-input"
                   placeholder="e.g. Accra"
                 />
                 {errors.location && <p className="form-error">{errors.location.message}</p>}
               </div>
               <div>
-                <label className="form-label">Region <span className="text-red-500">*</span></label>
-                <select {...register('region')} className="form-input">
+                <label htmlFor="region" className="form-label">Region <span className="text-red-500">*</span></label>
+                <select id="region" {...register('region')} className="form-input">
                   <option value="">Select region</option>
                   {GHANA_REGIONS.map(r => (
                     <option key={r} value={r}>{r}</option>

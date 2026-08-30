@@ -76,6 +76,7 @@ export function HeroSection() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-sand-600" />
                 <input
                   type="search"
+                  aria-label="Search eco-friendly products"
                   placeholder="What are you looking for?"
                   value={query}
                   onChange={e => setQuery(e.target.value)}

@@ -99,7 +99,34 @@ export async function AdminLayout({ children, title }: AdminLayoutProps) {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 p-6 md:p-8 overflow-auto min-w-0">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto min-w-0">
+          {/* Mobile nav. The sidebar above is `hidden md:flex` with no fallback,
+              so on a phone an admin could not reach Vendors, Listings, Orders
+              or Payouts at all. */}
+          <nav
+            aria-label="Admin sections"
+            className="md:hidden -mx-4 px-4 mb-5 overflow-x-auto scrollbar-hide"
+          >
+            <ul className="flex items-center gap-2 w-max">
+              {navItems.map(({ href, label, icon: Icon, badge }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-full border border-sand-200 bg-white text-sm font-medium text-sand-700 hover:border-green-300 hover:bg-green-50 transition-colors whitespace-nowrap"
+                  >
+                    <Icon className="w-4 h-4 text-sand-600" aria-hidden="true" />
+                    {label}
+                    {badge > 0 && (
+                      <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 text-xs font-semibold bg-green-600 text-white rounded-full">
+                        {badge > 99 ? '99+' : badge}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
           <div className="mb-6">
             <h1 className="text-2xl font-display font-bold text-sand-900">{title}</h1>
           </div>

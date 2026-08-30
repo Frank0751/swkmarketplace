@@ -393,18 +393,18 @@ export default function EditListingPage() {
 
             {/* Title */}
             <div>
-              <label className="form-label">Product Title <span className="text-red-500">*</span></label>
-              <input {...register('title')} className="form-input" />
+              <label htmlFor="title" className="form-label">Product Title <span className="text-red-500">*</span></label>
+              <input id="title" {...register('title')} className="form-input" />
               {errors.title && <p className="form-error">{errors.title.message}</p>}
             </div>
 
             {/* Short description */}
             <div>
-              <label className="form-label">
+              <label htmlFor="short_description" className="form-label">
                 Short Description <span className="text-red-500">*</span>
                 <span className="ml-1 text-sand-600 font-normal">(max 160 chars)</span>
               </label>
-              <input {...register('short_description')} className="form-input" />
+              <input id="short_description" {...register('short_description')} className="form-input" />
               <div className="flex justify-between mt-1">
                 {errors.short_description
                   ? <p className="form-error">{errors.short_description.message}</p>
@@ -417,15 +417,15 @@ export default function EditListingPage() {
 
             {/* Full description */}
             <div>
-              <label className="form-label">Full Description <span className="text-red-500">*</span></label>
-              <textarea {...register('description')} className="form-input min-h-[140px] resize-y" />
+              <label htmlFor="description" className="form-label">Full Description <span className="text-red-500">*</span></label>
+              <textarea id="description" {...register('description')} className="form-input min-h-[140px] resize-y" />
               {errors.description && <p className="form-error">{errors.description.message}</p>}
             </div>
 
             {/* Category */}
             <div>
-              <label className="form-label">Category <span className="text-red-500">*</span></label>
-              <select {...register('category')} className="form-input">
+              <label htmlFor="category" className="form-label">Category <span className="text-red-500">*</span></label>
+              <select id="category" {...register('category')} className="form-input">
                 <option value="">Select a category</option>
                 {(Object.keys(CATEGORY_META) as ProductCategory[]).map(cat => (
                   <option key={cat} value={cat}>
@@ -442,25 +442,25 @@ export default function EditListingPage() {
             <h2 className="text-base font-display font-semibold text-sand-900">Pricing &amp; Inventory</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="form-label">Price (GHS) <span className="text-red-500">*</span></label>
+                <label htmlFor="price_ghs" className="form-label">Price (GHS) <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-sand-600 font-medium">GHS</span>
-                  <input {...register('price_ghs')} type="number" step="0.01" min="0" className="form-input pl-12" />
+                  <input id="price_ghs" {...register('price_ghs')} type="number" step="0.01" min="0" className="form-input pl-12" />
                 </div>
                 {errors.price_ghs && <p className="form-error">{errors.price_ghs.message}</p>}
               </div>
               <div>
-                <label className="form-label">Stock Quantity</label>
-                <input {...register('stock_quantity')} type="number" min="0" className="form-input" />
+                <label htmlFor="stock_quantity" className="form-label">Stock Quantity</label>
+                <input id="stock_quantity" {...register('stock_quantity')} type="number" min="0" className="form-input" />
                 {errors.stock_quantity && <p className="form-error">{errors.stock_quantity.message}</p>}
               </div>
               <div>
-                <label className="form-label">Unit <span className="text-sand-600 font-normal">(optional)</span></label>
-                <input {...register('unit')} className="form-input" placeholder="e.g. per kg, per dozen" />
+                <label htmlFor="unit" className="form-label">Unit <span className="text-sand-600 font-normal">(optional)</span></label>
+                <input id="unit" {...register('unit')} className="form-input" placeholder="e.g. per kg, per dozen" />
               </div>
               <div>
-                <label className="form-label">Minimum Order</label>
-                <input {...register('minimum_order')} type="number" min="1" className="form-input" />
+                <label htmlFor="minimum_order" className="form-label">Minimum Order</label>
+                <input id="minimum_order" {...register('minimum_order')} type="number" min="1" className="form-input" />
                 {errors.minimum_order && <p className="form-error">{errors.minimum_order.message}</p>}
               </div>
             </div>
@@ -471,13 +471,13 @@ export default function EditListingPage() {
             <h2 className="text-base font-display font-semibold text-sand-900">Location</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="form-label">City / Town <span className="text-red-500">*</span></label>
-                <input {...register('location')} className="form-input" />
+                <label htmlFor="location" className="form-label">City / Town <span className="text-red-500">*</span></label>
+                <input id="location" {...register('location')} className="form-input" />
                 {errors.location && <p className="form-error">{errors.location.message}</p>}
               </div>
               <div>
-                <label className="form-label">Region <span className="text-red-500">*</span></label>
-                <select {...register('region')} className="form-input">
+                <label htmlFor="region" className="form-label">Region <span className="text-red-500">*</span></label>
+                <select id="region" {...register('region')} className="form-input">
                   <option value="">Select region</option>
                   {GHANA_REGIONS.map(r => (
                     <option key={r} value={r}>{r}</option>

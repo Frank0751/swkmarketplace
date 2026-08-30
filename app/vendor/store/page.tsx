@@ -181,7 +181,7 @@ export default function VendorStoreProfilePage() {
               knowing who they&rsquo;re supporting. (Blank lines create paragraphs.)
             </p>
             <textarea
-              {...register('story')}
+              id="story" {...register('story')}
               rows={8}
               className="form-input resize-y"
               placeholder="We started in 2021 when…"

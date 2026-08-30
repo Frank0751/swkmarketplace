@@ -271,11 +271,11 @@ export default function VendorApplyPage() {
 
                 {/* Business name */}
                 <div>
-                  <label className="form-label">
+                  <label htmlFor="business_name" className="form-label">
                     Business Name <span className="text-red-500">*</span>
                   </label>
                   <input
-                    {...register('business_name')}
+                    id='business_name' {...register('business_name')}
                     className="form-input"
                     placeholder="e.g. Kojo&apos;s Organic Farm"
                   />
@@ -286,10 +286,10 @@ export default function VendorApplyPage() {
 
                 {/* Category */}
                 <div>
-                  <label className="form-label">
+                  <label htmlFor="category" className="form-label">
                     Business Category <span className="text-red-500">*</span>
                   </label>
-                  <select {...register('category')} className="form-input">
+                  <select id='category' {...register('category')} className="form-input">
                     <option value="">Select a category</option>
                     {(Object.keys(CATEGORY_META) as ProductCategory[]).map(cat => (
                       <option key={cat} value={cat}>
@@ -304,12 +304,12 @@ export default function VendorApplyPage() {
 
                 {/* Business description */}
                 <div>
-                  <label className="form-label">
+                  <label htmlFor="business_description" className="form-label">
                     Business Description <span className="text-red-500">*</span>
                     <span className="ml-1 text-sand-600 font-normal">(min 100 characters)</span>
                   </label>
                   <textarea
-                    {...register('business_description')}
+                    id='business_description' {...register('business_description')}
                     className="form-input min-h-[120px] resize-y"
                     placeholder="Tell us about your business, what you sell, and how you operate..."
                   />
@@ -326,11 +326,11 @@ export default function VendorApplyPage() {
                 {/* Location + region */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">
+                    <label htmlFor="location" className="form-label">
                       City / Town <span className="text-red-500">*</span>
                     </label>
                     <input
-                      {...register('location')}
+                      id='location' {...register('location')}
                       className="form-input"
                       placeholder="e.g. Kumasi"
                     />
@@ -339,10 +339,10 @@ export default function VendorApplyPage() {
                     )}
                   </div>
                   <div>
-                    <label className="form-label">
+                    <label htmlFor="region" className="form-label">
                       Region <span className="text-red-500">*</span>
                     </label>
-                    <select {...register('region')} className="form-input">
+                    <select id='region' {...register('region')} className="form-input">
                       <option value="">Select region</option>
                       {GHANA_REGIONS.map(r => (
                         <option key={r} value={r}>{r}</option>
@@ -356,11 +356,11 @@ export default function VendorApplyPage() {
 
                 {/* Phone */}
                 <div>
-                  <label className="form-label">
+                  <label htmlFor="phone" className="form-label">
                     Phone Number <span className="text-red-500">*</span>
                   </label>
                   <input
-                    {...register('phone')}
+                    id='phone' {...register('phone')}
                     type="tel"
                     className="form-input"
                     placeholder="+233 24 000 0000"
@@ -372,14 +372,14 @@ export default function VendorApplyPage() {
 
                 {/* SDG 12 statement */}
                 <div>
-                  <label className="form-label">
+                  <label htmlFor="sustainability_statement" className="form-label">
                     Sustainability Statement <span className="text-red-500">*</span>
                   </label>
                   <p className="text-xs text-sand-600 mb-1.5">
                     Describe how your business supports SDG 12 (Responsible Consumption &amp; Production).
                   </p>
                   <textarea
-                    {...register('sustainability_statement')}
+                    id='sustainability_statement' {...register('sustainability_statement')}
                     className="form-input min-h-[120px] resize-y"
                     placeholder="e.g. We use zero pesticides and package all products in biodegradable materials. Our supply chain sources directly from local farmers, reducing food miles by 80%..."
                   />
@@ -394,35 +394,53 @@ export default function VendorApplyPage() {
                 </div>
 
                 {/* Social links */}
-                <div>
-                  <label className="form-label">Social Links <span className="text-sand-600 font-normal">(optional)</span></label>
+                {/* One legend for the group, plus a real label per input, so a
+                    screen reader announces which of the three fields it is on. */}
+                <fieldset>
+                  <legend className="form-label">
+                    Social Links <span className="text-sand-600 font-normal">(optional)</span>
+                  </legend>
                   <div className="space-y-3">
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-sand-600 font-medium">instagram.com/</span>
-                      <input
-                        {...register('instagram')}
-                        className="form-input pl-28"
-                        placeholder="yourhandle"
-                      />
+                    <div>
+                      <label htmlFor="instagram" className="sr-only">Instagram handle</label>
+                      <div className="relative">
+                        <span aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-sand-600 font-medium">instagram.com/</span>
+                        <input
+                          id="instagram"
+                          {...register('instagram')}
+                          className="form-input pl-28"
+                          placeholder="yourhandle"
+                        />
+                      </div>
                     </div>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-sand-600 font-medium">facebook.com/</span>
-                      <input
-                        {...register('facebook')}
-                        className="form-input pl-[5.5rem]"
-                        placeholder="yourpage"
-                      />
+                    <div>
+                      <label htmlFor="facebook" className="sr-only">Facebook page</label>
+                      <div className="relative">
+                        <span aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-sand-600 font-medium">facebook.com/</span>
+                        <input
+                          id="facebook"
+                          {...register('facebook')}
+                          className="form-input pl-[5.5rem]"
+                          placeholder="yourpage"
+                        />
+                      </div>
                     </div>
-                    <input
-                      {...register('website')}
-                      className="form-input"
-                      placeholder="https://yourwebsite.com"
-                    />
-                    {errors.website && (
-                      <p className="form-error">{errors.website.message}</p>
-                    )}
+                    <div>
+                      <label htmlFor="website" className="sr-only">Website address</label>
+                      <input
+                        id="website"
+                        {...register('website')}
+                        aria-invalid={!!errors.website}
+                        aria-describedby={errors.website ? 'website-error' : undefined}
+                        className="form-input"
+                        placeholder="https://yourwebsite.com"
+                      />
+                      {errors.website && (
+                        <p id="website-error" role="alert" className="form-error">{errors.website.message}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </fieldset>
 
                 {/* Submit */}
                 <div className="pt-2">
