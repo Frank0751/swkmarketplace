@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Search, Menu, X, ShoppingBag, User, ChevronDown, Settings } from 'lucide-react'
+import { Search, Menu, X, ShoppingBag, User, ChevronDown, Settings, ExternalLink } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { User as UserType } from '@/types'
 import { clsx } from 'clsx'
@@ -120,6 +120,18 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+
+              {/* Route back to the parent organisation. The marketplace is a
+                  programme of SWK Ghana, and without this the only way back was
+                  a link buried in the footer. */}
+              <a
+                href="https://swkghana.org"
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-sand-600 hover:text-sand-900 hover:bg-sand-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              >
+                About SWK Ghana
+                <ExternalLink className="w-3 h-3 text-sand-600" aria-hidden="true" />
+                <span className="sr-only">(opens the main SWK Ghana website)</span>
+              </a>
             </div>
 
             {/* Search bar, desktop */}
@@ -277,6 +289,18 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+
+              {/* The desktop nav is hidden on mobile, so without this entry a
+                  phone user has no route back to the main site at all. */}
+              <a
+                href="https://swkghana.org"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-1.5 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
+              >
+                About SWK Ghana
+                <ExternalLink className="w-3.5 h-3.5 text-sand-600" aria-hidden="true" />
+                <span className="sr-only">(opens the main SWK Ghana website)</span>
+              </a>
               {user ? (
                 /* Signed-in users previously had nothing here, and the desktop
                    account menu is hover-only on touch, so there was no way to
