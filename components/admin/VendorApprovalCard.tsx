@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Building2,
   MapPin,
@@ -40,6 +40,21 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
   const [rejecting, setRejecting]     = useState(false)
   const [rejectReason, setRejectReason] = useState('')
   const [loading, setLoading]         = useState(false)
+  // Supporting photos are private; signed viewing links are fetched only
+  // when an admin opens the application
+  const [docs, setDocs]               = useState<{ id: string; label: string | null; url: string }[] | null>(null)
+  const [docsFailed, setDocsFailed]   = useState(false)
+
+  useEffect(() => {
+    if (!expanded || docs !== null) return
+    fetch(`/api/admin/vendor-documents?vendor_id=${vendor.id}`)
+      .then(res => (res.ok ? res.json() : Promise.reject(res)))
+      .then(json => setDocs(json.data ?? []))
+      .catch(() => {
+        setDocsFailed(true)
+        setDocs([])
+      })
+  }, [expanded, docs, vendor.id])
 
   const statusCfg = STATUS_CONFIG[vendor.status] ?? STATUS_CONFIG.pending
   const StatusIcon = statusCfg.icon
@@ -144,7 +159,8 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
       {/* Expand toggle */}
       <button
         onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-center justify-between px-5 py-2.5 bg-sand-50 border-t border-sand-200 text-xs font-medium text-sand-600 hover:bg-sand-100 transition-colors"
+        aria-expanded={expanded}
+        className="w-full flex items-center justify-between min-h-[44px] px-5 py-2.5 bg-sand-50 border-t border-sand-200 text-xs font-medium text-sand-600 hover:bg-sand-100 transition-colors"
       >
         <span>View full application</span>
         {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -173,7 +189,44 @@ export function VendorApprovalCard({ vendor, onApprove, onReject }: VendorApprov
             </p>
           </div>
 
-          {/* Proof documents */}
+          {/* Supporting photos (private, signed links) */}
+          <div>
+            <div className="text-xs font-semibold text-sand-600 uppercase tracking-wider mb-2">
+              Supporting Photos
+            </div>
+            {docs === null ? (
+              <p className="text-xs text-sand-600">Loading…</p>
+            ) : docs.length === 0 ? (
+              <p className="text-xs text-sand-600">
+                {docsFailed ? 'Couldn’t load the photos. Try reopening the application.' : 'None submitted.'}
+              </p>
+            ) : (
+              <div className="grid grid-cols-3 gap-2">
+                {docs.map(doc => (
+                  <a
+                    key={doc.id}
+                    href={doc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block group"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={doc.url}
+                      alt={doc.label ?? 'Supporting photo'}
+                      loading="lazy"
+                      className="w-full aspect-square object-cover rounded-lg border border-sand-200 group-hover:opacity-90"
+                    />
+                    <span className="mt-1 block text-[11px] text-sand-700 truncate">
+                      {doc.label ?? 'Photo'} <span className="sr-only">(opens full size)</span>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Proof documents (older applications) */}
           {vendor.proof_documents && vendor.proof_documents.length > 0 && (
             <div>
               <div className="text-xs font-semibold text-sand-600 uppercase tracking-wider mb-2">

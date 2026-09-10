@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { generateSlug } from '@/lib/utils'
-import { sendListingApproved } from '@/lib/email/brevo'
-import type { ProductStatus } from '@/types'
-
-const CONTENT_FIELDS = ['title', 'description', 'short_description', 'price_ghs', 'images', 'category']
+import { formatCurrency } from '@/lib/utils'
+import {
+  listingSchema,
+  reviewedContentChanged,
+  changedFields,
+  firstIssue,
+} from '@/lib/marketplace/listing'
+import { sendListingApproved, sendListingRejected, sendAdminAlert } from '@/lib/email/brevo'
 
 export async function GET(
   _request: NextRequest,
@@ -15,12 +19,11 @@ export async function GET(
 
     const { data: { user } } = await supabase.auth.getUser()
 
-    let query = supabase
+    const { data: product, error } = await supabase
       .from('products')
       .select('*, vendor:vendor_profiles(*, user:users(*))')
       .eq('id', params.id)
-
-    const { data: product, error } = await query.single()
+      .single()
 
     if (error || !product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
@@ -46,20 +49,17 @@ export async function GET(
       }
     }
 
-    // Increment view count (fire-and-forget)
-    const adminSupabase = await createAdminClient()
-    void adminSupabase
-      .from('products')
-      .update({ views: (product.views ?? 0) + 1 })
-      .eq('id', params.id)
-      .then(undefined, () => {})
-
     return NextResponse.json({ data: product })
   } catch (err) {
     console.error('[GET /api/products/[id]]', err)
     return NextResponse.json({ error: 'Failed to fetch product' }, { status: 500 })
   }
 }
+
+const adminSchema = z.object({
+  status:           z.enum(['approved', 'rejected', 'paused', 'pending_review']),
+  rejection_reason: z.string().trim().max(1000).optional(),
+})
 
 export async function PATCH(
   request: NextRequest,
@@ -68,8 +68,8 @@ export async function PATCH(
   try {
     const supabase = await createClient()
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -85,81 +85,133 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // Fetch current product
-    const { data: product, error: fetchError } = await supabase
+    const { data: product } = await supabase
       .from('products')
-      .select('*, vendor:vendor_profiles(id, user_id, user:users(email))')
+      .select('*, vendor:vendor_profiles(id, user_id, business_name, user:users(email))')
       .eq('id', params.id)
-      .single()
+      .maybeSingle()
 
-    if (fetchError || !product) {
+    if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    // Vendors can only edit their own products
-    if (role === 'vendor') {
-      const vendorUserId = (product.vendor as { user_id?: string } | null)?.user_id
-      if (vendorUserId !== user.id) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const vendor = product.vendor as unknown as {
+      id: string
+      user_id: string
+      business_name: string
+      user?: { email?: string }
+    } | null
+
+    const body = await request.json().catch(() => ({}))
+
+    // ── Admin: review decisions ────────────────────────────────────────────
+    if (role === 'admin') {
+      const parsed = adminSchema.safeParse(body)
+      if (!parsed.success) {
+        return NextResponse.json({ error: firstIssue(parsed.error) }, { status: 400 })
       }
-    }
+      const { status, rejection_reason } = parsed.data
 
-    const body = await request.json()
-    const { status: newStatus, rejection_reason, ...rest } = body as {
-      status?: ProductStatus
-      rejection_reason?: string
-      [key: string]: unknown
-    }
-
-    const updatePayload: Record<string, unknown> = { ...rest }
-
-    // Admins can set status directly
-    if (role === 'admin' && newStatus) {
-      updatePayload.status = newStatus
-      if (newStatus === 'rejected' && rejection_reason) {
-        updatePayload.rejection_reason = rejection_reason
+      if (status === 'rejected' && !rejection_reason) {
+        return NextResponse.json({ error: 'Tell the vendor what to change' }, { status: 400 })
       }
-    }
 
-    // Vendors: if content fields changed, reset to pending_review
-    if (role === 'vendor') {
-      const contentChanged = CONTENT_FIELDS.some(field => field in rest)
-      if (contentChanged) {
-        updatePayload.status = 'pending_review'
-        updatePayload.rejection_reason = null
+      const admin = await createAdminClient()
+      const { data: updated, error } = await admin
+        .from('products')
+        .update({ status, rejection_reason: status === 'rejected' ? rejection_reason : null })
+        .eq('id', params.id)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      const vendorEmail = vendor?.user?.email
+      if (vendorEmail && status !== product.status) {
+        if (status === 'approved') {
+          await sendListingApproved(vendorEmail, { title: product.title })
+            .catch(err => console.error('[Email] listing approved:', err))
+        }
+        if (status === 'rejected' && rejection_reason) {
+          await sendListingRejected(vendorEmail, { title: product.title, reason: rejection_reason })
+            .catch(err => console.error('[Email] listing rejected:', err))
+        }
       }
+
+      return NextResponse.json({ data: updated, message: 'Listing updated' })
     }
 
-    // Auto-regenerate slug if title changed
-    if (rest.title && typeof rest.title === 'string') {
-      updatePayload.slug = generateSlug(rest.title)
+    // ── Vendor: editing their own listing ──────────────────────────────────
+    if (vendor?.user_id !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // If price_ghs changed, update price (pesewas) too
-    if (rest.price_ghs && typeof rest.price_ghs === 'number') {
-      updatePayload.price = Math.round(rest.price_ghs * 100)
+    // Only listing fields are accepted; anything else in the body (status,
+    // views, vendor_id...) is dropped rather than written
+    const parsed = listingSchema.partial().safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: firstIssue(parsed.error) }, { status: 400 })
     }
 
-    const adminSupabase = await createAdminClient()
-    const { data: updated, error: updateError } = await adminSupabase
+    const changes = changedFields(product, parsed.data)
+
+    let nextStatus = product.status as string
+    if (product.status === 'rejected') {
+      // Saving a rejected listing resubmits it
+      nextStatus = 'pending_review'
+    } else if (product.status === 'approved' && reviewedContentChanged(product, changes)) {
+      nextStatus = 'pending_review'
+    }
+
+    const payload: Record<string, unknown> = { ...changes }
+    if (nextStatus !== product.status) {
+      payload.status = nextStatus
+      payload.rejection_reason = null
+    }
+
+    if (Object.keys(payload).length === 0) {
+      return NextResponse.json({ data: product, review: false, message: 'No changes to save' })
+    }
+
+    // The vendor's own session, so the database guard checks this write too.
+    // The slug never changes: links already shared on WhatsApp keep working.
+    const { data: updated, error: updateError } = await supabase
       .from('products')
-      .update(updatePayload)
+      .update(payload)
       .eq('id', params.id)
       .select()
       .single()
 
-    if (updateError) throw updateError
-
-    // Send listing approved email
-    if (role === 'admin' && newStatus === 'approved') {
-      const vendorEmail = (product.vendor as { user?: { email?: string } } | null)?.user?.email
-      if (vendorEmail) {
-        sendListingApproved(vendorEmail, { title: product.title })
-          .catch(err => console.error('[Email] listing approved:', err))
+    if (updateError) {
+      if (updateError.code === '42501') {
+        return NextResponse.json({ error: updateError.message }, { status: 403 })
       }
+      throw updateError
     }
 
-    return NextResponse.json({ data: updated, message: 'Product updated' })
+    const sentForReview = updated.status === 'pending_review' && product.status !== 'pending_review'
+
+    if (sentForReview) {
+      await sendAdminAlert({
+        subject: `Listing to review: ${updated.title}`,
+        heading: product.status === 'rejected'
+          ? 'A rejected listing was resubmitted'
+          : 'A live listing was edited',
+        intro: 'It is hidden from buyers until it is approved again.',
+        rows: [
+          ['Listing', updated.title],
+          ['Vendor', vendor?.business_name],
+          ['Price', formatCurrency(updated.price_ghs)],
+        ],
+        cta: { path: '/admin/listings', label: 'Review listings' },
+      }).catch(err => console.error('[Email] listing review alert:', err))
+    }
+
+    return NextResponse.json({
+      data: updated,
+      review: sentForReview,
+      message: sentForReview ? 'Saved and sent for review' : 'Listing updated',
+    })
   } catch (err) {
     console.error('[PATCH /api/products/[id]]', err)
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })

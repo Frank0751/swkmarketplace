@@ -25,11 +25,12 @@ import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
+import { DELIVERY_FEE_GHS } from '@/lib/marketplace/orders'
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'How it works | SWK Marketplace',
+  title: 'How it works',
   description:
     'Learn how SWK Marketplace connects eco-conscious buyers with verified youth-led green entrepreneurs across Ghana. Secure escrow payments, SDG 12 verification, and fair payouts.',
   openGraph: {
@@ -313,7 +314,7 @@ export default function HowItWorksPage() {
                   icon: <Banknote className="w-6 h-6 text-green-600" />,
                   title: 'Receive your payout',
                   description:
-                    'After the buyer confirms delivery, the escrow is released. SWK Ghana deducts a 15% platform commission and transfers the remaining 85% directly to your bank account.',
+                    'After the buyer confirms delivery, the escrow is released. SWK Ghana deducts a 15% platform commission and sends the remaining 85% to your mobile money or bank account.',
                 },
                 {
                   step: 5,
@@ -351,7 +352,7 @@ export default function HowItWorksPage() {
               </div>
               <h3 className="text-lg font-display font-bold text-sand-900 mb-2">Platform fee: just 15%</h3>
               <p className="text-sm text-sand-600 leading-relaxed mb-4">
-                SWK Ghana charges a <strong>15% commission</strong> on each sale, significantly lower than most marketplaces. This fee covers payment processing, platform maintenance, vendor support, and SDG 12 verification services.
+                SWK Ghana charges a <strong>15% commission</strong> on each sale, and nothing else: no listing or monthly fees. It covers payment processing, platform maintenance, vendor support, and SDG 12 verification services.
               </p>
               <div className="flex items-center justify-center gap-6 text-sm">
                 <div className="text-center">
@@ -497,7 +498,7 @@ export default function HowItWorksPage() {
             <div className="space-y-3">
               <FAQItem
                 question="Is SWK Marketplace only for buyers in Ghana?"
-                answer="SWK Marketplace primarily serves buyers and vendors across Ghana, but we welcome buyers from across Africa and beyond. Delivery availability and fees depend on the vendor's region. Check the product listing for delivery options before placing an order."
+                answer={`For now, SWK Marketplace delivers within Ghana, to all 16 regions. Delivery is a flat GHS ${DELIVERY_FEE_GHS} per order, shown before you pay. The vendor arranges delivery and calls the phone number you give at checkout.`}
               />
               <FAQItem
                 question="How do I know my payment is safe?"
@@ -509,7 +510,7 @@ export default function HowItWorksPage() {
               />
               <FAQItem
                 question="What happens if I'm not happy with my order?"
-                answer="If your order doesn't arrive, arrives damaged, or significantly differs from the product description, don't confirm delivery. Instead, raise a dispute from your buyer dashboard. SWK Ghana will investigate and, where appropriate, issue a full refund. Your payment is always protected until you choose to release it."
+                answer="If your order doesn't arrive, arrives damaged, or significantly differs from the product description, don't confirm delivery. Instead, press “Report a problem” on your order page. Your payment stays on hold while SWK Ghana investigates and, where appropriate, issues a full refund."
               />
               <FAQItem
                 question="How long does delivery take?"
@@ -517,7 +518,7 @@ export default function HowItWorksPage() {
               />
               <FAQItem
                 question="What is the 15% platform commission?"
-                answer="When a sale is made, SWK Ghana deducts 15% of the total order value as a platform fee. This covers payment processing costs (Paystack fees), platform maintenance, vendor support, SDG verification services, and promotion of vendors. The remaining 85% is transferred directly to the vendor's bank account after delivery confirmation."
+                answer="When a sale is made, SWK Ghana deducts 15% of the total order value as a platform fee. This covers payment processing costs (Paystack fees), platform maintenance, vendor support, SDG verification services, and promotion of vendors. The remaining 85% is sent to the vendor's mobile money or bank account after delivery is confirmed."
               />
             </div>
 

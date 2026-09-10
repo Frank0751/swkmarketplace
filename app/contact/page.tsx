@@ -9,7 +9,7 @@ import { ContactForm } from '@/components/contact/ContactForm'
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'Contact us | SWK Marketplace',
+  title: 'Contact us',
   description:
     'Get in touch with the SWK Ghana team — questions about orders, vendors, or the marketplace.',
   openGraph: {

@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { initializePayment } from '@/lib/paystack/client'
-import type { GhanaRegion } from '@/types'
+import { initializePayment, paymentsMode } from '@/lib/paystack/client'
+import { expectedPesewas } from '@/lib/paystack/confirm'
+import { DELIVERY_FEE_GHS } from '@/lib/marketplace/orders'
+import { normalizeGhanaPhone } from '@/lib/marketplace/phone'
+import { firstIssue } from '@/lib/marketplace/listing'
+import { isDemoId } from '@/lib/demo/data'
+import { GHANA_REGIONS, type GhanaRegion } from '@/types'
 
-const DELIVERY_FEE = 20 // GHS
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://marketplace.swkghana.org'
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,8 +27,8 @@ export async function GET(request: NextRequest) {
       .single()
 
     const { searchParams } = new URL(request.url)
-    const page    = parseInt(searchParams.get('page') ?? '1')
-    const limit   = parseInt(searchParams.get('limit') ?? '20')
+    const page    = Math.max(1, parseInt(searchParams.get('page') ?? '1') || 1)
+    const limit   = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') ?? '20') || 20))
     const status  = searchParams.get('status')
     const offset  = (page - 1) * limit
 
@@ -45,7 +51,6 @@ export async function GET(request: NextRequest) {
     if (profile?.role === 'buyer') {
       query = query.eq('buyer_id', user.id)
     } else if (profile?.role === 'vendor') {
-      // Find vendor profile
       const { data: vendorProfile } = await supabase
         .from('vendor_profiles')
         .select('id')
@@ -77,104 +82,121 @@ export async function GET(request: NextRequest) {
   }
 }
 
+const orderSchema = z.object({
+  product_id:       z.string().min(1, 'Choose a product'),
+  quantity:         z.coerce.number().int().min(1, 'Quantity must be at least 1').max(1000),
+  delivery_address: z.string().trim().min(5, 'Please enter a fuller delivery address').max(300),
+  delivery_region:  z.enum(GHANA_REGIONS as [GhanaRegion, ...GhanaRegion[]], {
+    errorMap: () => ({ message: 'Please select a delivery region' }),
+  }),
+  delivery_phone:   z.string().trim().refine(
+    value => normalizeGhanaPhone(value) !== null,
+    'Enter a Ghana phone number the vendor can call, e.g. 024 123 4567',
+  ),
+  buyer_notes:      z.string().trim().max(500).optional(),
+})
+
+const round2 = (n: number) => Math.round(n * 100) / 100
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const body = await request.json()
-    const {
-      product_id,
-      quantity = 1,
-      delivery_address,
-      delivery_region,
-      buyer_notes,
-    } = body as {
-      product_id: string
-      quantity: number
-      delivery_address: string
-      delivery_region: GhanaRegion
-      buyer_notes?: string
-    }
-
-    if (!product_id || !delivery_address || !delivery_region) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
       return NextResponse.json(
-        { error: 'product_id, delivery_address, and delivery_region are required' },
+        { error: 'Please sign in to place an order', code: 'auth_required' },
+        { status: 401 },
+      )
+    }
+
+    const parsed = orderSchema.safeParse(await request.json().catch(() => ({})))
+    if (!parsed.success) {
+      return NextResponse.json({ error: firstIssue(parsed.error) }, { status: 400 })
+    }
+    const input = parsed.data
+
+    if (isDemoId(input.product_id)) {
+      return NextResponse.json(
+        { error: 'Sample products show how the marketplace works and can’t be ordered.' },
         { status: 400 },
       )
     }
 
-    // Fetch product
-    const { data: product, error: productError } = await supabase
+    // Checked before anything is written, so no order is left behind unpaid
+    if (paymentsMode() === 'off') {
+      return NextResponse.json(
+        { error: 'Online payment isn’t switched on yet. Please check back soon.', code: 'payments_unavailable' },
+        { status: 503 },
+      )
+    }
+
+    const { data: product } = await supabase
       .from('products')
-      .select('*, vendor:vendor_profiles(id, user_id)')
-      .eq('id', product_id)
-      .single()
+      .select('id, title, status, price_ghs, stock_quantity, minimum_order, vendor:vendor_profiles(id, user_id, status)')
+      .eq('id', input.product_id)
+      .maybeSingle()
 
-    if (productError || !product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+    const vendor = product?.vendor as unknown as { id: string; user_id: string; status: string } | null
+
+    if (!product || product.status !== 'approved' || !vendor || vendor.status !== 'approved') {
+      return NextResponse.json({ error: 'This product is no longer available' }, { status: 404 })
     }
 
-    if (product.status !== 'approved') {
-      return NextResponse.json({ error: 'Product is not available' }, { status: 400 })
+    if (vendor.user_id === user.id) {
+      return NextResponse.json({ error: 'You can’t order your own product' }, { status: 400 })
     }
 
-    if (product.stock_quantity < quantity) {
-      return NextResponse.json({ error: 'Insufficient stock' }, { status: 400 })
+    if (product.stock_quantity < input.quantity) {
+      return NextResponse.json(
+        { error: product.stock_quantity > 0 ? `Only ${product.stock_quantity} left in stock` : 'This product is out of stock' },
+        { status: 400 },
+      )
     }
 
-    if (product.minimum_order && quantity < product.minimum_order) {
+    if (product.minimum_order && input.quantity < product.minimum_order) {
       return NextResponse.json(
         { error: `Minimum order quantity is ${product.minimum_order}` },
         { status: 400 },
       )
     }
 
-    const vendorProfile = product.vendor as { id: string; user_id: string } | null
-    if (!vendorProfile) {
-      return NextResponse.json({ error: 'Vendor not found' }, { status: 404 })
-    }
-
-    // Fetch buyer info
     const { data: buyer } = await supabase
       .from('users')
       .select('email, full_name')
       .eq('id', user.id)
       .single()
 
-    if (!buyer) {
-      return NextResponse.json({ error: 'Buyer profile not found' }, { status: 404 })
+    if (!buyer?.email) {
+      return NextResponse.json({ error: 'Your account has no email address for the receipt' }, { status: 400 })
     }
 
-    // Calculate pricing
-    const unit_price  = product.price_ghs
-    const subtotal    = unit_price * quantity
-    const delivery_fee = DELIVERY_FEE
-    const total_amount = subtotal + delivery_fee
+    // Prices come from the database, never from the request
+    const unit_price   = Number(product.price_ghs)
+    const subtotal     = round2(unit_price * input.quantity)
+    const delivery_fee = DELIVERY_FEE_GHS
+    const total_amount = round2(subtotal + delivery_fee)
 
-    // Create order (reference auto-generated by Postgres trigger)
-    const adminSupabase = await createAdminClient()
-    const { data: order, error: orderError } = await adminSupabase
+    // Reference auto-generated by Postgres trigger
+    const admin = await createAdminClient()
+    const { data: order, error: orderError } = await admin
       .from('orders')
       .insert({
-        buyer_id:          user.id,
-        vendor_id:         vendorProfile.id,
-        product_id:        product.id,
-        quantity,
+        buyer_id:         user.id,
+        vendor_id:        vendor.id,
+        product_id:       product.id,
+        quantity:         input.quantity,
         unit_price,
         subtotal,
         delivery_fee,
         total_amount,
-        status:            'pending',
-        delivery_address,
-        delivery_region,
-        buyer_notes:       buyer_notes || null,
+        status:           'pending',
+        delivery_address: input.delivery_address,
+        delivery_region:  input.delivery_region,
+        delivery_phone:   normalizeGhanaPhone(input.delivery_phone),
+        buyer_notes:      input.buyer_notes || null,
       })
-      .select()
+      .select('id, reference, total_amount')
       .single()
 
     if (orderError || !order) {
@@ -182,30 +204,42 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
     }
 
-    // Initialize Paystack payment
-    const payment = await initializePayment({
-      email:  buyer.email,
-      amount: total_amount * 100, // convert GHS to pesewas
-      metadata: {
-        order_id:   order.id,
-        buyer_id:   user.id,
-        vendor_id:  vendorProfile.id,
-        reference:  order.reference,
-      },
-      callback_url: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://marketplace.swkghana.org'}/buyer/orders/${order.id}?payment=success`,
-    })
+    let payment: { authorization_url: string; reference: string }
+    try {
+      payment = await initializePayment({
+        email:  buyer.email,
+        amount: expectedPesewas(total_amount),
+        metadata: {
+          order_id:  order.id,
+          reference: order.reference,
+          buyer_id:  user.id,
+          vendor_id: vendor.id,
+        },
+        callback_url: `${APP_URL}/buyer/orders/${order.id}?payment=success`,
+      })
+    } catch (err) {
+      console.error('[POST /api/orders] Payment initialisation failed:', err)
+      await admin
+        .from('orders')
+        .update({ status: 'cancelled', admin_notes: 'Cancelled automatically: the payment page could not be opened.' })
+        .eq('id', order.id)
+      return NextResponse.json(
+        { error: 'We couldn’t open the payment page. Please try again in a moment.' },
+        { status: 502 },
+      )
+    }
 
-    // Store Paystack reference
-    await adminSupabase
+    await admin
       .from('orders')
       .update({ paystack_reference: payment.reference })
       .eq('id', order.id)
 
     return NextResponse.json(
       {
-        data: { ...order, paystack_reference: payment.reference },
+        order_id:    order.id,
+        reference:   order.reference,
         payment_url: payment.authorization_url,
-        message: 'Order created successfully',
+        message:     'Order created',
       },
       { status: 201 },
     )

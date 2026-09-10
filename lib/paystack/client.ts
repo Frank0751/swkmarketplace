@@ -27,7 +27,23 @@ export interface InitializePaymentResult {
   reference: string
 }
 
+/**
+ * Whether online payment can run here. A test key on the live site would let
+ * anyone "pay" with Paystack's published test cards and receive a real order,
+ * so production refuses test keys unless PAYSTACK_ALLOW_TEST_MODE=true.
+ */
+export function paymentsMode(): 'live' | 'test' | 'off' {
+  const key = process.env.PAYSTACK_SECRET_KEY ?? ''
+  if (key.startsWith('sk_live_')) return 'live'
+  if (key.startsWith('sk_test_')) {
+    const isProduction = process.env.VERCEL_ENV === 'production'
+    return isProduction && process.env.PAYSTACK_ALLOW_TEST_MODE !== 'true' ? 'off' : 'test'
+  }
+  return 'off'
+}
+
 export interface VerifyPaymentResult {
+  id?: number
   status: string          // 'success' | 'failed' | 'abandoned' | 'pending'
   reference: string
   amount: number          // in pesewas
@@ -88,6 +104,7 @@ export async function verifyPayment(reference: string): Promise<VerifyPaymentRes
     status: boolean
     message: string
     data: {
+      id: number
       status: string
       reference: string
       amount: number
@@ -110,6 +127,7 @@ export async function verifyPayment(reference: string): Promise<VerifyPaymentRes
   }
 
   return {
+    id: data.data.id,
     status: data.data.status,
     reference: data.data.reference,
     amount: data.data.amount,

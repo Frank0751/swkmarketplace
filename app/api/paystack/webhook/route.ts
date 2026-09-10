@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyWebhookSignature } from '@/lib/paystack/webhook'
 import { createAdminClient } from '@/lib/supabase/server'
-import {
-  sendOrderConfirmation,
-  sendVendorOrderNotification,
-} from '@/lib/email/brevo'
+import { settleOrderPayment } from '@/lib/paystack/confirm'
 
 export const runtime = 'nodejs'
+
+/** Paystack sends metadata as an object, or as a JSON string when a payment was started from Paystack Inline */
+function readMetadata(raw: unknown): Record<string, unknown> {
+  if (raw && typeof raw === 'object') return raw as Record<string, unknown>
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw)
+      return parsed && typeof parsed === 'object' ? parsed : {}
+    } catch {
+      return {}
+    }
+  }
+  return {}
+}
 
 export async function POST(request: NextRequest) {
   let body: string
@@ -24,18 +35,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
   }
 
-  let event: {
-    event: string
-    data: {
-      id?: number
-      reference: string
-      status?: string
-      amount?: number
-      paid_at?: string
-      customer?: { email: string; first_name?: string; last_name?: string }
-      metadata?: Record<string, unknown>
-    }
-  }
+  let event: { event: string; data?: { reference?: string; metadata?: unknown } }
 
   try {
     event = JSON.parse(body)
@@ -43,118 +43,41 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
   }
 
-  console.log('[Paystack Webhook] Received event:', event.event)
+  const reference = event.data?.reference
 
   try {
     const supabase = await createAdminClient()
 
-    if (event.event === 'charge.success') {
-      const { reference, metadata, id: paystackId } = event.data
-      const order_id = metadata?.order_id as string | undefined
-
-      // Update by paystack_reference first
-      const { data: updatedByRef } = await supabase
-        .from('orders')
-        .update({
-          status: 'paid',
-          paystack_reference: reference,
-          paystack_transaction_id: paystackId?.toString(),
-        })
-        .eq('paystack_reference', reference)
-        .select('*, buyer:users(*), vendor:vendor_profiles(business_name, user:users(email)), product:products(title)')
-        .single()
-
-      // Fallback: update by order_id in metadata (for orders that don't have ref yet)
-      if (!updatedByRef && order_id) {
-        await supabase
-          .from('orders')
-          .update({
-            status: 'paid',
-            paystack_reference: reference,
-            paystack_transaction_id: paystackId?.toString(),
-          })
-          .eq('id', order_id)
-          .eq('status', 'pending')
-      }
-
-      // Re-fetch order with joins for email
-      const { data: order } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          buyer:users(*),
-          vendor:vendor_profiles(business_name, user:users(email)),
-          product:products(title)
-        `)
-        .or(
-          order_id
-            ? `id.eq.${order_id},paystack_reference.eq.${reference}`
-            : `paystack_reference.eq.${reference}`,
-        )
-        .single()
-
-      if (order) {
-        // Send emails (non-blocking, don't fail webhook if email fails)
-        const buyerEmail = order.buyer?.email
-        const vendorEmail = (order.vendor as { business_name?: string; user?: { email?: string } } | null)?.user?.email
-        const buyerName  = order.buyer?.full_name ?? 'Customer'
-        const vendorName = (order.vendor as { business_name?: string } | null)?.business_name ?? 'Vendor'
-        const productTitle = (order.product as { title?: string } | null)?.title ?? 'Your product'
-
-        const emailPromises: Promise<unknown>[] = []
-
-        if (buyerEmail) {
-          emailPromises.push(
-            sendOrderConfirmation(buyerEmail, {
-              reference:    order.reference,
-              product_title: productTitle,
-              total_amount: order.total_amount,
-              vendor_name:  vendorName,
-              buyer_name:   buyerName,
-            }).catch(err => console.error('[Webhook Email] Buyer confirmation failed:', err)),
-          )
-        }
-
-        if (vendorEmail) {
-          emailPromises.push(
-            sendVendorOrderNotification(vendorEmail, {
-              reference:    order.reference,
-              product_title: productTitle,
-              quantity:     order.quantity,
-              total_amount: order.total_amount,
-              buyer_name:   buyerName,
-            }).catch(err => console.error('[Webhook Email] Vendor notification failed:', err)),
-          )
-        }
-
-        await Promise.allSettled(emailPromises)
-        console.log(`[Paystack Webhook] Order ${order.reference} marked as paid`)
-      }
+    if (event.event === 'charge.success' && reference) {
+      // A valid signature only proves Paystack sent this, not that the payment
+      // covers the order: anyone can start a payment with the public key and
+      // attach any order id. settleOrderPayment re-verifies amount and currency.
+      const metadata = readMetadata(event.data?.metadata)
+      const result = await settleOrderPayment(supabase, {
+        reference,
+        orderId: typeof metadata.order_id === 'string' ? metadata.order_id : null,
+      })
+      console.log(`[Paystack Webhook] charge.success ${reference}: ${result.outcome}`)
     }
 
-    if (event.event === 'transfer.success') {
-      const { reference } = event.data
-      if (reference) {
-        await supabase
-          .from('payouts')
-          .update({ status: 'released' })
-          .eq('paystack_transfer_id', reference)
-      }
+    if (event.event === 'transfer.success' && reference) {
+      await supabase
+        .from('payouts')
+        .update({ status: 'released' })
+        .eq('paystack_transfer_id', reference)
     }
 
-    if (event.event === 'transfer.failed' || event.event === 'transfer.reversed') {
-      const { reference } = event.data
-      if (reference) {
-        await supabase
-          .from('payouts')
-          .update({ status: 'failed' })
-          .eq('paystack_transfer_id', reference)
-      }
+    if ((event.event === 'transfer.failed' || event.event === 'transfer.reversed') && reference) {
+      await supabase
+        .from('payouts')
+        .update({ status: 'failed' })
+        .eq('paystack_transfer_id', reference)
     }
   } catch (err) {
     console.error('[Paystack Webhook] Processing error:', err)
-    // Return 200 to prevent Paystack from retrying, log error for investigation
-    return NextResponse.json({ received: true, warning: 'Processing error logged' })
+    // A 500 makes Paystack retry later. Settling is idempotent, so a retry can
+    // never mark an order paid twice or send its emails twice.
+    return NextResponse.json({ error: 'Processing failed, will be retried' }, { status: 500 })
   }
 
   return NextResponse.json({ received: true })

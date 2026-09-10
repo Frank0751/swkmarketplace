@@ -151,44 +151,48 @@ export default function NewListingPage() {
     if (!vendorId) return
     setSubmitting(true)
 
-    const supabase = createClient()
-
     const imageUrls = values.images
       .map(img => img.url.trim())
       .filter(url => url.length > 0)
 
-    const payload = {
-      vendor_id:         vendorId,
-      title:             values.title,
-      short_description: values.short_description,
-      description:       values.description,
-      price_ghs:         values.price_ghs,
-      price:             Math.round(values.price_ghs * 100), // pesewas
-      category:          values.category as ProductCategory,
-      stock_quantity:    values.stock_quantity,
-      unit:              values.unit || null,
-      minimum_order:     values.minimum_order,
-      location:          values.location,
-      region:            values.region as GhanaRegion,
-      sdg_tags:          values.sdg_tags as SDGTag[],
-      value_tags:        values.value_tags as ValueTag[],
-      images:            imageUrls,
-      status:            'pending_review',
-      views:             0,
-      order_count:       0,
-    }
+    try {
+      // Through the API: it validates the listing, files it for review and
+      // tells the SWK Ghana team. (This used to insert straight into the
+      // database, including a "price" column that doesn't exist, so every
+      // submission failed.)
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title:             values.title,
+          short_description: values.short_description,
+          description:       values.description,
+          price_ghs:         values.price_ghs,
+          category:          values.category as ProductCategory,
+          stock_quantity:    values.stock_quantity,
+          unit:              values.unit || null,
+          minimum_order:     values.minimum_order,
+          location:          values.location,
+          region:            values.region as GhanaRegion,
+          sdg_tags:          values.sdg_tags as SDGTag[],
+          value_tags:        values.value_tags as ValueTag[],
+          images:            imageUrls,
+        }),
+      })
+      const json = await res.json().catch(() => ({}))
 
-    const { error } = await supabase.from('products').insert(payload)
+      if (!res.ok) {
+        toast.error(json.error ?? 'Failed to submit listing. Please try again.')
+        return
+      }
 
-    if (error) {
-      toast.error('Failed to submit listing. Please try again.')
-      console.error(error)
+      setSuccess(true)
+      window.scrollTo(0, 0)
+    } catch {
+      toast.error('Something went wrong. Please check your connection and try again.')
+    } finally {
       setSubmitting(false)
-      return
     }
-
-    setSuccess(true)
-    setSubmitting(false)
   }
 
   if (checking) {

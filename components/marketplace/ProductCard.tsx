@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { MapPin, ShoppingBag } from 'lucide-react'
 import { cn, formatCurrency } from '@/lib/utils'
 import { isDemoId } from '@/lib/demo/data'
+import { canOptimizeImage } from '@/lib/marketplace/images'
 import { Product, CATEGORY_META, VALUE_TAG_META, ValueTag } from '@/types'
 
 interface ProductCardProps {
@@ -36,11 +37,11 @@ export function ProductCard({ product }: ProductCardProps) {
           alt={product.title}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          unoptimized={!canOptimizeImage(primaryImage)}
           className={cn(
             'object-cover transition-transform duration-300 group-hover:scale-105',
             isOutOfStock && 'opacity-60 grayscale'
           )}
-          onError={undefined}
         />
 
         {/* SDG 12 badge */}

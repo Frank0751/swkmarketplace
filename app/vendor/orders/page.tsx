@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   ShieldCheck,
   PackageOpen,
+  Phone,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
@@ -24,6 +25,7 @@ import {
   ORDER_STATUS_COLORS,
   cn,
 } from '@/lib/utils'
+import { formatGhanaPhone, whatsappDigits } from '@/lib/marketplace/phone'
 import type { Order, OrderStatus, VendorProfile } from '@/types'
 
 type TabValue = 'all' | 'action' | 'in_progress' | 'completed' | 'other'
@@ -79,6 +81,9 @@ export default function VendorOrdersPage() {
         buyer:users(id, full_name)
       `)
       .eq('vendor_id', (vendor as VendorProfile).id)
+      // Unpaid and abandoned checkouts aren't orders yet: showing them made
+      // vendors think they had sales to prepare
+      .not('status', 'in', '(pending,cancelled)')
       .order('created_at', { ascending: false })
 
     // Distinguish "the query failed" from "you have no orders": swallowing the
@@ -261,6 +266,27 @@ export default function VendorOrdersPage() {
                           {order.delivery_address}, {order.delivery_region}
                         </span>
                       </div>
+                      {order.delivery_phone && ['paid', 'confirmed', 'dispatched', 'disputed'].includes(order.status) && (
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs">
+                          <a
+                            href={`tel:${order.delivery_phone}`}
+                            className="inline-flex items-center gap-1.5 min-h-[32px] font-semibold text-green-700 hover:text-green-800"
+                          >
+                            <Phone className="w-3.5 h-3.5" aria-hidden="true" />
+                            Call buyer: {formatGhanaPhone(order.delivery_phone)}
+                          </a>
+                          {whatsappDigits(order.delivery_phone) && (
+                            <a
+                              href={`https://wa.me/${whatsappDigits(order.delivery_phone)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center min-h-[32px] font-semibold text-green-700 hover:text-green-800 underline underline-offset-2"
+                            >
+                              WhatsApp
+                            </a>
+                          )}
+                        </div>
+                      )}
                       {order.buyer_notes && (
                         <p className="mt-2 text-xs text-sand-600 bg-sand-50 border border-sand-100 rounded-lg px-3 py-2">
                           Buyer note: {order.buyer_notes}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { productSearchFilter } from '@/lib/marketplace/search'
 import type { Product, ProductCategory, ValueTag, GhanaRegion } from '@/types'
 
 export interface ProductFilters {
@@ -86,8 +87,9 @@ export function useProducts(filters: ProductFilters = {}): UseProductsReturn {
         query = query.contains('value_tags', valueTags)
       }
 
-      if (search && search.trim()) {
-        query = query.ilike('title', `%${search.trim()}%`)
+      const searchFilter = productSearchFilter(search)
+      if (searchFilter) {
+        query = query.or(searchFilter)
       }
 
       if (typeof minPrice === 'number') {

@@ -1,38 +1,59 @@
 'use client'
 
-import { useState } from 'react'
-import { Wallet, CheckCircle, Clock, AlertCircle, TrendingUp } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Wallet, CheckCircle, Clock, AlertCircle, TrendingUp, Smartphone, Landmark, AlertTriangle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn, formatCurrency, formatDate, formatRelativeTime } from '@/lib/utils'
+import { describePayoutDestination, type AdminPayout } from '@/lib/admin/payouts'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import type { Payout, PayoutStatus } from '@/types'
+import type { PayoutStatus } from '@/types'
 
 interface PayoutPanelProps {
-  payouts: Payout[]
+  payouts: AdminPayout[]
 }
 
 const STATUS_CONFIG: Record<PayoutStatus, { label: string; color: string }> = {
-  held:            { label: 'Held in Escrow',   color: 'bg-teal-50 text-teal-700' },
-  pending_release: { label: 'Pending Release',   color: 'bg-gold-50 text-gold-700' },
-  released:        { label: 'Released',          color: 'bg-green-50 text-green-700' },
-  failed:          { label: 'Failed',            color: 'bg-red-50 text-red-700' },
+  held:            { label: 'Held in escrow',       color: 'bg-teal-50 text-teal-700' },
+  pending_release: { label: 'Ready to release',     color: 'bg-gold-50 text-gold-700' },
+  released:        { label: 'Released',             color: 'bg-green-50 text-green-700' },
+  failed:          { label: 'Failed',               color: 'bg-red-50 text-red-700' },
+  cancelled:       { label: 'Cancelled (refunded)', color: 'bg-sand-100 text-sand-600' },
 }
 
 type FilterStatus = PayoutStatus | 'all'
 
+/**
+ * Escrow rule: a payout can be released once delivery is confirmed. The API
+ * enforces this too; showing it here saves an admin a failed click.
+ */
+function releaseState(p: AdminPayout): { canRelease: boolean; waiting?: string } {
+  if (p.status === 'pending_release') return { canRelease: true }
+  if (p.status === 'held') {
+    if (p.order?.status === 'delivered') return { canRelease: true }
+    return {
+      canRelease: false,
+      waiting: p.order?.status === 'disputed' ? 'On hold: problem reported' : 'Waiting for delivery',
+    }
+  }
+  return { canRelease: false }
+}
+
 export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
-  const [payouts, setPayouts]         = useState<Payout[]>(initialPayouts)
+  const [payouts, setPayouts]           = useState<AdminPayout[]>(initialPayouts)
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
-  const [loading, setLoading]         = useState<Record<string, boolean>>({})
+  const [loading, setLoading]           = useState<Record<string, boolean>>({})
   // The payout awaiting confirmation, so the dialog can restate who gets paid
-  // what before an irreversible transfer.
-  const [pendingRelease, setPendingRelease] = useState<Payout | null>(null)
+  // what, and where, before it is marked released.
+  const [pendingRelease, setPendingRelease] = useState<AdminPayout | null>(null)
+
+  // Refresh replaces the list; without this the panel kept showing the
+  // payouts it was first rendered with
+  useEffect(() => setPayouts(initialPayouts), [initialPayouts])
 
   const filtered = filterStatus === 'all'
     ? payouts
     : payouts.filter(p => p.status === filterStatus)
 
-  // Totals
   const totalHeld = payouts
     .filter(p => p.status === 'held' || p.status === 'pending_release')
     .reduce((sum, p) => sum + p.gross_amount, 0)
@@ -45,6 +66,8 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
     .filter(p => p.status === 'released')
     .reduce((sum, p) => sum + p.commission_amount, 0)
 
+  const readyCount = payouts.filter(p => releaseState(p).canRelease).length
+
   const handleRelease = async (payoutId: string) => {
     setLoading(prev => ({ ...prev, [payoutId]: true }))
     try {
@@ -53,16 +76,13 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
         headers: { 'Content-Type': 'application/json' },
       })
 
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Failed to release payout')
-      }
-
       const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to release payout')
+
       setPayouts(prev =>
         prev.map(p => p.id === payoutId ? { ...p, ...data.payout } : p),
       )
-      toast.success('Payout released successfully!')
+      toast.success('Payout marked as released. The vendor has been emailed.')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Release failed')
     } finally {
@@ -71,11 +91,14 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
   }
 
   const filterTabs: { label: string; value: FilterStatus }[] = [
-    { label: 'All',             value: 'all' },
-    { label: 'Held',            value: 'held' },
-    { label: 'Pending Release', value: 'pending_release' },
-    { label: 'Released',        value: 'released' },
+    { label: 'All',              value: 'all' },
+    { label: 'Ready to release', value: 'pending_release' },
+    { label: 'Held',             value: 'held' },
+    { label: 'Released',         value: 'released' },
+    { label: 'Cancelled',        value: 'cancelled' },
   ]
+
+  const destination = describePayoutDestination(pendingRelease?.vendor?.payout_details)
 
   return (
     <div className="space-y-6">
@@ -83,23 +106,23 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-start gap-3">
           <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center flex-shrink-0">
-            <Clock className="w-5 h-5 text-teal-600" />
+            <Clock className="w-5 h-5 text-teal-600" aria-hidden="true" />
           </div>
           <div>
-            <div className="text-xs font-medium text-sand-600">Total Held (Escrow)</div>
+            <div className="text-xs font-medium text-sand-600">Held in escrow</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalHeld)}</div>
             <div className="text-xs text-sand-600 mt-0.5">
-              {payouts.filter(p => p.status === 'held' || p.status === 'pending_release').length} payouts
+              {readyCount > 0 ? `${readyCount} ready to release` : 'None ready to release'}
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-start gap-3">
           <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-            <CheckCircle className="w-5 h-5 text-green-600" />
+            <CheckCircle className="w-5 h-5 text-green-600" aria-hidden="true" />
           </div>
           <div>
-            <div className="text-xs font-medium text-sand-600">Total Released</div>
+            <div className="text-xs font-medium text-sand-600">Paid to vendors</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalReleased)}</div>
             <div className="text-xs text-sand-600 mt-0.5">
               {payouts.filter(p => p.status === 'released').length} payouts
@@ -109,24 +132,30 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
 
         <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-start gap-3">
           <div className="w-10 h-10 rounded-lg bg-gold-100 flex items-center justify-center flex-shrink-0">
-            <TrendingUp className="w-5 h-5 text-gold-600" />
+            <TrendingUp className="w-5 h-5 text-gold-600" aria-hidden="true" />
           </div>
           <div>
-            <div className="text-xs font-medium text-sand-600">Commission Earned</div>
+            <div className="text-xs font-medium text-sand-600">Commission earned</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalCommission)}</div>
             <div className="text-xs text-sand-600 mt-0.5">15% of released payouts</div>
           </div>
         </div>
       </div>
 
+      <p className="text-xs text-sand-600 leading-relaxed">
+        Send each vendor their share to the account shown, then press <strong>Release</strong> to
+        record it and email them. Payouts become releasable once delivery is confirmed.
+      </p>
+
       {/* Filter tabs */}
-      <div className="flex items-center gap-1 flex-wrap">
+      <div className="flex items-center gap-1 flex-wrap" role="group" aria-label="Filter payouts">
         {filterTabs.map(tab => (
           <button
             key={tab.value}
             onClick={() => setFilterStatus(tab.value)}
+            aria-pressed={filterStatus === tab.value}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
+              'min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
               filterStatus === tab.value
                 ? 'bg-green-600 text-white'
                 : 'bg-sand-100 text-sand-600 hover:bg-sand-200',
@@ -141,7 +170,7 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
       <div className="bg-white rounded-xl border border-sand-200 overflow-hidden">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-sand-600">
-            <AlertCircle className="w-8 h-8 mb-2" />
+            <AlertCircle className="w-8 h-8 mb-2" aria-hidden="true" />
             <p className="text-sm font-medium">No payouts found</p>
           </div>
         ) : (
@@ -149,11 +178,11 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-sand-200 bg-sand-50">
-                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Vendor</th>
+                  <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Vendor &amp; pay to</th>
                   <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Order Ref</th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Gross</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Gross</th>
                   <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden lg:table-cell">Commission (15%)</th>
-                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Net Payout</th>
+                  <th scope="col" className="text-right px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Vendor gets</th>
                   <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider">Status</th>
                   <th scope="col" className="text-left px-4 py-3 text-xs font-semibold text-sand-600 uppercase tracking-wider hidden md:table-cell">Date</th>
                   <th scope="col" className="px-4 py-3"><span className="sr-only">Action</span></th>
@@ -161,8 +190,11 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
               </thead>
               <tbody className="divide-y divide-sand-100">
                 {filtered.map(payout => {
-                  const statusCfg = STATUS_CONFIG[payout.status]
-                  const canRelease = payout.status === 'held' || payout.status === 'pending_release'
+                  const statusCfg = STATUS_CONFIG[payout.status] ?? STATUS_CONFIG.held
+                  const { canRelease, waiting } = releaseState(payout)
+                  const details = payout.vendor?.payout_details
+                  const dest = describePayoutDestination(details)
+                  const DestIcon = details?.method === 'bank' ? Landmark : Smartphone
 
                   return (
                     <tr key={payout.id} className="hover:bg-sand-50 transition-colors">
@@ -173,13 +205,24 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                         <div className="text-xs text-sand-600">
                           {payout.vendor?.user?.email ?? ''}
                         </div>
+                        {dest ? (
+                          <div className="mt-1 flex items-center gap-1 text-xs text-sand-700">
+                            <DestIcon className="w-3.5 h-3.5 flex-shrink-0 text-teal-600" aria-hidden="true" />
+                            <span>{dest}</span>
+                          </div>
+                        ) : (
+                          <div className="mt-1 flex items-center gap-1 text-xs font-medium text-red-600">
+                            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+                            No payout details yet
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         <span className="font-mono text-xs text-green-700 font-semibold">
                           {payout.order?.reference ?? '-'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right font-medium text-sand-700">
+                      <td className="px-4 py-3 text-right font-medium text-sand-700 hidden lg:table-cell">
                         {formatCurrency(payout.gross_amount)}
                       </td>
                       <td className="px-4 py-3 text-right text-sand-600 hidden lg:table-cell">
@@ -189,12 +232,7 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                         {formatCurrency(payout.net_amount)}
                       </td>
                       <td className="px-4 py-3">
-                        <span
-                          className={cn(
-                            'inline-block px-2 py-0.5 rounded-full text-xs font-medium',
-                            statusCfg.color,
-                          )}
-                        >
+                        <span className={cn('inline-block px-2 py-0.5 rounded-full text-xs font-medium', statusCfg.color)}>
                           {statusCfg.label}
                         </span>
                       </td>
@@ -204,7 +242,7 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                           : formatRelativeTime(payout.created_at)}
                       </td>
                       <td className="px-4 py-3">
-                        {canRelease && (
+                        {canRelease ? (
                           <button
                             onClick={() => setPendingRelease(payout)}
                             disabled={loading[payout.id]}
@@ -213,7 +251,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                             <Wallet className="w-3.5 h-3.5" aria-hidden="true" />
                             {loading[payout.id] ? 'Releasing…' : 'Release'}
                           </button>
-                        )}
+                        ) : waiting ? (
+                          <span className="text-xs text-sand-600 whitespace-nowrap">{waiting}</span>
+                        ) : null}
                       </td>
                     </tr>
                   )
@@ -230,16 +270,19 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
         onConfirm={async () => {
           if (pendingRelease) await handleRelease(pendingRelease.id)
         }}
-        title="Release this payout?"
-        description="This transfers the net amount to the vendor and closes the escrow for this order."
+        title="Mark this payout as released?"
+        description="Do this after you have sent the money. The vendor gets an email saying it is on its way."
         details={pendingRelease ? [
-          { label: 'Vendor',          value: pendingRelease.vendor?.business_name ?? '—' },
-          { label: 'Gross',           value: formatCurrency(pendingRelease.gross_amount) },
+          { label: 'Vendor',           value: pendingRelease.vendor?.business_name ?? '—' },
+          { label: 'Send to',          value: destination ?? 'No payout details on file' },
+          { label: 'Gross',            value: formatCurrency(pendingRelease.gross_amount) },
           { label: 'Commission (15%)', value: `-${formatCurrency(pendingRelease.commission_amount)}` },
-          { label: 'Vendor receives', value: formatCurrency(pendingRelease.net_amount), emphasis: true },
+          { label: 'Vendor receives',  value: formatCurrency(pendingRelease.net_amount), emphasis: true },
         ] : []}
-        warning="Releasing is final and cannot be reversed from the admin panel."
-        confirmLabel="Release payout"
+        warning={destination
+          ? 'This is final and cannot be reversed from the admin panel.'
+          : 'This vendor has not added payout details. Only continue if you have paid them another way.'}
+        confirmLabel="Yes, it's been sent"
       />
     </div>
   )

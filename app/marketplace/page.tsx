@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SlidersHorizontal, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { SlidersHorizontal, ChevronLeft, ChevronRight, Search, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
 import { Navbar } from '@/components/layout/Navbar'
@@ -12,12 +12,14 @@ import { ValueFilterStrip } from '@/components/marketplace/ValueFilterStrip'
 import { ProductGrid } from '@/components/marketplace/ProductGrid'
 import { MobileSortSelect } from '@/components/marketplace/MobileSortSelect'
 import { demoEnabled, getDemoProducts } from '@/lib/demo/data'
+import { productSearchFilter } from '@/lib/marketplace/search'
+import { hasLiveProducts } from '@/lib/marketplace/catalogue'
 import { CATEGORY_META, GHANA_REGIONS, VALUE_TAG_META, type ProductCategory, type GhanaRegion, type ValueTag } from '@/types'
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'Shop sustainable products | SWK Marketplace',
+  title: 'Shop sustainable products',
   description:
     'Discover eco-friendly, SDG 12-verified products from verified youth-led green entrepreneurs across Ghana and Africa.',
   openGraph: {
@@ -76,7 +78,8 @@ async function fetchProductCount({
   if (category) query = query.eq('category', category)
   if (region) query = query.eq('region', region)
   if (valueTags && valueTags.length > 0) query = query.contains('value_tags', valueTags)
-  if (search?.trim()) query = query.ilike('title', `%${search.trim()}%`)
+  const searchFilter = productSearchFilter(search)
+  if (searchFilter) query = query.or(searchFilter)
   if (typeof minPrice === 'number') query = query.gte('price_ghs', minPrice)
   if (typeof maxPrice === 'number') query = query.lte('price_ghs', maxPrice)
 
@@ -126,8 +129,10 @@ export default async function MarketplacePage({
     maxPrice,
   })
 
-  // Mirror the ProductGrid sample-data fallback so the header count matches
-  if (totalCount === 0 && demoEnabled()) {
+  // Mirror the ProductGrid sample-data fallback so the header count matches:
+  // samples appear only while the shop has no real products at all
+  const showingSamples = totalCount === 0 && demoEnabled() && !(await hasLiveProducts())
+  if (showingSamples) {
     totalCount = getDemoProducts({
       limit: 1000,
       category,
@@ -337,6 +342,24 @@ export default async function MarketplacePage({
                     <span className="ml-0.5 opacity-60">×</span>
                   </Link>
                 )}
+              </div>
+            )}
+
+            {/* Say plainly that these are samples, and turn visitors who sell
+                into applicants */}
+            {showingSamples && (
+              <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border border-gold-200 bg-gold-50">
+                <Sparkles className="w-5 h-5 flex-shrink-0 text-gold-600" aria-hidden="true" />
+                <p className="flex-1 text-sm text-sand-800 leading-relaxed">
+                  <strong>You&rsquo;re looking at sample listings.</strong> They show how the marketplace
+                  works while our first verified vendors join, and can&rsquo;t be ordered.
+                </p>
+                <Link
+                  href="/vendor/apply"
+                  className="inline-flex items-center justify-center min-h-[44px] px-4 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors whitespace-nowrap"
+                >
+                  Become a founding vendor
+                </Link>
               </div>
             )}
 

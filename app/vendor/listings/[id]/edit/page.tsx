@@ -76,6 +76,7 @@ export default function EditListingPage() {
   const [notFound,   setNotFound]   = useState(false)
   const [success,    setSuccess]    = useState(false)
   const [product,    setProduct]    = useState<Product | null>(null)
+  const [sentForReview, setSentForReview] = useState(false)
   const [vendorId,   setVendorId]   = useState<string | null>(null)
 
   const {
@@ -196,63 +197,52 @@ export default function EditListingPage() {
     if (!vendorId || !product) return
     setSubmitting(true)
 
-    const supabase = createClient()
-
     const imageUrls = values.images
       .map(img => img.url.trim())
       .filter(url => url.length > 0)
 
-    // If content changed on an approved listing, set back to pending_review
-    const contentChanged =
-      values.title             !== product.title             ||
-      values.short_description !== product.short_description ||
-      values.description       !== product.description       ||
-      values.price_ghs         !== product.price_ghs         ||
-      values.category          !== product.category
+    try {
+      // The API decides what needs review (words, photos or category of a
+      // live listing; any save of a rejected one) and alerts the SWK team.
+      // It used to be decided here, which missed photo swaps entirely.
+      const res = await fetch(`/api/products/${product.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title:             values.title,
+          short_description: values.short_description,
+          description:       values.description,
+          price_ghs:         values.price_ghs,
+          category:          values.category as ProductCategory,
+          stock_quantity:    values.stock_quantity,
+          unit:              values.unit || null,
+          minimum_order:     values.minimum_order,
+          location:          values.location,
+          region:            values.region as GhanaRegion,
+          sdg_tags:          values.sdg_tags as SDGTag[],
+          value_tags:        values.value_tags as ValueTag[],
+          images:            imageUrls,
+        }),
+      })
+      const json = await res.json().catch(() => ({}))
 
-    const newStatus = (product.status === 'approved' && contentChanged)
-      ? 'pending_review'
-      : product.status
+      if (!res.ok) {
+        toast.error(json.error ?? 'Failed to update listing. Please try again.')
+        return
+      }
 
-    const payload = {
-      title:             values.title,
-      short_description: values.short_description,
-      description:       values.description,
-      price_ghs:         values.price_ghs,
-      price:             Math.round(values.price_ghs * 100),
-      category:          values.category as ProductCategory,
-      stock_quantity:    values.stock_quantity,
-      unit:              values.unit || null,
-      minimum_order:     values.minimum_order,
-      location:          values.location,
-      region:            values.region as GhanaRegion,
-      sdg_tags:          values.sdg_tags as SDGTag[],
-      value_tags:        values.value_tags as ValueTag[],
-      images:            imageUrls,
-      status:            newStatus,
-    }
-
-    const { error } = await supabase
-      .from('products')
-      .update(payload)
-      .eq('id', product.id)
-      .eq('vendor_id', vendorId)
-
-    if (error) {
-      toast.error('Failed to update listing. Please try again.')
-      console.error(error)
+      if (json.data) setProduct(json.data as Product)
+      setSentForReview(Boolean(json.review))
+      toast.success(json.review
+        ? 'Saved and sent for review. It’s hidden from buyers until approved.'
+        : 'Listing updated')
+      setSuccess(true)
+      window.scrollTo(0, 0)
+    } catch {
+      toast.error('Something went wrong. Please check your connection and try again.')
+    } finally {
       setSubmitting(false)
-      return
     }
-
-    if (newStatus === 'pending_review' && product.status === 'approved') {
-      toast.success('Listing updated and sent for re-review (content changed).')
-    } else {
-      toast.success('Listing updated successfully!')
-    }
-
-    setSuccess(true)
-    setSubmitting(false)
   }
 
   // ─── Loading ─────────────────────────────────────────────────────────────
@@ -299,9 +289,13 @@ export default function EditListingPage() {
           <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-10 h-10 text-green-600" />
           </div>
-          <h1 className="text-3xl font-display font-bold text-sand-900 mb-3">Listing Updated!</h1>
+          <h1 className="text-3xl font-display font-bold text-sand-900 mb-3">
+            {sentForReview ? 'Sent for review' : 'Listing Updated!'}
+          </h1>
           <p className="text-sand-600 text-base mb-8">
-            Your changes have been saved successfully.
+            {sentForReview
+              ? 'Your changes are saved. The SWK Ghana team will review the listing, usually within 24–48 hours, and email you. It’s hidden from buyers until then.'
+              : 'Your changes have been saved successfully.'}
           </p>
           <div className="flex gap-3 justify-center">
             <Link
@@ -347,9 +341,9 @@ export default function EditListingPage() {
           <div className="flex items-start gap-3 p-4 bg-gold-50 border border-gold-100 rounded-xl text-gold-700 mb-6">
             <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <p className="text-xs leading-relaxed">
-              This listing is currently <strong>live</strong>. Changing the title, description, or price will
-              send it back to <strong>pending review</strong> until approved by SWK Ghana. Price and stock
-              changes do not require re-review unless the title or description also changes.
+              This listing is currently <strong>live</strong>. Changing the title, descriptions, photos or
+              category sends it back to <strong>pending review</strong> until SWK Ghana approves it again.
+              Price and stock changes stay live straight away.
             </p>
           </div>
         )}
@@ -359,8 +353,9 @@ export default function EditListingPage() {
           <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-100 rounded-xl text-red-700 mb-6">
             <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold mb-0.5">Previously Rejected</p>
+              <p className="text-sm font-semibold mb-0.5">Changes requested</p>
               <p className="text-xs">{product.rejection_reason}</p>
+              <p className="text-xs mt-1.5 font-medium">Fix this below and save: saving resubmits the listing for review.</p>
             </div>
           </div>
         )}

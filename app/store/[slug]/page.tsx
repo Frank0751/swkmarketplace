@@ -26,6 +26,7 @@ import { ShareStoreLink } from '@/components/vendor/ShareStoreLink'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { FadeIn, Stagger, StaggerItem } from '@/components/ui/motion'
 import { demoEnabled, getDemoVendor, getDemoProducts, isDemoId } from '@/lib/demo/data'
+import { whatsappDigits, formatGhanaPhone } from '@/lib/marketplace/phone'
 import { CATEGORY_META, type Product, type VendorProfile } from '@/types'
 
 interface StorePageProps {
@@ -98,7 +99,9 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
     openGraph: {
       title,
       description,
-      images: vendor.banner_url ? [{ url: vendor.banner_url }] : undefined,
+      images: vendor.banner_url || vendor.logo_url
+        ? [{ url: (vendor.banner_url || vendor.logo_url) as string }]
+        : undefined,
     },
   }
 }
@@ -115,7 +118,10 @@ export default async function StorePage({ params }: StorePageProps) {
   const slug = vendor.slug ?? vendor.id
   const isSample = isDemoId(vendor.id)
 
-  const whatsappDigits = vendor.phone?.replace(/[^0-9]/g, '')
+  // wa.me needs the international number with no + or leading 0: a local
+  // "024…" number used to produce a link that opened nobody's chat
+  const waNumber = whatsappDigits(vendor.phone)
+    ?? (vendor.phone?.trim().startsWith('+') ? vendor.phone.replace(/\D/g, '') : null)
 
   const facts = [
     vendor.year_founded && { icon: CalendarDays, label: 'Founded', value: String(vendor.year_founded) },
@@ -358,18 +364,23 @@ export default async function StorePage({ params }: StorePageProps) {
                       <Phone className="w-4 h-4 text-sand-600 mt-0.5 flex-shrink-0" />
                       <div className="flex flex-col gap-0.5">
                         <a href={`tel:${vendor.phone}`} className="text-sand-600 hover:text-green-700 transition-colors">
-                          {vendor.phone}
+                          {formatGhanaPhone(vendor.phone)}
                         </a>
-                        {whatsappDigits && (
+                        {waNumber && (
                           <a
-                            href={`https://wa.me/${whatsappDigits}`}
+                            href={`https://wa.me/${waNumber}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-green-600 font-semibold hover:text-green-700"
+                            className="text-xs text-green-700 font-semibold hover:text-green-800"
                           >
                             Chat on WhatsApp →
                           </a>
                         )}
+                        {/* Matches the Terms: questions welcome, payment only
+                            on the platform, where escrow protects the buyer */}
+                        <span className="text-[11px] text-sand-600 leading-snug mt-1">
+                          Ask anything, but pay only through SWK Marketplace so your money stays protected.
+                        </span>
                       </div>
                     </div>
                   )}

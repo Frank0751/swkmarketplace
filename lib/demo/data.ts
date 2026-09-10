@@ -3,6 +3,7 @@ import type {
   ProductCategory,
   VendorProfile,
 } from '@/types'
+import { cleanSearchTerm } from '@/lib/marketplace/search'
 
 // ─── Demo / sample data ─────────────────────────────────────────────────────────
 //
@@ -163,7 +164,6 @@ function product(
     vendor_id: v.id,
     description: '',
     short_description: '',
-    price: Math.round(p.price_ghs * 100),
     stock_quantity: 25,
     sdg_tags: ['sdg_12_responsible_consumption'],
     value_tags: [],
@@ -357,8 +357,9 @@ export function getDemoProducts({
   if (valueTags && valueTags.length > 0) {
     items = items.filter(p => valueTags.every(t => (p.value_tags as string[]).includes(t)))
   }
-  if (search && search.trim()) {
-    const q = search.trim().toLowerCase()
+  // Cleaned exactly like the live search, so "forest, honey" matches here too
+  const q = cleanSearchTerm(search).toLowerCase()
+  if (q) {
     items = items.filter(
       p =>
         p.title.toLowerCase().includes(q) ||

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Ubuntu } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { JsonLd } from '@/components/seo/JsonLd'
 import './globals.css'
 
@@ -104,6 +106,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             },
           }}
         />
+        {/* Cookieless page views and real-user speed, shown on Vercel's
+            dashboard. Only rendered on Vercel, which serves the scripts;
+            elsewhere they would 404 on every page. */}
+        {process.env.VERCEL === '1' && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   )

@@ -2,7 +2,8 @@ import { AdminLayout } from '@/components/admin/AdminLayout'
 import { OrderManagement } from '@/components/admin/OrderManagement'
 import { createClient } from '@/lib/supabase/server'
 import { formatCurrency } from '@/lib/utils'
-import { ShoppingCart, Wallet, AlertTriangle } from 'lucide-react'
+import { isConfirmationOverdue, CONFIRMATION_WINDOW_DAYS } from '@/lib/marketplace/orders'
+import { ShoppingCart, Wallet, AlertTriangle, Clock } from 'lucide-react'
 import type { Order } from '@/types'
 
 export const metadata = { title: 'Order Management' }
@@ -43,12 +44,13 @@ export default async function AdminOrdersPage() {
     .reduce((sum, o) => sum + o.total_amount, 0)
 
   const disputedCount = orders.filter(o => o.status === 'disputed').length
+  const overdueCount  = orders.filter(o => isConfirmationOverdue(o)).length
   const totalOrders   = orders.length
 
   return (
     <AdminLayout title="Order Management">
       {/* Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
             <ShoppingCart className="w-5 h-5 text-blue-600" />
@@ -78,8 +80,19 @@ export default async function AdminOrdersPage() {
             <div className="text-xs font-medium text-sand-600">Active Disputes</div>
             <div className="text-2xl font-bold text-sand-900">{disputedCount}</div>
             {disputedCount > 0 && (
-              <div className="text-xs text-red-500 mt-0.5">Requires immediate attention</div>
+              <div className="text-xs text-red-600 mt-0.5">Requires immediate attention</div>
             )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-gold-100 flex items-center justify-center flex-shrink-0">
+            <Clock className="w-5 h-5 text-gold-600" aria-hidden="true" />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-sand-600">Awaiting buyer {CONFIRMATION_WINDOW_DAYS}+ days</div>
+            <div className="text-2xl font-bold text-sand-900">{overdueCount}</div>
+            <div className="text-xs text-sand-600 mt-0.5">Dispatched but not confirmed</div>
           </div>
         </div>
       </div>

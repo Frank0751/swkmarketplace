@@ -54,6 +54,12 @@ describe('getDemoProducts filtering', () => {
     expect(hits.some(p => p.slug === 'demo-raw-forest-honey')).toBe(true)
   })
 
+  it('treats punctuation in a search the same way the live search does', () => {
+    for (const search of ['forest, honey', '(honey)', 'honey*']) {
+      expect(getDemoProducts({ search }).some(p => p.slug === 'demo-raw-forest-honey'), search).toBe(true)
+    }
+  })
+
   it('filters by price range', () => {
     const hits = getDemoProducts({ minPrice: 50, maxPrice: 100 })
     for (const p of hits) {

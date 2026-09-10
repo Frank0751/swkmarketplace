@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { verifyPayment } from '@/lib/paystack/client'
+import { settleOrderPayment } from '@/lib/paystack/confirm'
 
-// POST /api/paystack/verify, reconcile an order's payment status directly
-// with Paystack. Fallback for when the buyer returns via callback_url before
-// (or without) the webhook being processed.
+// POST /api/paystack/verify: reconcile an order's payment directly with
+// Paystack when the buyer returns from the payment page, in case the webhook
+// hasn't arrived yet. Uses the same checks as the webhook (amount, currency).
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { order_id } = (await request.json()) as { order_id?: string }
+    const { order_id } = (await request.json().catch(() => ({}))) as { order_id?: string }
     if (!order_id) {
       return NextResponse.json({ error: 'order_id is required' }, { status: 400 })
     }
@@ -23,14 +23,13 @@ export async function POST(request: NextRequest) {
       .from('orders')
       .select('id, buyer_id, status, paystack_reference')
       .eq('id', order_id)
-      .single()
+      .maybeSingle()
 
-    // RLS already limits visibility to order parties; still require the buyer
     if (!order || order.buyer_id !== user.id) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
-    // Already reconciled (webhook got there first), nothing to do
+    // Already reconciled (the webhook got there first), nothing to do
     if (order.status !== 'pending') {
       return NextResponse.json({ status: order.status, reconciled: false })
     }
@@ -39,23 +38,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Order has no payment reference' }, { status: 400 })
     }
 
-    const payment = await verifyPayment(order.paystack_reference)
+    const admin = await createAdminClient()
+    const result = await settleOrderPayment(admin, {
+      reference: order.paystack_reference,
+      orderId: order.id,
+    })
 
-    if (payment.status !== 'success') {
-      return NextResponse.json({ status: 'pending', paystack_status: payment.status, reconciled: false })
-    }
-
-    // Guard: pending → paid only. The DB trigger creates the payout record.
-    const adminSupabase = await createAdminClient()
-    const { error: updateError } = await adminSupabase
-      .from('orders')
-      .update({ status: 'paid' })
-      .eq('id', order.id)
-      .eq('status', 'pending')
-
-    if (updateError) throw updateError
-
-    return NextResponse.json({ status: 'paid', reconciled: true })
+    return NextResponse.json({
+      status: result.outcome === 'paid' ? 'paid' : order.status,
+      reconciled: result.outcome === 'paid',
+      outcome: result.outcome,
+    })
   } catch (err) {
     console.error('[POST /api/paystack/verify]', err)
     return NextResponse.json({ error: 'Failed to verify payment' }, { status: 500 })

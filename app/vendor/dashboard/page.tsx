@@ -6,7 +6,6 @@ import {
   PlusCircle,
   Store,
   ShoppingBag,
-  DollarSign,
   BarChart3,
   Clock,
   AlertTriangle,
@@ -15,6 +14,7 @@ import {
   ArrowRight,
   PackageOpen,
   ExternalLink,
+  Wallet,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
@@ -22,7 +22,7 @@ import { ShareStoreLink } from '@/components/vendor/ShareStoreLink'
 import { formatCurrency, formatDate, formatRelativeTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, cn } from '@/lib/utils'
 import type { Order, VendorProfile } from '@/types'
 
-export const metadata = { title: 'Vendor Dashboard | SWK Marketplace' }
+export const metadata = { title: 'Vendor Dashboard' }
 
 const VENDOR_NAV = [
   { href: '/vendor/dashboard',  label: 'Dashboard',    icon: LayoutDashboard },
@@ -30,6 +30,7 @@ const VENDOR_NAV = [
   { href: '/vendor/listings',   label: 'My Listings',  icon: Package },
   { href: '/vendor/listings/new', label: 'Add Listing', icon: PlusCircle },
   { href: '/vendor/store',      label: 'My Store Page', icon: Store },
+  { href: '/vendor/payouts',    label: 'Payouts',      icon: Wallet },
 ]
 
 export default async function VendorDashboardPage() {
@@ -70,9 +71,10 @@ export default async function VendorDashboardPage() {
   let pendingGross   = 0
   let orderCount     = 0
   let productCounts = { total: 0, approved: 0, pending: 0 }
+  let payoutDetailsMissing = false
 
   if (vendor.status === 'approved') {
-    const [ordersRes, productsRes, payoutsRes, orderCountRes] = await Promise.all([
+    const [ordersRes, productsRes, payoutsRes, orderCountRes, payoutDetailsRes] = await Promise.all([
       supabase
         .from('orders')
         .select(`
@@ -101,6 +103,13 @@ export default async function VendorDashboardPage() {
         .from('orders')
         .select('id', { count: 'exact', head: true })
         .eq('vendor_id', vendor.id),
+
+      // Without payout details SWK Ghana has nowhere to send the money
+      supabase
+        .from('vendor_payout_details')
+        .select('vendor_id')
+        .eq('vendor_id', vendor.id)
+        .maybeSingle(),
     ])
 
     recentOrders = (ordersRes.data ?? []) as unknown as Order[]
@@ -113,6 +122,7 @@ export default async function VendorDashboardPage() {
     pendingPayouts = (payoutsRes.data ?? []).reduce((sum, p) => sum + (p.net_amount ?? 0), 0)
     pendingGross   = (payoutsRes.data ?? []).reduce((sum, p) => sum + (p.gross_amount ?? 0), 0)
     orderCount     = orderCountRes.count ?? 0
+    payoutDetailsMissing = !payoutDetailsRes.error && !payoutDetailsRes.data
   }
 
   return (
@@ -264,17 +274,33 @@ export default async function VendorDashboardPage() {
           {/* ── APPROVED: stats + orders ── */}
           {vendor.status === 'approved' && (
             <>
+              {payoutDetailsMissing && (
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 mb-6 rounded-xl border border-gold-200 bg-gold-50">
+                  <Wallet className="w-5 h-5 flex-shrink-0 text-gold-600" aria-hidden="true" />
+                  <p className="flex-1 text-sm text-sand-800">
+                    <strong>Add your payout details.</strong> Tell us your mobile money or bank account so
+                    we can send you your earnings.
+                  </p>
+                  <Link
+                    href="/vendor/payouts"
+                    className="inline-flex items-center justify-center min-h-[44px] px-4 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors whitespace-nowrap"
+                  >
+                    Add payout details
+                  </Link>
+                </div>
+              )}
+
               {/* Stats */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Total Sales</span>
+                    <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Orders fulfilled</span>
                     <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
-                      <DollarSign className="w-4 h-4 text-green-600" />
+                      <CheckCircle2 className="w-4 h-4 text-green-600" aria-hidden="true" />
                     </div>
                   </div>
-                  <p className="text-2xl font-display font-bold text-sand-900">
-                    {formatCurrency(vendor.total_sales ?? 0)}
+                  <p className="text-3xl font-display font-bold text-sand-900">
+                    {vendor.total_sales ?? 0}
                   </p>
                 </div>
 
@@ -306,8 +332,8 @@ export default async function VendorDashboardPage() {
                     </div>
                   </div>
                   <p className="text-2xl font-display font-bold text-sand-900">{formatCurrency(pendingPayouts)}</p>
-                  {/* Total Sales is gross and this figure is net, so state the
-                      deduction rather than leaving an unexplained 15% gap. */}
+                  {/* This figure is net, so state the deduction rather than
+                      leaving an unexplained 15% gap. */}
                   <p className="mt-1 text-xs text-sand-600">
                     {pendingGross > 0
                       ? `From ${formatCurrency(pendingGross)} in sales, after the 15% platform fee`

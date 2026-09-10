@@ -16,7 +16,7 @@ const ITEMS: { icon: LucideIcon; label: string }[] = [
   { icon: Users, label: 'Youth-Led Vendors' },
   { icon: MapPin, label: 'Made in Ghana' },
   { icon: Recycle, label: 'Zero Greenwashing' },
-  { icon: HandCoins, label: '15% Reinvested in Youth' },
+  { icon: HandCoins, label: 'Run by a Youth Nonprofit' },
   { icon: Truck, label: 'Nationwide Delivery' },
   { icon: Star, label: 'Verified Buyer Reviews' },
 ]

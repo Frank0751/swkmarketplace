@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 
 const REVIEWABLE_STATUSES = ['delivered', 'released']
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 // GET /api/reviews?product_id=xxx, public review list + reviewer names,
 // plus eligibility info for the signed-in user
@@ -12,6 +13,12 @@ export async function GET(request: NextRequest) {
 
     if (!product_id) {
       return NextResponse.json({ error: 'product_id is required' }, { status: 400 })
+    }
+
+    // Sample listings have ids like "demo-…", which aren't UUIDs; querying
+    // with one made Postgres error and this route answer 500
+    if (!UUID.test(product_id)) {
+      return NextResponse.json({ data: [], can_review: false, reviewable_order_id: null })
     }
 
     // Admin client: users RLS hides other buyers' rows, but reviews should

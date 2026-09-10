@@ -1,43 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { sendOrderDispatched, sendDeliveryConfirmed } from '@/lib/email/brevo'
+import {
+  sendOrderConfirmedByVendor,
+  sendOrderDispatched,
+  sendDeliveryConfirmed,
+  sendRefundIssued,
+  sendDisputeReceived,
+  sendVendorDisputeNotice,
+  sendAdminAlert,
+} from '@/lib/email/brevo'
+import { canTransition, type OrderActor } from '@/lib/marketplace/orders'
+import { firstIssue } from '@/lib/marketplace/listing'
+import { formatCurrency, ORDER_STATUS_LABELS } from '@/lib/utils'
 import type { OrderStatus } from '@/types'
 
-// Valid status transitions by role
-const TRANSITIONS: Record<string, Record<OrderStatus, OrderStatus[]>> = {
-  vendor: {
-    pending:    ['confirmed'],
-    paid:       ['confirmed'],
-    confirmed:  ['dispatched'],
-    dispatched: [],
-    delivered:  [],
-    released:   [],
-    disputed:   [],
-    refunded:   [],
-    cancelled:  [],
-  },
-  buyer: {
-    pending:    ['cancelled'],
-    paid:       [],
-    confirmed:  [],
-    dispatched: ['delivered'],
-    delivered:  [],
-    released:   [],
-    disputed:   [],
-    refunded:   [],
-    cancelled:  [],
-  },
-  admin: {
-    pending:    ['paid', 'cancelled'],
-    paid:       ['confirmed', 'refunded', 'disputed'],
-    confirmed:  ['dispatched', 'disputed'],
-    dispatched: ['delivered', 'disputed'],
-    delivered:  ['released'],
-    released:   [],
-    disputed:   ['refunded', 'released'],
-    refunded:   [],
-    cancelled:  [],
-  },
+const ORDER_STATUSES = [
+  'pending', 'paid', 'confirmed', 'dispatched',
+  'delivered', 'released', 'disputed', 'refunded', 'cancelled',
+] as const
+
+/**
+ * Which side of this order the signed-in user is on. Decided per order rather
+ * than per account role: a vendor who buys from another vendor is the buyer on
+ * that order, and previously couldn't confirm its delivery.
+ */
+function actorFor(
+  order: { buyer_id: string; vendor?: unknown },
+  userId: string,
+  role: string | undefined,
+): OrderActor | null {
+  if (role === 'admin') return 'admin'
+  if (order.buyer_id === userId) return 'buyer'
+  if ((order.vendor as { user_id?: string } | null)?.user_id === userId) return 'vendor'
+  return null
 }
 
 export async function GET(
@@ -47,8 +44,8 @@ export async function GET(
   try {
     const supabase = await createClient()
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -74,23 +71,8 @@ export async function GET(
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
-    // Access control: buyer or vendor party, or admin
-    const role = profile?.role
-    if (role !== 'admin') {
-      if (role === 'buyer' && order.buyer_id !== user.id) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-      }
-      if (role === 'vendor') {
-        // check vendor id
-        const { data: vp } = await supabase
-          .from('vendor_profiles')
-          .select('id')
-          .eq('user_id', user.id)
-          .single()
-        if (!vp || order.vendor_id !== vp.id) {
-          return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-        }
-      }
+    if (!actorFor(order, user.id, profile?.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     return NextResponse.json({ data: order })
@@ -100,6 +82,14 @@ export async function GET(
   }
 }
 
+const patchSchema = z.object({
+  status:             z.enum(ORDER_STATUSES).optional(),
+  note:               z.string().trim().max(1000).optional(),
+  vendor_notes:       z.string().trim().max(1000).optional(),
+  admin_notes:        z.string().trim().max(2000).optional(),
+  estimated_delivery: z.string().trim().max(100).optional(),
+})
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } },
@@ -107,8 +97,8 @@ export async function PATCH(
   try {
     const supabase = await createClient()
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -118,134 +108,107 @@ export async function PATCH(
       .eq('id', user.id)
       .single()
 
-    const role = profile?.role as 'buyer' | 'vendor' | 'admin' | undefined
-    if (!role) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Fetch existing order
-    const { data: order, error: orderError } = await supabase
+    const { data: order } = await supabase
       .from('orders')
-      .select(`
-        *,
-        buyer:users(email, full_name),
-        vendor:vendor_profiles(id, business_name, user_id, user:users(email)),
-        product:products(title)
-      `)
+      .select('id, status, buyer_id, vendor:vendor_profiles(user_id)')
       .eq('id', params.id)
-      .single()
+      .maybeSingle()
 
-    if (orderError || !order) {
+    if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
-    // Access control
-    if (role !== 'admin') {
-      if (role === 'buyer' && order.buyer_id !== user.id) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-      }
-      if (role === 'vendor') {
-        const vendorProfile = order.vendor as { id: string; user_id: string } | null
-        if (!vendorProfile || vendorProfile.user_id !== user.id) {
-          return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-        }
-      }
+    const actor = actorFor(order, user.id, profile?.role)
+    if (!actor) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const body = await request.json()
-    const { status: newStatus, note, vendor_notes, admin_notes } = body as {
-      status?: OrderStatus
-      note?: string
-      vendor_notes?: string
-      admin_notes?: string
+    const parsed = patchSchema.safeParse(await request.json().catch(() => ({})))
+    if (!parsed.success) {
+      return NextResponse.json({ error: firstIssue(parsed.error) }, { status: 400 })
     }
 
-    const currentStatus = order.status as OrderStatus
-    const allowedTransitions = TRANSITIONS[role]?.[currentStatus] ?? []
+    const { status: next, note, vendor_notes, admin_notes, estimated_delivery } = parsed.data
+    const current = order.status as OrderStatus
+    const changingStatus = !!next && next !== current
 
-    if (newStatus && !allowedTransitions.includes(newStatus)) {
+    if (changingStatus && !canTransition(actor, current, next)) {
       return NextResponse.json(
         {
-          error: `Transition from "${currentStatus}" to "${newStatus}" is not allowed for role "${role}"`,
+          error: `An order that is "${ORDER_STATUS_LABELS[current] ?? current}" can’t be moved to "${ORDER_STATUS_LABELS[next] ?? next}" from here.`,
         },
         { status: 400 },
       )
     }
 
-    // Build update payload
-    const updatePayload: Record<string, unknown> = {}
-    if (newStatus) updatePayload.status = newStatus
-    if (vendor_notes !== undefined) updatePayload.vendor_notes = vendor_notes
-    if (admin_notes  !== undefined) updatePayload.admin_notes  = admin_notes
+    if (next === 'disputed' && actor === 'buyer' && (note ?? '').length < 10) {
+      return NextResponse.json(
+        { error: 'Please tell us what went wrong so we can help.' },
+        { status: 400 },
+      )
+    }
 
-    // Set timestamps on specific transitions
-    if (newStatus === 'dispatched') updatePayload.dispatched_at = new Date().toISOString()
-    if (newStatus === 'delivered')  updatePayload.delivered_at  = new Date().toISOString()
-    if (newStatus === 'released')   updatePayload.released_at   = new Date().toISOString()
+    if (admin_notes !== undefined && actor !== 'admin') {
+      return NextResponse.json({ error: 'Only SWK Ghana can write admin notes' }, { status: 403 })
+    }
 
-    const adminSupabase = await createAdminClient()
+    if ((vendor_notes !== undefined || estimated_delivery !== undefined) && actor === 'buyer') {
+      return NextResponse.json({ error: 'Only the vendor can update delivery details' }, { status: 403 })
+    }
 
-    const { data: updated, error: updateError } = await adminSupabase
+    const payload: Record<string, unknown> = {}
+    if (changingStatus) payload.status = next
+    if (vendor_notes !== undefined) payload.vendor_notes = vendor_notes || null
+    if (admin_notes !== undefined) payload.admin_notes = admin_notes || null
+    if (estimated_delivery !== undefined) payload.estimated_delivery = estimated_delivery || null
+
+    const now = new Date().toISOString()
+    if (changingStatus && next === 'dispatched') payload.dispatched_at = now
+    if (changingStatus && next === 'delivered') payload.delivered_at = now
+
+    if (Object.keys(payload).length === 0) {
+      return NextResponse.json({ error: 'Nothing to update' }, { status: 400 })
+    }
+
+    const admin = await createAdminClient()
+
+    // Guarded on the status we checked, so two people acting at once can't both win
+    const { data: updated, error: updateError } = await admin
       .from('orders')
-      .update(updatePayload)
+      .update(payload)
       .eq('id', params.id)
+      .eq('status', current)
       .select()
-      .single()
+      .maybeSingle()
 
     if (updateError) throw updateError
+    if (!updated) {
+      return NextResponse.json(
+        { error: 'This order was just updated by someone else. Refresh to see its latest status.' },
+        { status: 409 },
+      )
+    }
 
-    // Status changes are auto-logged to order_history by the orders_log_status
-    // trigger, only insert here when there is a note to attach
-    if (newStatus && newStatus !== currentStatus) {
+    if (changingStatus) {
+      // The orders_log_status trigger records every status change; add a row
+      // only when there is a note to keep with it (e.g. a buyer's problem report)
       if (note) {
-        const { error: historyError } = await adminSupabase
+        const { error: historyError } = await admin
           .from('order_history')
-          .insert({
-            order_id:   params.id,
-            status:     newStatus,
-            note,
-            created_by: user.id,
-          })
+          .insert({ order_id: params.id, status: next, note, created_by: user.id })
         if (historyError) console.error('[Order history insert]', historyError)
       }
 
-      // Send emails for specific transitions
-      const buyerEmail  = (order.buyer as { email?: string } | null)?.email
-      const vendorEmail = (order.vendor as { user?: { email?: string } } | null)?.user?.email
-      const productTitle = (order.product as { title?: string } | null)?.title ?? 'Your product'
-      const orderRef    = order.reference
-
-      if (newStatus === 'dispatched' && buyerEmail) {
-        sendOrderDispatched(buyerEmail, {
-          reference:          orderRef,
-          product_title:      productTitle,
-          estimated_delivery: order.estimated_delivery,
-        }).catch(err => console.error('[Email] dispatched:', err))
-      }
-
-      if (newStatus === 'delivered') {
-        // Notify vendor that delivery confirmed + payout pending
-        if (vendorEmail) {
-          // Fetch payout net amount
-          const { data: payout } = await adminSupabase
-            .from('payouts')
-            .select('net_amount')
-            .eq('order_id', params.id)
-            .single()
-
-          sendDeliveryConfirmed(vendorEmail, {
-            reference:  orderRef,
-            net_amount: payout?.net_amount ?? 0,
-          }).catch(err => console.error('[Email] delivered-vendor:', err))
-        }
-        // Also update payout to pending_release
-        const { error: payoutError } = await adminSupabase
+      if (next === 'delivered') {
+        const { error: payoutError } = await admin
           .from('payouts')
           .update({ status: 'pending_release' })
           .eq('order_id', params.id)
           .eq('status', 'held')
         if (payoutError) console.error('[Payout pending_release]', payoutError)
       }
+
+      await notifyTransition(admin, params.id, next as OrderStatus, note)
     }
 
     return NextResponse.json({ data: updated, message: 'Order updated' })
@@ -253,4 +216,117 @@ export async function PATCH(
     console.error('[PATCH /api/orders/[id]]', err)
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
   }
+}
+
+/**
+ * Emails for a status change. Read with the service role: under the caller's
+ * own session, RLS hides the other party's email address, so a buyer
+ * confirming delivery never triggered the vendor's email, and a vendor
+ * dispatching never triggered the buyer's.
+ */
+async function notifyTransition(
+  admin: SupabaseClient,
+  orderId: string,
+  status: OrderStatus,
+  note?: string,
+) {
+  const { data: o } = await admin
+    .from('orders')
+    .select(`
+      reference, total_amount, estimated_delivery,
+      buyer:users(email, full_name),
+      vendor:vendor_profiles(business_name, user:users(email)),
+      product:products(title),
+      payout:payouts(net_amount)
+    `)
+    .eq('id', orderId)
+    .single()
+
+  if (!o) return
+
+  const buyer = o.buyer as unknown as { email?: string; full_name?: string } | null
+  const vendor = o.vendor as unknown as { business_name?: string; user?: { email?: string } } | null
+  const productTitle = (o.product as unknown as { title?: string } | null)?.title ?? 'Your product'
+  const payoutRaw = o.payout as unknown
+  const payout = (Array.isArray(payoutRaw) ? payoutRaw[0] : payoutRaw) as { net_amount?: number } | null
+  const vendorName = vendor?.business_name ?? 'The vendor'
+
+  const sends: Promise<unknown>[] = []
+
+  switch (status) {
+    case 'confirmed':
+      if (buyer?.email) {
+        sends.push(sendOrderConfirmedByVendor(buyer.email, {
+          reference: o.reference,
+          product_title: productTitle,
+          vendor_name: vendorName,
+        }))
+      }
+      break
+
+    case 'dispatched':
+      if (buyer?.email) {
+        sends.push(sendOrderDispatched(buyer.email, {
+          reference: o.reference,
+          product_title: productTitle,
+          estimated_delivery: o.estimated_delivery ?? undefined,
+        }))
+      }
+      break
+
+    case 'delivered':
+      if (vendor?.user?.email) {
+        sends.push(sendDeliveryConfirmed(vendor.user.email, {
+          reference: o.reference,
+          net_amount: payout?.net_amount ?? 0,
+        }))
+      }
+      sends.push(sendAdminAlert({
+        subject: `Payout ready: ${o.reference}`,
+        heading: 'A payout is ready to release',
+        intro: 'Delivery is confirmed. Send the vendor their share to their payout account, then mark it released.',
+        rows: [
+          ['Order', o.reference],
+          ['Vendor', vendorName],
+          ['Vendor receives', payout?.net_amount != null ? formatCurrency(payout.net_amount) : null],
+        ],
+        cta: { path: '/admin/payouts', label: 'Open payouts' },
+      }))
+      break
+
+    case 'disputed':
+      if (buyer?.email) sends.push(sendDisputeReceived(buyer.email, { reference: o.reference }))
+      if (vendor?.user?.email) {
+        sends.push(sendVendorDisputeNotice(vendor.user.email, {
+          reference: o.reference,
+          product_title: productTitle,
+        }))
+      }
+      sends.push(sendAdminAlert({
+        subject: `Problem reported: ${o.reference}`,
+        heading: 'A buyer reported a problem',
+        intro: 'The payment is on hold. Speak to the buyer and the vendor, then resolve the order as delivered or refunded.',
+        rows: [
+          ['Order', o.reference],
+          ['Product', productTitle],
+          ['Vendor', vendorName],
+          ['Buyer', buyer?.full_name],
+          ['Amount held', formatCurrency(o.total_amount)],
+        ],
+        quote: note,
+        cta: { path: '/admin/orders', label: 'Open orders' },
+      }))
+      break
+
+    case 'refunded':
+      if (buyer?.email) {
+        sends.push(sendRefundIssued(buyer.email, { reference: o.reference, amount: o.total_amount }))
+      }
+      break
+  }
+
+  const results = await Promise.allSettled(sends)
+  results.forEach(r => {
+    if (r.status === 'rejected') console.error('[Order email]', r.reason)
+  })
 }

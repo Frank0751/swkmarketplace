@@ -1,45 +1,51 @@
 'use client'
 
 import { useState, Fragment } from 'react'
-import { ChevronDown, ChevronUp, AlertCircle } from 'lucide-react'
+import { ChevronDown, ChevronUp, AlertCircle, Phone, Clock, Info } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn, formatCurrency, formatDate, formatRelativeTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
+import { ORDER_TRANSITIONS, CONFIRMATION_WINDOW_DAYS, isConfirmationOverdue } from '@/lib/marketplace/orders'
+import { formatGhanaPhone } from '@/lib/marketplace/phone'
 import type { Order, OrderStatus } from '@/types'
 
 interface OrderManagementProps {
   orders: Order[]
 }
 
-const ADMIN_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  pending:    ['paid', 'cancelled'],
-  paid:       ['confirmed', 'refunded', 'disputed'],
-  confirmed:  ['dispatched', 'disputed'],
-  dispatched: ['delivered', 'disputed'],
-  delivered:  ['released'],
-  released:   [],
-  disputed:   ['refunded', 'released'],
-  refunded:   [],
-  cancelled:  [],
+type FilterValue = OrderStatus | 'all' | 'attention'
+
+/** What each admin action does, shown before the admin commits to it */
+const ACTION_HINTS: Partial<Record<OrderStatus, string>> = {
+  paid:      'Only for a payment received outside Paystack (e.g. mobile money sent to SWK directly).',
+  delivered: 'Confirms delivery for the buyer and queues the vendor’s payout for release. Check with both sides first.',
+  refunded:  'Refund the buyer in your Paystack dashboard first. This returns the stock, cancels the vendor’s payout and emails the buyer.',
+  disputed:  'Puts the order on hold while you look into it. The payout can’t be released until it is resolved.',
+  cancelled: 'Cancels an unpaid order.',
 }
 
-type FilterStatus = OrderStatus | 'all'
+function needsAttention(order: Order): boolean {
+  return order.status === 'disputed' || isConfirmationOverdue(order)
+}
 
 export function OrderManagement({ orders: initialOrders }: OrderManagementProps) {
-  const [orders, setOrders]           = useState<Order[]>(initialOrders)
-  const [expandedId, setExpandedId]   = useState<string | null>(null)
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
-  const [adminNotes, setAdminNotes]   = useState<Record<string, string>>({})
+  const [orders, setOrders]             = useState<Order[]>(initialOrders)
+  const [expandedId, setExpandedId]     = useState<string | null>(null)
+  const [filter, setFilter]             = useState<FilterValue>('all')
+  const [adminNotes, setAdminNotes]     = useState<Record<string, string>>({})
   const [pendingStatus, setPendingStatus] = useState<Record<string, OrderStatus>>({})
-  const [loading, setLoading]         = useState<Record<string, boolean>>({})
+  const [loading, setLoading]           = useState<Record<string, boolean>>({})
 
-  const filtered = filterStatus === 'all'
+  const filtered = filter === 'all'
     ? orders
-    : orders.filter(o => o.status === filterStatus)
+    : filter === 'attention'
+      ? orders.filter(needsAttention)
+      : orders.filter(o => o.status === filter)
 
   const statusCounts = orders.reduce((acc, o) => {
     acc[o.status] = (acc[o.status] ?? 0) + 1
     return acc
   }, {} as Record<string, number>)
+  const attentionCount = orders.filter(needsAttention).length
 
   const handleStatusUpdate = async (orderId: string) => {
     const newStatus = pendingStatus[orderId]
@@ -56,12 +62,9 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
         }),
       })
 
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Failed to update order')
-      }
-
       const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to update order')
+
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...data.data } : o))
       setPendingStatus(prev => { const n = { ...prev }; delete n[orderId]; return n })
       setAdminNotes(prev => { const n = { ...prev }; delete n[orderId]; return n })
@@ -73,35 +76,39 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
     }
   }
 
-  const filterTabs: { label: string; value: FilterStatus }[] = [
-    { label: 'All',        value: 'all' },
-    { label: 'Paid',       value: 'paid' },
-    { label: 'Confirmed',  value: 'confirmed' },
-    { label: 'Dispatched', value: 'dispatched' },
-    { label: 'Delivered',  value: 'delivered' },
-    { label: 'Released',   value: 'released' },
-    { label: 'Disputed',   value: 'disputed' },
+  const filterTabs: { label: string; value: FilterValue; count?: number }[] = [
+    { label: 'All',             value: 'all',        count: orders.length },
+    { label: 'Needs attention', value: 'attention',  count: attentionCount },
+    { label: 'Awaiting payment', value: 'pending',   count: statusCounts.pending },
+    { label: 'Paid',            value: 'paid',       count: statusCounts.paid },
+    { label: 'Confirmed',       value: 'confirmed',  count: statusCounts.confirmed },
+    { label: 'Dispatched',      value: 'dispatched', count: statusCounts.dispatched },
+    { label: 'Delivered',       value: 'delivered',  count: statusCounts.delivered },
+    { label: 'Released',        value: 'released',   count: statusCounts.released },
+    { label: 'Disputed',        value: 'disputed',   count: statusCounts.disputed },
+    { label: 'Refunded',        value: 'refunded',   count: statusCounts.refunded },
   ]
 
   return (
     <div className="space-y-4">
       {/* Filter tabs */}
-      <div className="flex items-center gap-1 flex-wrap">
+      <div className="flex items-center gap-1 flex-wrap" role="group" aria-label="Filter orders">
         {filterTabs.map(tab => (
           <button
             key={tab.value}
-            onClick={() => setFilterStatus(tab.value)}
+            onClick={() => setFilter(tab.value)}
+            aria-pressed={filter === tab.value}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
-              filterStatus === tab.value
+              'min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
+              filter === tab.value
                 ? 'bg-green-600 text-white'
-                : 'bg-sand-100 text-sand-600 hover:bg-sand-200',
+                : tab.value === 'attention' && attentionCount > 0
+                  ? 'bg-red-50 text-red-700 hover:bg-red-100'
+                  : 'bg-sand-100 text-sand-600 hover:bg-sand-200',
             )}
           >
             {tab.label}
-            {tab.value !== 'all' && statusCounts[tab.value]
-              ? ` (${statusCounts[tab.value]})`
-              : tab.value === 'all' ? ` (${orders.length})` : ''}
+            {tab.count ? ` (${tab.count})` : ''}
           </button>
         ))}
       </div>
@@ -110,8 +117,10 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
       <div className="bg-white rounded-xl border border-sand-200 overflow-hidden">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-sand-600">
-            <AlertCircle className="w-8 h-8 mb-2" />
-            <p className="text-sm font-medium">No orders found</p>
+            <AlertCircle className="w-8 h-8 mb-2" aria-hidden="true" />
+            <p className="text-sm font-medium">
+              {filter === 'attention' ? 'Nothing needs attention right now' : 'No orders found'}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -131,7 +140,11 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
               <tbody className="divide-y divide-sand-100">
                 {filtered.map(order => {
                   const isExpanded = expandedId === order.id
-                  const transitions = ADMIN_STATUS_TRANSITIONS[order.status] ?? []
+                  const transitions = ORDER_TRANSITIONS.admin[order.status] ?? []
+                  const overdue = isConfirmationOverdue(order)
+                  const selected = pendingStatus[order.id]
+                  const noteId = `admin-note-${order.id}`
+                  const selectId = `new-status-${order.id}`
 
                   return (
                     /* Keyed Fragment: the key was on the inner <tr>, so React
@@ -159,14 +172,15 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                           {formatCurrency(order.total_amount)}
                         </td>
                         <td className="px-4 py-3">
-                          <span
-                            className={cn(
-                              'inline-block px-2 py-0.5 rounded-full text-xs font-medium',
-                              ORDER_STATUS_COLORS[order.status],
-                            )}
-                          >
+                          <span className={cn('inline-block px-2 py-0.5 rounded-full text-xs font-medium', ORDER_STATUS_COLORS[order.status])}>
                             {ORDER_STATUS_LABELS[order.status]}
                           </span>
+                          {overdue && (
+                            <span className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-red-600">
+                              <Clock className="w-3 h-3" aria-hidden="true" />
+                              Unconfirmed {CONFIRMATION_WINDOW_DAYS}+ days
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-xs text-sand-600 hidden md:table-cell">
                           {formatRelativeTime(order.created_at)}
@@ -174,8 +188,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                         <td className="px-4 py-3 text-sand-600">
                           {/* A real button: the row's onClick alone left the
                               status controls in the expanded row unreachable
-                              by keyboard, so an admin could not change any
-                              order status without a mouse. */}
+                              by keyboard. */}
                           <button
                             type="button"
                             onClick={e => {
@@ -195,9 +208,8 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                         </td>
                       </tr>
 
-                      {/* Expanded row */}
                       {isExpanded && (
-                        <tr key={`${order.id}-expanded`}>
+                        <tr>
                           <td colSpan={8} className="px-4 pb-4 bg-sand-50 border-b border-sand-200">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3">
                               {/* Order details */}
@@ -206,10 +218,6 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                   Order Details
                                 </h4>
                                 <div className="bg-white rounded-lg border border-sand-200 p-3 space-y-1.5 text-xs">
-                                  <div className="flex justify-between">
-                                    <span className="text-sand-600">Order ID</span>
-                                    <span className="font-mono text-sand-700">{order.id.slice(0, 8)}…</span>
-                                  </div>
                                   <div className="flex justify-between">
                                     <span className="text-sand-600">Date placed</span>
                                     <span className="text-sand-700">{formatDate(order.created_at)}</span>
@@ -230,12 +238,27 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                     <span className="text-sand-600">Total</span>
                                     <span className="text-sand-900">{formatCurrency(order.total_amount)}</span>
                                   </div>
+                                  {order.dispatched_at && (
+                                    <div className="flex justify-between">
+                                      <span className="text-sand-600">Dispatched</span>
+                                      <span className="text-sand-700">{formatDate(order.dispatched_at)}</span>
+                                    </div>
+                                  )}
                                 </div>
 
                                 <div className="bg-white rounded-lg border border-sand-200 p-3 space-y-1.5 text-xs">
-                                  <div className="text-sand-600 font-medium">Delivery address</div>
+                                  <div className="text-sand-600 font-medium">Deliver to</div>
                                   <div className="text-sand-700">{order.delivery_address}</div>
                                   <div className="text-sand-600">{order.delivery_region}</div>
+                                  {order.delivery_phone && (
+                                    <a
+                                      href={`tel:${order.delivery_phone}`}
+                                      className="inline-flex items-center gap-1 text-green-700 font-medium hover:underline"
+                                    >
+                                      <Phone className="w-3 h-3" aria-hidden="true" />
+                                      {formatGhanaPhone(order.delivery_phone)}
+                                    </a>
+                                  )}
                                 </div>
 
                                 {order.buyer_notes && (
@@ -259,21 +282,33 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                   Update Status
                                 </h4>
 
+                                {overdue && (
+                                  <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg p-3 text-xs text-red-700">
+                                    <Clock className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                                    <p>
+                                      Dispatched over {CONFIRMATION_WINDOW_DAYS} days ago and the buyer hasn&rsquo;t
+                                      confirmed or reported a problem. Under the Terms you may confirm delivery for
+                                      them once you&rsquo;ve checked with the vendor and tried to reach the buyer.
+                                    </p>
+                                  </div>
+                                )}
+
                                 {transitions.length > 0 ? (
                                   <div className="bg-white rounded-lg border border-sand-200 p-3 space-y-3">
                                     <div>
-                                      <label className="text-xs font-medium text-sand-600 mb-1 block">
+                                      <label htmlFor={selectId} className="text-xs font-medium text-sand-600 mb-1 block">
                                         New status
                                       </label>
                                       <select
-                                        value={pendingStatus[order.id] ?? ''}
+                                        id={selectId}
+                                        value={selected ?? ''}
                                         onChange={e =>
                                           setPendingStatus(prev => ({
                                             ...prev,
                                             [order.id]: e.target.value as OrderStatus,
                                           }))
                                         }
-                                        className="w-full px-3 py-2 text-sm border border-sand-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 bg-white"
+                                        className="w-full min-h-[44px] px-3 py-2 text-sm border border-sand-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 bg-white"
                                       >
                                         <option value="">- select status -</option>
                                         {transitions.map(s => (
@@ -282,13 +317,20 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                           </option>
                                         ))}
                                       </select>
+                                      {selected && ACTION_HINTS[selected] && (
+                                        <p className="mt-2 flex items-start gap-1.5 text-xs text-sand-700">
+                                          <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-teal-600" aria-hidden="true" />
+                                          {ACTION_HINTS[selected]}
+                                        </p>
+                                      )}
                                     </div>
 
                                     <div>
-                                      <label className="text-xs font-medium text-sand-600 mb-1 block">
-                                        Admin note (optional)
+                                      <label htmlFor={noteId} className="text-xs font-medium text-sand-600 mb-1 block">
+                                        Admin note (optional, internal)
                                       </label>
                                       <textarea
+                                        id={noteId}
                                         value={adminNotes[order.id] ?? ''}
                                         onChange={e =>
                                           setAdminNotes(prev => ({
@@ -296,7 +338,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                             [order.id]: e.target.value,
                                           }))
                                         }
-                                        placeholder="Internal note about this status change..."
+                                        placeholder="e.g. Called the buyer on 12 Sept, confirmed received"
                                         className="w-full px-3 py-2 text-sm border border-sand-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 resize-none"
                                         rows={2}
                                       />
@@ -304,22 +346,24 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
 
                                     <button
                                       onClick={() => handleStatusUpdate(order.id)}
-                                      disabled={!pendingStatus[order.id] || loading[order.id]}
-                                      className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
+                                      disabled={!selected || loading[order.id]}
+                                      className="w-full min-h-[44px] py-2 px-4 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
                                     >
                                       {loading[order.id] ? 'Updating…' : 'Update Status'}
                                     </button>
                                   </div>
                                 ) : (
                                   <div className="bg-sand-50 rounded-lg border border-sand-200 p-3 text-xs text-sand-600">
-                                    No further status transitions available for this order.
+                                    {order.status === 'delivered'
+                                      ? 'Delivery is confirmed. Release the vendor’s payout from the Payouts page.'
+                                      : 'No further status changes are available for this order.'}
                                   </div>
                                 )}
 
                                 {order.admin_notes && (
                                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs">
                                     <div className="text-amber-700 font-medium mb-1">Admin notes</div>
-                                    <div className="text-amber-800">{order.admin_notes}</div>
+                                    <div className="text-amber-800 whitespace-pre-wrap">{order.admin_notes}</div>
                                   </div>
                                 )}
 

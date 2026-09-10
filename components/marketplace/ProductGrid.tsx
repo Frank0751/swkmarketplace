@@ -2,6 +2,8 @@ import { Leaf } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Product, ProductCategory } from '@/types'
 import { demoEnabled, getDemoProducts } from '@/lib/demo/data'
+import { productSearchFilter } from '@/lib/marketplace/search'
+import { hasLiveProducts } from '@/lib/marketplace/catalogue'
 import { ProductCard } from './ProductCard'
 
 interface ProductGridProps {
@@ -56,9 +58,10 @@ async function fetchProducts({
     query = query.contains('value_tags', valueTags)
   }
 
-  // Full-text / title search
-  if (search && search.trim()) {
-    query = query.ilike('title', `%${search.trim()}%`)
+  // Title, summary and description
+  const searchFilter = productSearchFilter(search)
+  if (searchFilter) {
+    query = query.or(searchFilter)
   }
 
   // Region + price range
@@ -101,9 +104,10 @@ async function fetchProducts({
 export async function ProductGrid(props: ProductGridProps) {
   let products = await fetchProducts(props)
 
-  // No live products yet, fall back to sample data so the marketplace
-  // stays presentable (disabled with NEXT_PUBLIC_DEMO_MODE=false)
-  if (products.length === 0 && demoEnabled()) {
+  // Until the first real product is approved, sample data keeps the shop
+  // presentable (off with NEXT_PUBLIC_DEMO_MODE=false). Once any real product
+  // exists, an empty search shows the empty state rather than samples.
+  if (products.length === 0 && demoEnabled() && !(await hasLiveProducts())) {
     products = getDemoProducts({
       limit: props.limit,
       category: props.category,

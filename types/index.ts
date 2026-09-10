@@ -60,8 +60,8 @@ export interface VendorProfile {
   website?: string
   status: VendorStatus
   rejection_reason?: string
-  total_sales: number
-  total_products: number
+  total_sales: number          // fulfilled orders (a count, kept by the database)
+  total_products: number       // live listings (kept by the database)
   rating: number
   review_count: number
   approved_at?: string
@@ -69,6 +69,28 @@ export interface VendorProfile {
   updated_at: string
   // Joined
   user?: User
+}
+
+export type MomoNetwork = 'MTN MoMo' | 'Telecel Cash' | 'AT Money'
+
+/** Where SWK Ghana sends a vendor's payouts. Private to the vendor and admins. */
+export interface VendorPayoutDetails {
+  vendor_id: string
+  method: 'momo' | 'bank'
+  momo_network?: MomoNetwork | null
+  bank_name?: string | null
+  account_name: string
+  account_number: string
+  updated_at: string
+}
+
+/** A supporting photo from a vendor application, stored privately in Cloudinary */
+export interface VendorDocument {
+  id: string
+  vendor_id: string
+  public_id: string
+  label?: string | null
+  created_at: string
 }
 
 // ─── Product ──────────────────────────────────────────────────────────────────
@@ -101,8 +123,7 @@ export interface Product {
   slug: string
   description: string
   short_description: string
-  price: number             // in GHS pesewas (multiply by 100)
-  price_ghs: number         // human-readable GHS
+  price_ghs: number         // GHS, e.g. 45.00
   stock_quantity: number
   images: string[]          // Cloudinary URLs, first is primary
   category: ProductCategory
@@ -157,6 +178,7 @@ export interface Order {
   status: OrderStatus
   delivery_address: string
   delivery_region: GhanaRegion
+  delivery_phone?: string | null   // +233XXXXXXXXX, for the vendor to arrange delivery
   buyer_notes?: string
   vendor_notes?: string
   admin_notes?: string
@@ -177,7 +199,7 @@ export interface Order {
 
 // ─── Payout ───────────────────────────────────────────────────────────────────
 
-export type PayoutStatus = 'held' | 'pending_release' | 'released' | 'failed'
+export type PayoutStatus = 'held' | 'pending_release' | 'released' | 'failed' | 'cancelled'
 
 export interface Payout {
   id: string
