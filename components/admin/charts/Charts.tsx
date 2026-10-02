@@ -4,7 +4,7 @@
  * Plain SVG rather than a charting library: these render on the server with no
  * client JS, add nothing to the bundle, and can be made properly accessible.
  *
- * Colour rules (validated, not eyeballed — the brand palette fails as a
+ * Colour rules (validated, not eyeballed: the brand palette fails as a
  * categorical set: teal reads as grey in a fill, and teal/green sit only ΔE 7.7
  * apart for normal vision):
  *   - one measure across categories  → a single hue, magnitude by length
@@ -283,7 +283,7 @@ export function TrendArea({
           </g>
         ))}
 
-        {/* Label the peak only — a number on every point is noise */}
+        {/* Label the peak only; a number on every point is noise */}
         <text
           x={Math.min(Math.max(peakIdx * stepX, 16), W - 16)}
           y={yOf(peak.value) - 10}

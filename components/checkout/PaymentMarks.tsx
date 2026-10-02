@@ -10,7 +10,7 @@ export function CardBrandMark({ brand, className }: { brand?: CardBrand | string
   const base = 'inline-flex items-center justify-center w-11 h-7 rounded-md border text-[10px] leading-none flex-shrink-0'
   if (brand === 'visa') {
     return (
-      <span aria-hidden="true" className={cn(base, 'bg-white border-sand-200 text-[#1a1f71] italic font-black text-[11px] tracking-tight', className)}>
+      <span aria-hidden="true" className={cn(base, 'bg-white border-sand-200 text-[#1a1f71] font-black text-[11px] tracking-tight', className)}>
         VISA
       </span>
     )

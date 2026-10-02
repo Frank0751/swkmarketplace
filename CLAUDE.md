@@ -1,4 +1,4 @@
-# SWK Marketplace — Claude Code Context
+# SWK Marketplace: Claude Code Context
 
 ## Project overview
 SWK Marketplace is a world-class, production-grade sustainable e-commerce platform built for SWK Ghana (swkghana.org). It connects eco-conscious buyers with verified youth-led green entrepreneurs across Ghana and Africa.
@@ -16,18 +16,18 @@ SWK Marketplace is a world-class, production-grade sustainable e-commerce platfo
 - Only THEN does admin release payout to vendor
 - SWK Ghana deducts **15% commission** before releasing
 - `payout.net_amount = payout.gross_amount * 0.85`
-- Payouts are NEVER auto-released — admin must manually approve OR buyer confirms delivery which triggers release pipeline
+- Payouts are NEVER auto-released: admin must manually approve OR buyer confirms delivery which triggers release pipeline
 
 ### User roles
-- `buyer` — can browse, place orders, confirm delivery
-- `vendor` — must be APPROVED by admin before listing products
-- `admin` — SWK Ghana team; approves vendors, listings, releases payouts
-- Public (no login) — can browse and view products only
+- `buyer`: can browse, place orders, confirm delivery
+- `vendor`: must be APPROVED by admin before listing products
+- `admin`: SWK Ghana team; approves vendors, listings, releases payouts
+- Public (no login): can browse and view products only
 
 ### Vendor approval flow
 1. Vendor signs up → selects "I want to sell"
 2. Fills in application (business_name, category, sustainability_statement, proof docs)
-3. Status = `pending` — vendor CANNOT list products yet
+3. Status = `pending`: vendor CANNOT list products yet
 4. Admin reviews → approves or rejects with reason
 5. On approval: vendor_profiles.status = `approved`, users.role = `vendor`
 
@@ -68,42 +68,42 @@ SWK Marketplace is a world-class, production-grade sustainable e-commerce platfo
 
 ```
 app/
-  (auth)/          — login, signup, forgot-password (no navbar)
-  (public)/        — homepage, marketplace, product detail, vendor profile
-  (buyer)/         — buyer dashboard, orders (requires buyer/admin role)
-  (vendor)/        — vendor dashboard, listings, apply (requires approved vendor)
-  (admin)/         — full admin panel (requires admin role)
-  api/             — Next.js API routes
-    paystack/      — webhook handler (CRITICAL: verify Paystack signature)
-    orders/        — create, update order status
-    products/      — CRUD with approval gating
-    vendors/       — application, approval
-    payouts/       — release payout to vendor
+  (auth)/          login, signup, forgot-password (no navbar)
+  (public)/        homepage, marketplace, product detail, vendor profile
+  (buyer)/         buyer dashboard, orders (requires buyer/admin role)
+  (vendor)/        vendor dashboard, listings, apply (requires approved vendor)
+  (admin)/         full admin panel (requires admin role)
+  api/             Next.js API routes
+    paystack/      webhook handler (CRITICAL: verify Paystack signature)
+    orders/        create, update order status
+    products/      CRUD with approval gating
+    vendors/       application, approval
+    payouts/       release payout to vendor
 
 components/
-  layout/          — Navbar, Footer, AnnouncementBar, MobileBottomNav
-  marketplace/     — HeroSection, ProductCard, ProductGrid, CategoryStrip, etc.
-  auth/            — LoginForm, SignupForm
-  buyer/           — OrderTimeline, BuyerDashboard
-  vendor/          — VendorApplicationForm, ListingForm, VendorDashboard
-  admin/           — AdminLayout, VendorApprovalCard, OrderManagement, PayoutPanel
-  ui/              — Button, Badge, Modal, Card, Input, Skeleton (shared primitives)
+  layout/          Navbar, Footer, AnnouncementBar, MobileBottomNav
+  marketplace/     HeroSection, ProductCard, ProductGrid, CategoryStrip, etc.
+  auth/            LoginForm, SignupForm
+  buyer/           OrderTimeline, BuyerDashboard
+  vendor/          VendorApplicationForm, ListingForm, VendorDashboard
+  admin/           AdminLayout, VendorApprovalCard, OrderManagement, PayoutPanel
+  ui/              Button, Badge, Modal, Card, Input, Skeleton (shared primitives)
 
 lib/
   supabase/
-    client.ts      — browser Supabase client
-    server.ts      — server Supabase client + admin client
+    client.ts      browser Supabase client
+    server.ts      server Supabase client + admin client
   paystack/
-    client.ts      — Paystack init + helpers
-    webhook.ts     — signature verification
+    client.ts      Paystack init + helpers
+    webhook.ts     signature verification
   email/
-    brevo.ts       — email templates and send functions
-  hooks/           — useUser, useProducts, useOrders, useVendor
-  utils/           — formatCurrency, formatDate, generateSlug, cn
+    brevo.ts       email templates and send functions
+  hooks/           useUser, useProducts, useOrders, useVendor
+  utils/           formatCurrency, formatDate, generateSlug, cn
 
-types/index.ts     — ALL TypeScript types in one file
-middleware.ts      — Auth guard + role-based route protection
-supabase/migrations/ — All SQL migrations
+types/index.ts     ALL TypeScript types in one file
+middleware.ts      Auth guard + role-based route protection
+supabase/migrations/: All SQL migrations
 ```
 
 ---
@@ -111,38 +111,51 @@ supabase/migrations/ — All SQL migrations
 ## Design system
 
 ### Colors (Tailwind classes)
-- Primary green: `green-600` (#3B6D11) — buttons, links, active states
-- Gold accent: `gold-400` (#BA7517) — SDG badges, highlights
-- Trust teal: `teal-600` (#0F6E56) — escrow, verification badges
-- Background: `sand-50` (#FAF8F3) — page bg
-- Text: `sand-900` (#2A2823) — body text
+- Primary green: `green-600` (#3B6D11): buttons, links, active states
+- Gold accent: `gold-400` (#BA7517): SDG badges, highlights
+- Trust teal: `teal-600` (#0F6E56): escrow, verification badges
+- Background: `sand-50` (#FAF8F3): page bg
+- Text: `sand-900` (#2A2823): body text
 
 ### Typography
-- Display font: `font-display` (Playfair Display) — headings, hero text
-- Body font: `font-sans` (Plus Jakarta Sans) — all other text
+- **Ubuntu** (SWK Ghana's brand typeface) for everything: `font-sans` and `font-display` are both
+  Ubuntu, loaded once (upright only) in `app/layout.tsx`.
+- `font-mono` is Ubuntu Mono: order references, card numbers, eyebrow labels.
+- Titles are never italic. Highlight a phrase in a heading with colour
+  (`<span className="text-green-600">`), not slant.
+- No em dashes in copy, comments or docs: use commas, colons or full stops.
+
+### Visual language
+- Signature: the kente-inspired woven band (`.kente-band`) closing the hero, opening the footer and
+  framing the order confirmation. Keep it to those places.
+- Sections open with `SectionHeading`: mono eyebrow, title, short gold rule (`.rule`), one line of context.
+- Forest green (`green-900`) for dark sections and the footer; sand for page backgrounds; gold sparingly.
+- Few icons: keep functional ones (cart, search, menu, close, quantity, delete, arrows, status), not
+  decorative icon tiles beside headings.
 
 ### Key CSS classes (defined in globals.css)
-- `.product-card` — product card with hover lift
-- `.sdg-badge` — SDG 12 verified green pill
-- `.trust-badge` — escrow/verification teal badge
-- `.category-pill` — filterable category button
-- `.value-tag` — Shop by values tag
-- `.form-input`, `.form-label`, `.form-error` — form elements
-- `.container-app` — max-w-7xl with responsive padding
-- `.section` — standard vertical padding
+- `.eyebrow`, `.rule`, `.kente-band`, `.card-accent` (green line draws in on hover), `.rise` (hero entrance)
+- `.product-card`: product card with hover lift
+- `.sdg-badge`: SDG 12 verified green pill
+- `.trust-badge`: escrow/verification teal badge
+- `.category-pill`: filterable category button
+- `.value-tag`: Shop by values tag
+- `.form-input`, `.form-label`, `.form-error`: form elements
+- `.container-app`: max-w-7xl with responsive padding
+- `.section`: standard vertical padding
 
 ---
 
 ## Supabase schema summary
 
 ### Tables
-- `users` — id (= auth.uid), email, full_name, role, status
-- `vendor_profiles` — linked to users, holds all vendor info + status
-- `products` — linked to vendor_profiles, has status workflow
-- `orders` — buyer ↔ vendor ↔ product, full escrow lifecycle
-- `payouts` — created automatically when order paid (via trigger)
-- `order_history` — audit log of every status change
-- `product_reviews` — post-delivery reviews
+- `users`: id (= auth.uid), email, full_name, role, status
+- `vendor_profiles`: linked to users, holds all vendor info + status
+- `products`: linked to vendor_profiles, has status workflow
+- `orders`: buyer ↔ vendor ↔ product, full escrow lifecycle
+- `payouts`: created automatically when order paid (via trigger)
+- `order_history`: audit log of every status change
+- `product_reviews`: post-delivery reviews
 
 ### RLS rules
 - Products: only `approved` products visible publicly
@@ -236,11 +249,11 @@ Optional:
 
 1. **Always use `createClient()` from `lib/supabase/server.ts`** in Server Components and API routes
 2. **Always use `createClient()` from `lib/supabase/client.ts`** in Client Components
-3. **Never bypass RLS** — use `createAdminClient()` only for admin operations in API routes
-4. **Prices are stored in GHS** (decimal, e.g. 45.00 = GHS 45.00) — always format with `formatCurrency()`
-5. **Product slugs are auto-generated** from title — never set manually
-6. **Order references** are auto-generated by Postgres trigger — never set manually
-7. Commission rate is **15%** — stored in `payouts.commission_rate` and in `NEXT_PUBLIC_COMMISSION_RATE`
+3. **Never bypass RLS**: use `createAdminClient()` only for admin operations in API routes
+4. **Prices are stored in GHS** (decimal, e.g. 45.00 = GHS 45.00): always format with `formatCurrency()`
+5. **Product slugs are auto-generated** from title: never set manually
+6. **Order references** are auto-generated by Postgres trigger: never set manually
+7. Commission rate is **15%**: stored in `payouts.commission_rate` and in `NEXT_PUBLIC_COMMISSION_RATE`
 8. **The database doesn't trust the browser (migration 007).** Guard triggers stop users changing
    fields SWK controls (role, approval status, ratings, counters, listing review status); orders and
    payouts are read-only from the browser and change only through API routes. Run

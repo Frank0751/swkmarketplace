@@ -4,7 +4,6 @@ import {
   ShoppingBag,
   LayoutDashboard,
   User,
-  PackageOpen,
   CreditCard,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
@@ -124,8 +123,9 @@ export default async function BuyerOrdersPage({ searchParams }: Props) {
         {/* Main content */}
         <main id="main" className="flex-1 p-6 md:p-8 min-w-0">
           <div className="mb-6">
-            <h1 className="text-2xl font-display font-bold text-sand-900">My Orders</h1>
-            <p className="text-sand-600 text-sm mt-1">Track and manage all your purchases.</p>
+            <p className="eyebrow mb-2">Your account</p>
+            <h1 className="text-3xl font-display font-bold tracking-tight text-sand-900">My orders</h1>
+            <p className="text-sand-600 text-sm mt-1">Track every purchase, from payment to delivery.</p>
           </div>
 
           {/* Filter tabs */}
@@ -160,10 +160,7 @@ export default async function BuyerOrdersPage({ searchParams }: Props) {
           {paginated.length === 0 ? (
             <div className="bg-white rounded-xl border border-sand-200 shadow-card">
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                <div className="w-16 h-16 rounded-full bg-sand-100 flex items-center justify-center mb-4">
-                  <PackageOpen className="w-8 h-8 text-sand-600" />
-                </div>
-                <h3 className="text-base font-semibold text-sand-700 mb-1">
+                <h3 className="text-lg font-bold text-sand-900 mb-1">
                   {activeTab === 'all' ? 'No orders yet' : `No ${activeTab} orders`}
                 </h3>
                 <p className="text-sm text-sand-600 mb-6 max-w-xs">

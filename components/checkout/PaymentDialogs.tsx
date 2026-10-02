@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import { Loader2, ShieldCheck, Smartphone, KeyRound, Check } from 'lucide-react'
+import { Loader2, Check } from 'lucide-react'
 import { formatCurrency, cn } from '@/lib/utils'
 import { MomoMark } from '@/components/checkout/PaymentMarks'
 import { maskPhone } from '@/lib/payments/methods'
@@ -58,9 +58,7 @@ export function ProcessingDialog({ open, channel }: { open: boolean; channel: 'c
               </li>
             ))}
           </ol>
-          <p className="mt-5 inline-flex items-center gap-1.5 text-xs text-teal-700">
-            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" /> Held in escrow until you confirm delivery
-          </p>
+          <p className="mt-5 text-xs font-medium text-teal-700">Held in escrow until you confirm delivery</p>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -94,9 +92,7 @@ export function OtpDialog({ open, message, error, busy, onSubmit, onCancel }: Ot
           onOpenAutoFocus={e => { e.preventDefault(); inputRef.current?.focus() }}
           className="fixed left-1/2 top-1/2 z-[60] w-[calc(100vw-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-card-lg outline-none"
         >
-          <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mb-3">
-            <KeyRound className="w-6 h-6 text-teal-700" aria-hidden="true" />
-          </div>
+          <p className="eyebrow mb-2">Your bank</p>
           <Dialog.Title className="text-lg font-display font-bold text-sand-900">Verify this payment</Dialog.Title>
           <Dialog.Description className="text-sm text-sand-600 mt-1 leading-relaxed">{message}</Dialog.Description>
           <form
@@ -190,10 +186,7 @@ export function MomoPromptDialog({ open, network, phone, amount, busy, onApprove
           onOpenAutoFocus={e => { e.preventDefault(); approveRef.current?.focus() }}
           className="fixed left-1/2 top-1/2 z-[60] w-[calc(100vw-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-card-lg outline-none"
         >
-          <div className="flex items-center gap-2 text-sm font-semibold text-sand-900">
-            <Smartphone className="w-4 h-4 text-green-600" aria-hidden="true" />
-            <Dialog.Title>Approve on your phone</Dialog.Title>
-          </div>
+          <Dialog.Title className="text-lg font-display font-bold text-sand-900">Approve on your phone</Dialog.Title>
           <Dialog.Description className="text-xs text-sand-600 mt-1">
             We sent a payment request to {maskPhone(phone)}. Waiting for approval… {mm}:{ss}
           </Dialog.Description>

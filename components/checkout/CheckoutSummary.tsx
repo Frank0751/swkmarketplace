@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ShieldCheck, Store, FlaskConical } from 'lucide-react'
 import type { PricedCart } from '@/lib/cart/pricing'
 import { canOptimizeImage } from '@/lib/marketplace/images'
 import { formatCurrency } from '@/lib/utils'
@@ -14,10 +13,7 @@ export function CheckoutSummary({ summary }: { summary: PricedCart }) {
       <ul className="space-y-4" aria-label="Items in your order">
         {summary.shops.map(shop => (
           <li key={shop.vendor_id}>
-            <p className="flex items-center gap-1.5 text-xs font-semibold text-sand-700 mb-2">
-              <Store className="w-3.5 h-3.5 text-green-600" aria-hidden="true" />
-              {shop.vendor_name}
-            </p>
+            <p className="eyebrow mb-2.5">{shop.vendor_name}</p>
             <ul className="space-y-2.5">
               {shop.lines.map(line => {
                 const image = line.image || '/images/product-placeholder.svg'
@@ -63,16 +59,16 @@ export function CheckoutSummary({ summary }: { summary: PricedCart }) {
         </div>
       </dl>
 
-      <div className="flex items-start gap-2 rounded-xl bg-teal-50 border border-teal-100 px-3 py-2.5 text-xs text-teal-800">
-        <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-px" aria-hidden="true" />
-        <span>SWK Ghana holds your payment and pays each shop only after you confirm your delivery.</span>
-      </div>
+      <p className="rounded-xl bg-teal-50 border border-teal-100 px-3.5 py-3 text-xs leading-relaxed text-teal-800">
+        <strong className="font-semibold">Escrow protected.</strong> SWK Ghana holds your payment and pays each
+        shop only after you confirm your delivery.
+      </p>
 
       {summary.kind === 'sample' && (
-        <div className="flex items-start gap-2 rounded-xl bg-gold-50 border border-gold-100 px-3 py-2.5 text-xs text-gold-900">
-          <FlaskConical className="w-4 h-4 flex-shrink-0 mt-px text-gold-600" aria-hidden="true" />
-          <span>Sample products: this checkout uses a test payment. No real money is taken.</span>
-        </div>
+        <p className="rounded-xl bg-gold-50 border border-gold-100 px-3.5 py-3 text-xs leading-relaxed text-gold-900">
+          <strong className="font-semibold">Sample products.</strong> This checkout uses a test payment. No real
+          money is taken.
+        </p>
       )}
 
       <Link href="/cart" className="inline-flex min-h-[40px] items-center text-xs font-semibold text-green-700 hover:text-green-800">

@@ -1,101 +1,164 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import {
-  ShoppingBag,
-  ShieldCheck,
-  CheckCircle2,
-  Truck,
-  Star,
-  Leaf,
-  Store,
-  ClipboardList,
-  PackageCheck,
-  Banknote,
-  ChevronDown,
-  ArrowRight,
-  Globe,
-  Users,
-  BadgeCheck,
-  Wheat,
-  Recycle,
-  Hand,
-  Salad,
-} from 'lucide-react'
+import { ChevronDown, ArrowRight } from 'lucide-react'
 import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
+import { SectionHeading } from '@/components/marketplace/SectionHeading'
 import { DELIVERY_FEE_GHS } from '@/lib/marketplace/orders'
+import { formatCurrency } from '@/lib/utils'
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
   title: 'How it works',
   description:
-    'Learn how SWK Marketplace connects eco-conscious buyers with verified youth-led green entrepreneurs across Ghana. Secure escrow payments, SDG 12 verification, and fair payouts.',
+    'How SWK Marketplace connects buyers with verified youth-led green businesses across Ghana: one cart, escrow-protected payment, SDG 12 checked listings and fair payouts.',
   openGraph: {
     title: 'How SWK Marketplace works',
     description:
-      'Secure escrow payments, SDG 12-verified products, and fair payouts to Ghana\'s youth green entrepreneurs.',
+      'Escrow-protected payments, SDG 12 checked products, and fair payouts to Ghana\'s young green entrepreneurs.',
     url: 'https://marketplace.swkghana.org/how-it-works',
     siteName: 'SWK Marketplace',
   },
 }
 
-// ─── Sub-components ────────────────────────────────────────────────────────────
+// ─── Content ──────────────────────────────────────────────────────────────────
 
-interface StepCardProps {
-  step: number
-  icon: React.ReactNode
-  title: string
-  description: string
-  accent?: 'green' | 'teal' | 'gold'
-}
+const FACTS = [
+  { value: 'SDG 12', label: 'Every listing checked' },
+  { value: 'Escrow', label: 'On every order' },
+  { value: 'Youth-led', label: 'Every shop' },
+  { value: '16 regions', label: 'Delivery across Ghana' },
+]
 
-function StepCard({ step, icon, title, description, accent = 'green' }: StepCardProps) {
-  const accentClasses = {
-    green: 'bg-green-600 text-white',
-    teal: 'bg-teal-600 text-white',
-    gold: 'bg-gold-400 text-white',
-  }
+const BUYER_STEPS = [
+  {
+    title: 'Browse and discover',
+    body: 'Explore agribusiness goods, organic produce, recycled and upcycled products and handmade crafts. Filter by the values you care about: zero waste, organic, women-led and more.',
+  },
+  {
+    title: 'Add to cart and pay once',
+    body: 'Fill one cart from as many shops as you like and pay in a single checkout, by card or mobile money (MTN MoMo, Telecel Cash, AT Money). Save your address and payment method for next time.',
+  },
+  {
+    title: 'Each shop delivers',
+    body: 'Every shop confirms your order, calls you to arrange delivery and sends it out. You get an email at each stage and can follow every order from your account.',
+  },
+  {
+    title: 'Confirm delivery',
+    body: 'When your order arrives as described, confirm it. Only then is the shop paid. If something is wrong, report a problem instead and SWK Ghana steps in.',
+  },
+]
 
+const PROTECTIONS = [
+  { title: 'Escrow protection', body: 'Your money is released only when you confirm delivery.' },
+  { title: 'SDG 12 checked', body: 'Every product is reviewed for responsible production before it goes live.' },
+  { title: 'Genuine reviews', body: 'Only buyers with a delivered order can review a product.' },
+  { title: 'Problem resolution', body: 'Report a problem and SWK Ghana mediates, with a refund where it’s due.' },
+]
+
+const VENDOR_STEPS = [
+  {
+    title: 'Apply to sell',
+    body: 'Tell us about your business, your sustainability practices and how you align with SDG 12. The SWK Ghana team reviews every application within 2 to 3 business days.',
+  },
+  {
+    title: 'Get approved',
+    body: 'Once approved, you can create listings. Each one gets a quick review for quality and SDG 12 alignment before it goes live.',
+  },
+  {
+    title: 'Fulfil orders',
+    body: 'You’re emailed when a buyer pays. Confirm the order, call the buyer, dispatch it and update its status from your dashboard.',
+  },
+  {
+    title: 'Receive your payout',
+    body: 'When the buyer confirms delivery, SWK Ghana releases 85% of the sale to your mobile money or bank account.',
+  },
+  {
+    title: 'Build your reputation',
+    body: 'Verified buyers review your products, and your shop page tells your sustainability story to every visitor.',
+  },
+  {
+    title: 'Grow across Ghana',
+    body: 'Reach buyers in all 16 regions. SWK Ghana promotes its vendors through social media, events and partner networks.',
+  },
+]
+
+const ESCROW_STEPS = [
+  { title: 'Buyer pays', body: 'The payment goes to SWK Ghana, not straight to the shop.' },
+  { title: 'Funds held', body: 'The money waits safely while the shop prepares and delivers the order.' },
+  { title: 'Buyer confirms', body: 'The buyer confirms the order arrived as described.' },
+  { title: 'Shop paid', body: 'SWK Ghana releases 85% of the payment to the shop’s account.' },
+]
+
+const SDG_CRITERIA = [
+  'Products use sustainable, natural or recycled materials',
+  'Businesses operate with environmentally responsible practices',
+  'Packaging is minimal, biodegradable or reusable where possible',
+  'Businesses support local ecosystems and livelihoods',
+]
+
+const CATEGORIES = [
+  { label: 'Agribusiness', body: 'Sustainably grown crops and farm produce', href: '/marketplace?category=agribusiness' },
+  { label: 'Organic produce', body: 'Chemical-free fruit, vegetables and oils', href: '/marketplace?category=organic_produce' },
+  { label: 'Recycled & upcycled', body: 'Everyday goods from reclaimed materials', href: '/marketplace?category=recycled_upcycled' },
+  { label: 'Handmade crafts', body: 'Artisan pieces from natural materials', href: '/marketplace?category=handmade_crafts' },
+]
+
+const FAQS = [
+  {
+    q: 'Is SWK Marketplace only for buyers in Ghana?',
+    a: `For now, SWK Marketplace delivers within Ghana, to all 16 regions. Delivery is a flat ${formatCurrency(DELIVERY_FEE_GHS)} per shop in your cart, however many of that shop's products you buy, and it's shown before you pay. Each shop arranges its own delivery and calls the phone number you give at checkout.`,
+  },
+  {
+    q: 'How do I know my payment is safe?',
+    a: 'Your money is held in escrow by SWK Ghana and released only after you confirm your order arrived. Real payments are processed by Paystack, one of Africa’s most trusted payment providers. If there’s a problem, report it from your order page and we mediate. You’re never left without recourse.',
+  },
+  {
+    q: 'What are the sample shops?',
+    a: 'While our first verified vendors join, the marketplace shows four sample shops so you can try everything: add products to your cart, check out, save a card or mobile money number, and follow your order to delivery. Sample products are marked “Sample”, and their checkout uses a test payment, so no real money is ever taken. Use one of the test cards shown at checkout, or approve the on-screen mobile money prompt.',
+  },
+  {
+    q: 'What happens if I’m not happy with my order?',
+    a: 'If your order doesn’t arrive, arrives damaged, or is very different from the description, don’t confirm delivery. Press “Report a problem” on your order page instead. Your payment stays on hold while SWK Ghana investigates and, where appropriate, issues a full refund.',
+  },
+  {
+    q: 'How long does delivery take?',
+    a: 'It depends on where the shop is and where you are. Most shops dispatch within 1 to 3 business days of confirming your order. You’ll get an email when it’s on its way, and you can follow it from your account.',
+  },
+  {
+    q: 'Can I sell on SWK Marketplace?',
+    a: 'Yes, if you run a sustainable business in Ghana. Apply from “Become a vendor”. Our team reviews every application within 2 to 3 business days against SDG 12. There’s no monthly fee: SWK Ghana takes 15% only when you make a sale.',
+  },
+  {
+    q: 'What is the 15% platform commission?',
+    a: 'When a sale completes, SWK Ghana keeps 15% of the order total. It covers payment processing, the platform, vendor support and SDG 12 verification, and is reinvested in youth enterprise. The other 85% goes to the vendor’s mobile money or bank account after delivery is confirmed.',
+  },
+]
+
+// ─── Building blocks ──────────────────────────────────────────────────────────
+
+function StepNumber({ n }: { n: number }) {
   return (
-    <div className="relative flex gap-5">
-      {/* Step circle */}
-      <div className="flex-shrink-0 flex flex-col items-center">
-        <div
-          className={`w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold shadow-card ${accentClasses[accent]}`}
-        >
-          {step}
-        </div>
-        {/* Connector line, hidden on last item (handled via CSS in list) */}
-        <div className="flex-1 w-0.5 bg-sand-200 my-2 min-h-8" />
-      </div>
-
-      {/* Content */}
-      <div className="pb-8 flex-1">
-        <div className="flex items-start gap-3 mb-2">
-          <div className="mt-0.5 text-green-600">{icon}</div>
-          <h3 className="text-base font-semibold text-sand-900 leading-snug">{title}</h3>
-        </div>
-        <p className="text-sm text-sand-600 leading-relaxed ml-7">{description}</p>
-      </div>
-    </div>
+    <span
+      aria-hidden="true"
+      className="flex-shrink-0 w-11 h-11 rounded-full border-2 border-green-600 bg-white text-green-700 font-mono font-bold text-sm flex items-center justify-center"
+    >
+      {String(n).padStart(2, '0')}
+    </span>
   )
 }
 
-// ─── FAQ accordion (pure CSS, no JS needed) ────────────────────────────────────
-
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
-    <details className="group border border-sand-200 rounded-xl overflow-hidden bg-white">
-      <summary className="flex items-center justify-between px-5 py-4 cursor-pointer select-none list-none hover:bg-sand-50 transition-colors">
-        <span className="text-sm font-semibold text-sand-900 pr-4">{question}</span>
-        <ChevronDown className="w-4 h-4 text-sand-600 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
+    <details className="group rounded-xl border border-sand-200 bg-white open:border-green-600 transition-colors">
+      <summary className="flex items-center justify-between gap-4 px-5 min-h-[60px] cursor-pointer select-none list-none rounded-xl hover:bg-sand-50 transition-colors">
+        <span className="text-base font-semibold text-sand-900">{question}</span>
+        <ChevronDown className="w-5 h-5 text-sand-600 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" aria-hidden="true" />
       </summary>
-      <div className="px-5 pb-5 pt-1">
-        <p className="text-sm text-sand-600 leading-relaxed">{answer}</p>
-      </div>
+      <p className="px-5 pb-5 text-[15px] text-sand-700 leading-relaxed">{answer}</p>
     </details>
   )
 }
@@ -109,476 +172,254 @@ export default function HowItWorksPage() {
       <Navbar />
 
       <main id="main">
-
         {/* ── Hero ─────────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden bg-green-600 py-20 md:py-28">
-          {/* Decorative dot pattern */}
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
-              backgroundSize: '28px 28px',
-            }}
-            aria-hidden="true"
-          />
-
-          <div className="container-app relative text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 border border-white/20 text-green-100 text-xs font-medium mb-6">
-              <Leaf className="w-3.5 h-3.5" />
-              SDG 12 Verified Marketplace
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-white mb-5 text-balance leading-tight">
-              How SWK Marketplace<br className="hidden sm:block" /> works
-            </h1>
-
-            <p className="text-green-100 text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-8">
-              We connect eco-conscious buyers with verified youth-led green entrepreneurs across Ghana, safely, transparently, and sustainably.
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link
-                href="/marketplace"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-green-700 font-semibold text-sm hover:bg-green-50 transition-colors shadow-card"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                Start shopping
-              </Link>
-              <Link
-                href="/vendor/apply"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-green-700 text-white font-semibold text-sm hover:bg-green-800 border border-green-500 transition-colors"
-              >
-                <Store className="w-4 h-4" />
-                Become a vendor
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Stats bar ─────────────────────────────────────────────── */}
-        <section className="bg-white border-b border-sand-200 py-6">
+        <section className="bg-sand-50 pt-14 pb-16 md:pt-20 md:pb-24">
           <div className="container-app">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              {[
-                { icon: <BadgeCheck className="w-5 h-5 text-green-600" />, value: 'SDG 12', label: 'Verified products' },
-                { icon: <ShieldCheck className="w-5 h-5 text-teal-600" />, value: 'Escrow', label: 'Secure payments' },
-                { icon: <Users className="w-5 h-5 text-gold-400" />, value: 'Youth-led', label: 'Entrepreneurs' },
-                { icon: <Globe className="w-5 h-5 text-green-600" />, value: '16 regions', label: 'Across Ghana' },
-              ].map(({ icon, value, label }) => (
-                <div key={label} className="flex flex-col items-center gap-1.5">
-                  {icon}
-                  <div className="text-lg font-bold text-sand-900">{value}</div>
-                  <div className="text-xs text-sand-600">{label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── For buyers ────────────────────────────────────────────── */}
-        <section className="section bg-sand-50">
-          <div className="container-app">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-
-              <div>
-                <div className="inline-flex items-center gap-2 text-xs font-semibold text-green-600 uppercase tracking-widest mb-3">
-                  <ShoppingBag className="w-4 h-4" />
-                  For buyers
-                </div>
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-sand-900 mb-4 text-balance">
-                  Shop sustainably with confidence
-                </h2>
-                <p className="text-sand-600 text-sm leading-relaxed mb-8">
-                  Every product on SWK Marketplace is reviewed for SDG 12 alignment before going live. Your payment is held in escrow and only released after you confirm delivery, you're always protected.
-                </p>
-
-                {/* Steps */}
-                <div>
-                  <StepCard
-                    step={1}
-                    icon={<ShoppingBag className="w-5 h-5" />}
-                    title="Browse & discover"
-                    description="Browse hundreds of eco-friendly products across four categories: Agribusiness, Organic Produce, Recycled & Upcycled goods, and Handmade Crafts. Filter by values, zero-waste, organic, women-led, and more."
-                  />
-                  <StepCard
-                    step={2}
-                    icon={<ShieldCheck className="w-5 h-5" />}
-                    title="Add to cart and pay once"
-                    description="Fill one cart from as many shops as you like and pay in a single checkout, by card or mobile money (MTN MoMo, Telecel Cash, AT Money). Save your address and payment method for next time. Your payment goes into escrow, held safely by SWK Ghana, not released to any shop until you confirm delivery."
-                    accent="teal"
-                  />
-                  <StepCard
-                    step={3}
-                    icon={<Truck className="w-5 h-5" />}
-                    title="Receive your order"
-                    description="The vendor prepares and dispatches your order. You'll receive email updates at every stage. Track your order from your buyer dashboard."
-                  />
-                  <StepCard
-                    step={4}
-                    icon={<CheckCircle2 className="w-5 h-5" />}
-                    title="Confirm delivery & release payment"
-                    description="Once your order arrives and you're happy, confirm delivery in your dashboard. This triggers the release of payment to the vendor. You can raise a dispute if anything is wrong, we're here to help."
-                    accent="gold"
-                  />
-                </div>
-              </div>
-
-              {/* Visual panel */}
-              <div className="lg:pt-12">
-                <div className="rounded-2xl bg-white border border-sand-200 shadow-card p-6 space-y-4">
-                  <h3 className="text-sm font-semibold text-sand-700">Your buyer protections</h3>
-                  {[
-                    {
-                      icon: <ShieldCheck className="w-5 h-5 text-teal-600" />,
-                      title: 'Escrow protection',
-                      desc: 'Money is never released until YOU confirm delivery.',
-                    },
-                    {
-                      icon: <BadgeCheck className="w-5 h-5 text-green-600" />,
-                      title: 'SDG 12 verified',
-                      desc: 'Every product is screened for sustainability before listing.',
-                    },
-                    {
-                      icon: <Star className="w-5 h-5 text-gold-400" />,
-                      title: 'Vendor ratings',
-                      desc: 'Real reviews from real buyers, shop with confidence.',
-                    },
-                    {
-                      icon: <ClipboardList className="w-5 h-5 text-green-600" />,
-                      title: 'Dispute resolution',
-                      desc: 'Raise a dispute if your order has a problem and we\'ll step in.',
-                    },
-                  ].map(({ icon, title, desc }) => (
-                    <div key={title} className="flex gap-3 items-start">
-                      <div className="mt-0.5 flex-shrink-0">{icon}</div>
-                      <div>
-                        <p className="text-sm font-semibold text-sand-900">{title}</p>
-                        <p className="text-xs text-sand-600 mt-0.5">{desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-5 rounded-2xl overflow-hidden bg-green-600 p-6 text-white">
-                  <div className="text-xs font-semibold uppercase tracking-widest text-green-200 mb-2">Did you know?</div>
-                  <p className="text-sm text-green-100 leading-relaxed">
-                    Every purchase on SWK Marketplace directly supports a young Ghanaian green entrepreneur. 85% of your payment goes straight to the vendor, supporting livelihoods and sustainable businesses.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── For vendors ───────────────────────────────────────────── */}
-        <section className="section bg-white">
-          <div className="container-app">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 text-xs font-semibold text-green-600 uppercase tracking-widest mb-3">
-                <Store className="w-4 h-4" />
-                For vendors
-              </div>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-sand-900 mb-4 text-balance">
-                Sell your sustainable products to the world
-              </h2>
-              <p className="text-sand-600 text-sm max-w-lg mx-auto leading-relaxed">
-                Join Ghana's leading sustainable marketplace. Get your products in front of eco-conscious buyers, receive secure payouts, and grow your green business.
+            <div className="max-w-3xl">
+              <p className="eyebrow rise rise-1 mb-5">How it works</p>
+              <h1 className="rise rise-2 font-bold text-sand-900 text-[clamp(2.4rem,5.5vw,4.25rem)] leading-[1.05] tracking-[-0.025em] text-balance">
+                Buying and selling, <span className="text-green-600">made safe for everyone</span>
+              </h1>
+              <span className="rule rise rise-3 mt-6 mb-6" aria-hidden="true" />
+              <p className="rise rise-3 text-lg md:text-xl text-sand-700 leading-relaxed max-w-2xl">
+                SWK Marketplace connects buyers with verified youth-led green businesses across Ghana. Every
+                payment is held by SWK Ghana until the order arrives, so buyers and shops can trust each other.
               </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {[
-                {
-                  step: 1,
-                  icon: <ClipboardList className="w-6 h-6 text-green-600" />,
-                  title: 'Apply to become a vendor',
-                  description:
-                    'Fill out the vendor application with your business details, sustainability statement, and SDG alignment. The SWK Ghana team reviews every application within 2–3 business days.',
-                },
-                {
-                  step: 2,
-                  icon: <BadgeCheck className="w-6 h-6 text-teal-600" />,
-                  title: 'Get verified & approved',
-                  description:
-                    'Once approved, you receive your "SDG 12 Verified Vendor" status. You can now create product listings, each one goes through a quick review to ensure quality and alignment.',
-                },
-                {
-                  step: 3,
-                  icon: <PackageCheck className="w-6 h-6 text-gold-400" />,
-                  title: 'Fulfil orders',
-                  description:
-                    'When a buyer places an order, you\'ll be notified by email. Confirm the order, prepare the product, dispatch it, and update the status in your vendor dashboard.',
-                },
-                {
-                  step: 4,
-                  icon: <Banknote className="w-6 h-6 text-green-600" />,
-                  title: 'Receive your payout',
-                  description:
-                    'After the buyer confirms delivery, the escrow is released. SWK Ghana deducts a 15% platform commission and sends the remaining 85% to your mobile money or bank account.',
-                },
-                {
-                  step: 5,
-                  icon: <Star className="w-6 h-6 text-gold-400" />,
-                  title: 'Build your reputation',
-                  description:
-                    'Collect reviews from verified buyers. Higher-rated vendors get more visibility on the marketplace. Your vendor profile showcases your sustainability story to every buyer.',
-                },
-                {
-                  step: 6,
-                  icon: <Globe className="w-6 h-6 text-teal-600" />,
-                  title: 'Grow across Ghana & Africa',
-                  description:
-                    'Your products reach buyers across all 16 regions of Ghana and beyond. SWK Ghana actively promotes vendors through social media, events, and partner networks.',
-                },
-              ].map(({ step, icon, title, description }) => (
-                <div
-                  key={step}
-                  className="relative bg-sand-50 rounded-xl border border-sand-200 p-6 hover:border-green-200 hover:shadow-card transition-all"
-                >
-                  <div className="absolute top-4 right-4 w-7 h-7 rounded-full bg-sand-200 flex items-center justify-center text-xs font-bold text-sand-600">
-                    {step}
-                  </div>
-                  <div className="mb-3">{icon}</div>
-                  <h3 className="text-sm font-semibold text-sand-900 mb-2">{title}</h3>
-                  <p className="text-xs text-sand-600 leading-relaxed">{description}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Commission info */}
-            <div className="max-w-2xl mx-auto rounded-2xl border border-green-100 bg-green-50 p-6 sm:p-8 text-center">
-              <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center mx-auto mb-4">
-                <Banknote className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-display font-bold text-sand-900 mb-2">Platform fee: just 15%</h3>
-              <p className="text-sm text-sand-600 leading-relaxed mb-4">
-                SWK Ghana charges a <strong>15% commission</strong> on each sale, and nothing else: no listing or monthly fees. It covers payment processing, platform maintenance, vendor support, and SDG 12 verification services.
-              </p>
-              <div className="flex items-center justify-center gap-6 text-sm">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-700">85%</div>
-                  <div className="text-xs text-sand-600 mt-0.5">Goes to vendor</div>
-                </div>
-                <div className="w-px h-10 bg-sand-200" />
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-sand-700">15%</div>
-                  <div className="text-xs text-sand-600 mt-0.5">SWK platform fee</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Escrow explanation ────────────────────────────────────── */}
-        <section className="section bg-teal-600 text-white">
-          <div className="container-app">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="w-14 h-14 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center mx-auto mb-6">
-                <ShieldCheck className="w-7 h-7 text-white" />
-              </div>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-5 text-balance">
-                How escrow payments protect everyone
-              </h2>
-              <p className="text-teal-100 text-sm sm:text-base leading-relaxed mb-10 max-w-2xl mx-auto">
-                Escrow is a neutral holding mechanism. SWK Ghana acts as a trusted third party that holds your payment safely until the transaction is complete, protecting both buyers and vendors.
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
-                {[
-                  {
-                    step: '01',
-                    label: 'Buyer pays',
-                    desc: 'Payment goes to SWK Ghana escrow, not directly to the vendor.',
-                    color: 'bg-white/10 border-white/20',
-                  },
-                  {
-                    step: '02',
-                    label: 'Funds held',
-                    desc: 'Money is secure in escrow while the vendor prepares and dispatches the order.',
-                    color: 'bg-white/10 border-white/20',
-                  },
-                  {
-                    step: '03',
-                    label: 'Buyer confirms',
-                    desc: 'Buyer confirms delivery when the order arrives as expected.',
-                    color: 'bg-white/10 border-white/20',
-                  },
-                  {
-                    step: '04',
-                    label: 'Payout released',
-                    desc: 'SWK Ghana releases 85% of the payment to the vendor\'s account.',
-                    color: 'bg-white/15 border-white/30',
-                  },
-                ].map(({ step, label, desc, color }) => (
-                  <div key={step} className={`rounded-xl border ${color} p-4`}>
-                    <div className="text-xs font-bold text-teal-200 mb-2">{step}</div>
-                    <div className="text-sm font-semibold text-white mb-1.5">{label}</div>
-                    <div className="text-xs text-teal-100 leading-relaxed">{desc}</div>
-                  </div>
-                ))}
-              </div>
-
-              <p className="text-teal-200 text-xs mt-6">
-                If a dispute is raised, SWK Ghana mediates and can issue a refund, funds are never stuck.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ── SDG 12 section ────────────────────────────────────────── */}
-        <section className="section bg-sand-50">
-          <div className="container-app">
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                <div>
-                  <div className="inline-flex items-center gap-2 text-xs font-semibold text-green-600 uppercase tracking-widest mb-3">
-                    <Leaf className="w-4 h-4" />
-                    SDG 12 alignment
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-display font-bold text-sand-900 mb-5 text-balance">
-                    Why every product is SDG 12 verified
-                  </h2>
-                  <p className="text-sand-600 text-sm leading-relaxed mb-5">
-                    SDG 12, Responsible Consumption and Production, is at the core of everything SWK Marketplace does. We believe commerce can be a force for good on the planet.
-                  </p>
-                  <p className="text-sand-600 text-sm leading-relaxed mb-5">
-                    Every vendor application and product listing is reviewed by the SWK Ghana team against our SDG 12 criteria before being approved. This means buyers can trust that every purchase they make supports sustainable practices.
-                  </p>
-
-                  <div className="space-y-3">
-                    {[
-                      'Products use sustainable, natural, or recycled materials',
-                      'Vendors operate with environmentally responsible practices',
-                      'Packaging is minimal, biodegradable, or reusable where possible',
-                      'Businesses support local ecosystems and livelihoods',
-                    ].map(point => (
-                      <div key={point} className="flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-sand-600">{point}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* SDG categories grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { icon: Wheat, label: 'Agribusiness', desc: 'Sustainable crops and farm produce' },
-                    { icon: Recycle, label: 'Recycled & Upcycled', desc: 'Products from reclaimed materials' },
-                    { icon: Hand, label: 'Handmade Crafts', desc: 'Artisan goods with natural materials' },
-                    { icon: Salad, label: 'Organic Produce', desc: 'Chemical-free food products' },
-                  ].map(({ icon: Icon, label, desc }) => (
-                    <div
-                      key={label}
-                      className="bg-white rounded-xl border border-sand-200 p-4 hover:border-green-200 hover:shadow-card transition-all"
-                    >
-                      <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center mb-2">
-                        <Icon className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div className="text-sm font-semibold text-sand-900 mb-1">{label}</div>
-                      <div className="text-xs text-sand-600 leading-relaxed">{desc}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── FAQ ───────────────────────────────────────────────────── */}
-        <section className="section bg-white">
-          <div className="container-app max-w-3xl">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-sand-900 mb-3 text-balance">
-                Frequently asked questions
-              </h2>
-              <p className="text-sand-600 text-sm">Everything you need to know about SWK Marketplace.</p>
-            </div>
-
-            <div className="space-y-3">
-              <FAQItem
-                question="Is SWK Marketplace only for buyers in Ghana?"
-                answer={`For now, SWK Marketplace delivers within Ghana, to all 16 regions. Delivery is a flat GHS ${DELIVERY_FEE_GHS} per shop in your cart, however many of that shop's products you buy, and it's shown before you pay. Each shop arranges its own delivery and calls the phone number you give at checkout.`}
-              />
-              <FAQItem
-                question="How do I know my payment is safe?"
-                answer="All payments go through Paystack, one of Africa's most trusted payment processors. Your money is held in escrow by SWK Ghana and only released after you confirm that your order has arrived. If you have a problem, you can raise a dispute and we'll mediate. You are never at risk of losing money without recourse."
-              />
-              <FAQItem
-                question="Can I sell on SWK Marketplace as a vendor?"
-                answer="Yes! If you run a sustainable, eco-friendly business in Ghana or Africa, we'd love to have you. Apply by clicking 'Become a vendor', our team reviews every application within 2–3 business days and checks for alignment with SDG 12. Once approved, you can start listing products immediately. There's no monthly fee, we only take 15% when you make a sale."
-              />
-              <FAQItem
-                question="What happens if I'm not happy with my order?"
-                answer="If your order doesn't arrive, arrives damaged, or significantly differs from the product description, don't confirm delivery. Instead, press “Report a problem” on your order page. Your payment stays on hold while SWK Ghana investigates and, where appropriate, issues a full refund."
-              />
-              <FAQItem
-                question="How long does delivery take?"
-                answer="Delivery times depend on the vendor's location and your delivery region. Most vendors dispatch within 1–3 business days of order confirmation. You'll receive an email when your order is dispatched, and can track progress in your buyer dashboard. Estimated delivery dates are shown per listing where the vendor has provided them."
-              />
-              <FAQItem
-                question="What are the sample shops?"
-                answer="While our first verified vendors join, the marketplace shows four sample shops so you can try everything: add products to your cart, check out, save a card or mobile money number, and follow your order to delivery. Sample products are marked “Sample”, and their checkout uses a test payment, so no real money is ever taken. Use one of the test cards shown at checkout, or approve the on-screen mobile money prompt."
-              />
-              <FAQItem
-                question="What is the 15% platform commission?"
-                answer="When a sale is made, SWK Ghana deducts 15% of the total order value as a platform fee. This covers payment processing costs (Paystack fees), platform maintenance, vendor support, SDG verification services, and promotion of vendors. The remaining 85% is sent to the vendor's mobile money or bank account after delivery is confirmed."
-              />
-            </div>
-
-            <div className="mt-8 text-center">
-              <p className="text-sm text-sand-600 mb-3">Still have questions?</p>
-              <a
-                href="mailto:info@swkghana.org"
-                className="inline-flex items-center gap-2 text-sm text-green-600 font-medium hover:text-green-700 transition-colors"
-              >
-                Email us at info@swkghana.org
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ── CTA ───────────────────────────────────────────────────── */}
-        <section className="section bg-green-600">
-          <div className="container-app text-center">
-            <div className="max-w-xl mx-auto">
-              <div className="mx-auto mb-5 w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center" aria-hidden="true">
-                <Leaf className="w-7 h-7 text-white" />
-              </div>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4 text-balance">
-                Ready to shop sustainably?
-              </h2>
-              <p className="text-green-100 text-sm leading-relaxed mb-8">
-                Discover hundreds of eco-friendly products from Ghana's best youth-led green entrepreneurs. Every purchase makes a difference.
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="rise rise-4 mt-8 flex flex-col sm:flex-row gap-3">
                 <Link
                   href="/marketplace"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-white text-green-700 font-semibold text-sm hover:bg-green-50 transition-colors shadow-card"
+                  className="inline-flex items-center justify-center gap-2 min-h-[52px] px-7 rounded-xl bg-green-600 text-white text-sm font-bold hover:bg-green-700 transition-colors"
                 >
-                  <ShoppingBag className="w-4 h-4" />
-                  Shop now
+                  Start shopping <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </Link>
                 <Link
                   href="/vendor/apply"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-green-700 text-white font-semibold text-sm border border-green-500 hover:bg-green-800 transition-colors"
+                  className="inline-flex items-center justify-center min-h-[52px] px-7 rounded-xl border-2 border-green-600 text-green-700 text-sm font-bold hover:bg-green-50 transition-colors"
                 >
-                  <Leaf className="w-4 h-4" />
-                  Start selling
-                  <ArrowRight className="w-4 h-4" />
+                  Become a vendor
                 </Link>
               </div>
-              <p className="text-green-300 text-xs mt-6">
-                Already a vendor?{' '}
-                <Link href="/login" className="underline underline-offset-2 hover:text-white transition-colors">
-                  Sign in to your dashboard
-                </Link>
-              </p>
             </div>
           </div>
         </section>
 
+        {/* ── Facts ────────────────────────────────────────────────── */}
+        <section aria-label="Key facts" className="bg-green-900 text-white">
+          <dl className="container-app grid grid-cols-2 md:grid-cols-4">
+            {FACTS.map((fact, i) => (
+              <div
+                key={fact.label}
+                className={`flex flex-col px-4 sm:px-6 py-7 border-white/10 ${i % 2 === 1 ? 'border-l' : ''} ${i >= 2 ? 'border-t md:border-t-0' : ''} ${i === 2 ? 'md:border-l' : ''}`}
+              >
+                <dt className="order-2 mt-1 text-sm text-green-100">{fact.label}</dt>
+                <dd className="order-1 text-2xl md:text-3xl font-bold tracking-tight">{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        {/* ── For buyers ───────────────────────────────────────────── */}
+        <section className="section bg-white">
+          <div className="container-app grid lg:grid-cols-[1.2fr,0.8fr] gap-12 lg:gap-16 items-start">
+            <div>
+              <SectionHeading
+                eyebrow="For buyers"
+                title={<>Shop sustainably, <span className="text-green-600">with confidence</span></>}
+                subtitle="Every product is checked against SDG 12 before it goes live, and your payment is held until you confirm delivery."
+              />
+              <ol className="mt-10 space-y-8">
+                {BUYER_STEPS.map((step, i) => (
+                  <li key={step.title} className="relative flex gap-5">
+                    {i < BUYER_STEPS.length - 1 && (
+                      <span className="absolute left-[21px] top-12 -bottom-8 w-0.5 bg-sand-200" aria-hidden="true" />
+                    )}
+                    <StepNumber n={i + 1} />
+                    <div className="pt-1.5">
+                      <h3 className="text-lg font-bold text-sand-900">{step.title}</h3>
+                      <p className="mt-1.5 text-[15px] text-sand-700 leading-relaxed">{step.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <aside className="lg:sticky lg:top-24 space-y-5">
+              <div className="rounded-2xl border border-sand-200 bg-sand-50 p-6">
+                <h3 className="eyebrow mb-4">Your protections</h3>
+                <ul className="space-y-4">
+                  {PROTECTIONS.map(p => (
+                    <li key={p.title} className="flex gap-3">
+                      <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gold-400 flex-shrink-0" aria-hidden="true" />
+                      <span>
+                        <span className="block text-sm font-bold text-sand-900">{p.title}</span>
+                        <span className="block text-sm text-sand-700 mt-0.5">{p.body}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <p className="rounded-2xl bg-green-900 p-6 text-sm leading-relaxed text-green-50">
+                <strong className="block text-white text-base mb-1">Where your money goes</strong>
+                85% of every sale goes to the young entrepreneur who made it. The other 15% is reinvested in
+                training and growing youth-led businesses.
+              </p>
+            </aside>
+          </div>
+        </section>
+
+        {/* ── Escrow ───────────────────────────────────────────────── */}
+        <section className="section bg-sand-100">
+          <div className="container-app">
+            <SectionHeading
+              eyebrow="Escrow"
+              title="How escrow protects everyone"
+              subtitle="SWK Ghana acts as a neutral third party: it holds each payment until the order is complete, so buyers never pay for goods that don’t arrive and shops never ship for nothing."
+            />
+            <ol className="mt-12 grid gap-8 md:grid-cols-4">
+              {ESCROW_STEPS.map((step, i) => (
+                <li key={step.title} className="relative">
+                  {i < ESCROW_STEPS.length - 1 && (
+                    <span className="hidden md:block absolute top-[21px] left-11 -right-8 h-0.5 bg-green-600/30" aria-hidden="true" />
+                  )}
+                  <StepNumber n={i + 1} />
+                  <h3 className="mt-5 text-lg font-bold text-sand-900">{step.title}</h3>
+                  <p className="mt-1.5 text-[15px] text-sand-700 leading-relaxed">{step.body}</p>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-10 text-sm text-sand-700">
+              If a problem is reported, SWK Ghana mediates and can refund the buyer. Money is never stuck.
+            </p>
+          </div>
+        </section>
+
+        {/* ── For vendors ──────────────────────────────────────────── */}
+        <section className="section bg-white">
+          <div className="container-app">
+            <SectionHeading
+              eyebrow="For vendors"
+              title={<>Sell to buyers who <span className="text-green-600">care how it’s made</span></>}
+              subtitle="Join a marketplace built for Ghana’s young green entrepreneurs. Reach buyers across the country, get paid securely, and grow your business."
+            />
+            <ol className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {VENDOR_STEPS.map((step, i) => (
+                <li key={step.title} className="card-accent rounded-2xl border border-sand-200 bg-white p-6 hover:border-green-300 hover:shadow-card-md transition-all">
+                  <span className="font-mono text-xs font-bold text-gold-600" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="mt-2 text-lg font-bold text-sand-900">{step.title}</h3>
+                  <p className="mt-2 text-[15px] text-sand-700 leading-relaxed">{step.body}</p>
+                </li>
+              ))}
+            </ol>
+
+            <figure className="mt-12 max-w-2xl rounded-2xl bg-sand-50 border border-sand-200 p-6 sm:p-8">
+              <figcaption>
+                <span className="eyebrow">Platform fee</span>
+                <span className="block mt-2 text-2xl font-bold text-sand-900">15% per sale, nothing else</span>
+                <span className="block mt-2 text-[15px] text-sand-700 leading-relaxed">
+                  No listing or monthly fees. The commission covers payment processing, the platform, vendor
+                  support and SDG 12 verification.
+                </span>
+              </figcaption>
+              <div
+                className="mt-6 flex h-12 rounded-xl overflow-hidden"
+                role="img"
+                aria-label="Of every 100 cedis: 85 to the vendor, 15 to SWK Ghana"
+              >
+                <div className="flex items-center justify-center bg-green-600 text-white text-sm font-bold" style={{ width: '85%' }}>
+                  85% to the vendor
+                </div>
+                <div className="flex items-center justify-center bg-gold-400 text-white text-sm font-bold" style={{ width: '15%' }}>
+                  15%
+                </div>
+              </div>
+            </figure>
+          </div>
+        </section>
+
+        {/* ── SDG 12 ───────────────────────────────────────────────── */}
+        <section className="section bg-sand-50">
+          <div className="container-app grid lg:grid-cols-2 gap-12 items-start">
+            <div>
+              <SectionHeading
+                eyebrow="SDG 12 alignment"
+                title="Why every product is SDG 12 checked"
+                subtitle="SDG 12, Responsible Consumption and Production, is at the core of SWK Marketplace. The SWK Ghana team reviews every vendor and every listing against it before approval."
+              />
+              <ul className="mt-8 space-y-3">
+                {SDG_CRITERIA.map(point => (
+                  <li key={point} className="flex gap-3 text-[15px] text-sand-800">
+                    <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gold-400 flex-shrink-0" aria-hidden="true" />
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {CATEGORIES.map(c => (
+                <li key={c.label}>
+                  <Link
+                    href={c.href}
+                    className="card-accent block h-full rounded-2xl border border-sand-200 bg-white p-5 hover:border-green-300 hover:shadow-card-md transition-all"
+                  >
+                    <span className="block text-base font-bold text-sand-900">{c.label}</span>
+                    <span className="block mt-1 text-sm text-sand-700">{c.body}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ── FAQ ──────────────────────────────────────────────────── */}
+        <section className="section bg-white">
+          <div className="container-app max-w-3xl">
+            <SectionHeading eyebrow="Questions" title="Frequently asked questions" align="center" />
+            <div className="mt-10 space-y-3">
+              {FAQS.map(item => <FAQItem key={item.q} question={item.q} answer={item.a} />)}
+            </div>
+            <p className="mt-8 text-center text-sm text-sand-700">
+              Still have questions?{' '}
+              <a href="mailto:info@swkghana.org" className="font-semibold text-green-700 hover:text-green-800 underline underline-offset-2">
+                Email info@swkghana.org
+              </a>
+            </p>
+          </div>
+        </section>
+
+        {/* ── Call to action ───────────────────────────────────────── */}
+        <section className="section bg-green-900">
+          <div className="container-app max-w-2xl text-center">
+            <SectionHeading
+              eyebrow="Ready when you are"
+              title={<>Shop green. <span className="text-green-200">Support youth.</span></>}
+              subtitle="Discover eco-friendly products from youth-led businesses across Ghana. Every purchase makes a difference."
+              align="center"
+              onDark
+            />
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/marketplace"
+                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[52px] px-7 rounded-xl bg-white text-green-800 text-sm font-bold hover:bg-green-50 transition-colors"
+              >
+                Shop now <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/vendor/apply"
+                className="inline-flex items-center justify-center w-full sm:w-auto min-h-[52px] px-7 rounded-xl border border-white/40 text-white text-sm font-semibold hover:border-white hover:bg-white/10 transition-colors"
+              >
+                Start selling
+              </Link>
+            </div>
+            <p className="mt-6 text-sm text-green-100">
+              Already a vendor?{' '}
+              <Link href="/login" className="underline underline-offset-2 hover:text-white">
+                Sign in to your dashboard
+              </Link>
+            </p>
+          </div>
+        </section>
       </main>
 
       <Footer />

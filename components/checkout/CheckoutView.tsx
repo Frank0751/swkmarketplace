@@ -9,10 +9,8 @@ import {
   CheckCircle2,
   ChevronDown,
   CreditCard,
-  FlaskConical,
   Loader2,
   Lock,
-  MapPin,
   Plus,
   ShoppingBag,
   Smartphone,
@@ -406,8 +404,8 @@ export function CheckoutView({ profile, addresses, paymentMethods, paymentsMode 
   if (summary.lines.length === 0) {
     return (
       <div className="max-w-lg mx-auto bg-white rounded-2xl border border-sand-200 shadow-card px-6 py-14 text-center">
-        <ShoppingBag className="w-10 h-10 text-green-600 mx-auto mb-3" aria-hidden="true" />
-        <h2 className="text-xl font-display font-bold text-sand-900">Your cart is empty</h2>
+        <p className="eyebrow mb-3">Nothing to pay for</p>
+        <h2 className="text-2xl font-display font-bold text-sand-900">Your cart is empty</h2>
         <p className="text-sm text-sand-600 mt-1 mb-6">
           {items.length > 0 ? 'The items in your cart are no longer available.' : 'Add something to your cart to check out.'}
         </p>
@@ -421,8 +419,8 @@ export function CheckoutView({ profile, addresses, paymentMethods, paymentsMode 
   if (summary.kind === 'mixed') {
     return (
       <div className="max-w-lg mx-auto bg-white rounded-2xl border border-sand-200 shadow-card px-6 py-12 text-center">
-        <AlertCircle className="w-10 h-10 text-gold-600 mx-auto mb-3" aria-hidden="true" />
-        <h2 className="text-xl font-display font-bold text-sand-900">Sample and real products are paid separately</h2>
+        <p className="eyebrow mb-3">One more step</p>
+        <h2 className="text-2xl font-display font-bold text-sand-900">Sample and real products are paid separately</h2>
         <p className="text-sm text-sand-600 mt-2 mb-6">
           Sample products use a test payment, so they can’t share a checkout with real ones.
         </p>
@@ -494,7 +492,6 @@ export function CheckoutView({ profile, addresses, paymentMethods, paymentsMode 
                     />
                     <span className="flex-1 min-w-0 text-sm">
                       <span className="flex items-center gap-2 font-semibold text-sand-900">
-                        <MapPin className="w-3.5 h-3.5 text-green-600" aria-hidden="true" />
                         {a.label || 'Address'}
                         {a.is_default && <span className="text-[10px] font-semibold text-green-700 bg-green-100 rounded-full px-1.5 py-px">Default</span>}
                       </span>
@@ -633,8 +630,7 @@ export function CheckoutView({ profile, addresses, paymentMethods, paymentsMode 
             </h2>
 
             {isSample && (
-              <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-900">
-                <FlaskConical className="w-5 h-5 flex-shrink-0 text-gold-600" aria-hidden="true" />
+              <div className="mt-3 rounded-xl border border-gold-200 border-l-4 border-l-gold-400 bg-gold-50 px-4 py-3 text-sm text-gold-900">
                 <p>
                   <strong>Test payment.</strong> These are sample products, so you pay with a test card or a
                   simulated mobile money prompt. No real money is taken, and real cards are refused.

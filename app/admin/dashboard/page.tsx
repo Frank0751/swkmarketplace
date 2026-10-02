@@ -262,26 +262,20 @@ export default async function AdminDashboardPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
-        {statCards.map(card => {
-          const Icon = card.icon
-          return (
-            <Link
-              key={card.label}
-              href={card.href}
-              className="bg-white rounded-xl border border-sand-200 p-5 flex items-start gap-4 hover:border-green-300 hover:shadow-sm transition-all group"
-            >
-              <div className={cn('w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0', card.color)}>
-                <Icon className="w-5 h-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-sand-600">{card.label}</div>
-                <div className="text-2xl font-bold text-sand-900 mt-0.5 leading-tight">{card.value}</div>
-                <div className="text-xs text-sand-600 mt-1">{card.sub}</div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-sand-300 group-hover:text-green-600 transition-colors flex-shrink-0 mt-1" />
-            </Link>
-          )
-        })}
+        {statCards.map(card => (
+          <Link
+            key={card.label}
+            href={card.href}
+            className="card-accent bg-white rounded-xl border border-sand-200 p-5 flex items-start gap-4 hover:border-green-300 hover:shadow-card-md transition-all group"
+          >
+            <div className="flex-1 min-w-0">
+              <div className="eyebrow text-sand-600">{card.label}</div>
+              <div className="text-3xl font-bold tracking-tight text-sand-900 mt-2 leading-tight">{card.value}</div>
+              <div className="text-xs text-sand-600 mt-1.5">{card.sub}</div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-sand-300 group-hover:text-green-600 transition-colors flex-shrink-0 mt-1" aria-hidden="true" />
+          </Link>
+        ))}
       </div>
 
       {/* ── Analytics ── */}
@@ -382,8 +376,8 @@ export default async function AdminDashboardPage() {
                 const catMeta = CATEGORY_META[vendor.category]
                 return (
                   <div key={vendor.id} className="px-5 py-3 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0 text-base">
-                      
+                    <div className="w-9 h-9 rounded-full bg-green-100 text-green-800 flex items-center justify-center flex-shrink-0 text-sm font-bold" aria-hidden="true">
+                      {vendor.business_name.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-sand-900 truncate">{vendor.business_name}</div>
@@ -492,9 +486,7 @@ export default async function AdminDashboardPage() {
                         className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-sand-200"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-lg bg-sand-100 flex items-center justify-center flex-shrink-0 text-base">
-                        
-                      </div>
+                      <div className="w-10 h-10 rounded-lg bg-sand-100 flex-shrink-0 border border-sand-200" aria-hidden="true" />
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-sand-900 truncate">{listing.title}</div>

@@ -1,21 +1,52 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Leaf, Mail, MessageCircle, ShieldCheck } from 'lucide-react'
 
-// ─── Component ────────────────────────────────────────────────────────────────
+const SHOP_LINKS = [
+  { href: '/marketplace', label: 'All products' },
+  { href: '/marketplace?category=organic_produce', label: 'Organic produce' },
+  { href: '/marketplace?category=handmade_crafts', label: 'Handmade crafts' },
+  { href: '/marketplace?category=recycled_upcycled', label: 'Recycled & upcycled' },
+  { href: '/marketplace?category=agribusiness', label: 'Agribusiness' },
+]
+
+const HELP_LINKS = [
+  { href: '/how-it-works', label: 'How it works' },
+  { href: '/vendor/apply', label: 'Become a vendor' },
+  { href: '/contact', label: 'Contact us' },
+  { href: '/terms', label: 'Terms' },
+  { href: '/privacy', label: 'Privacy' },
+]
+
+function FooterLinks({ title, links }: { title: string; links: { href: string; label: string }[] }) {
+  return (
+    <div>
+      <h2 className="eyebrow eyebrow-on-dark mb-4">{title}</h2>
+      <ul className="space-y-1">
+        {links.map(({ href, label }) => (
+          <li key={href}>
+            <Link
+              href={href}
+              className="inline-flex items-center min-h-[40px] text-sm text-green-50/90 hover:text-white transition-colors"
+            >
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 export function Footer() {
   return (
-    <footer className="bg-green-600 text-white">
-      {/* Main footer grid */}
-      <div className="container-app py-12">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+    <footer className="bg-green-900 text-white">
+      <span className="kente-band" aria-hidden="true" />
 
-          {/* Brand column */}
-          <div className="lg:col-span-2">
-            {/* Logo */}
-            <Link href="/" className="inline-flex items-center gap-3 group mb-4">
-              <div className="rounded-xl bg-white px-2.5 py-1.5 group-hover:scale-105 transition-transform">
+      <div className="container-app py-14">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr,1fr,1fr,1fr]">
+          <div>
+            <Link href="/" className="inline-flex items-center gap-3 group">
+              <span className="rounded-xl bg-white px-2.5 py-1.5 transition-transform group-hover:scale-[1.03]">
                 <Image
                   src="/images/swk-logo.png"
                   alt="SWK: Sustainability with Koomson"
@@ -23,68 +54,26 @@ export function Footer() {
                   height={36}
                   className="h-9 w-auto"
                 />
-              </div>
-              <div>
-                <div className="text-base font-display font-bold text-white leading-tight">SWK Marketplace</div>
-                <div className="text-[10px] font-medium text-green-50 leading-tight tracking-widest uppercase">swkghana.org</div>
-              </div>
+              </span>
+              <span>
+                <span className="block text-base font-bold leading-tight">SWK Marketplace</span>
+                <span className="block font-mono text-[11px] uppercase tracking-[0.18em] text-green-100">by SWK Ghana</span>
+              </span>
             </Link>
-
-            <p className="text-sm text-green-50 leading-relaxed max-w-xs">
-              Connecting eco-conscious buyers with verified youth-led green entrepreneurs across Ghana and Africa. Every purchase supports SDG 12, Responsible Consumption and Production.
+            <p className="mt-5 text-sm leading-relaxed text-green-50/90 max-w-xs">
+              Eco-friendly products from verified youth-led businesses across Ghana. Every order is held in
+              escrow until it arrives, and every listing is checked against SDG 12.
             </p>
-
-            {/* SDG 12 badge */}
-            <div className="inline-flex items-center gap-2 mt-5 px-3 py-1.5 rounded-full bg-white/10 border border-white/20">
-              {/* White, not green-50: the bg-white/10 overlay lightens the green
-                  underneath enough that green-50 drops to 4.33:1. */}
-              <ShieldCheck className="w-4 h-4 text-white" aria-hidden="true" />
-              <span className="text-xs font-medium text-white">SDG 12 Verified Marketplace</span>
-            </div>
           </div>
 
-          {/* Explore links */}
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-green-50 mb-4">
-              Explore
-            </h3>
-            <ul className="space-y-2.5">
-              {[
-                { href: '/marketplace',    label: 'Shop all products' },
-                { href: '/how-it-works',   label: 'How it works' },
-                { href: '/vendor/apply',   label: 'Become a vendor' },
-                { href: '/contact',        label: 'Contact us' },
-                { href: 'https://swkghana.org', label: 'About SWK Ghana', external: true },
-              ].map(({ href, label, external }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    target={external ? '_blank' : undefined}
-                    rel={external ? 'noopener noreferrer' : undefined}
-                    className="text-sm text-green-50 hover:text-white transition-colors inline-flex items-center gap-1 min-h-[44px] group"
-                  >
-                    {label}
-                    {external && (
-                      <span className="opacity-0 group-hover:opacity-60 text-[10px] transition-opacity">↗</span>
-                    )}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterLinks title="Shop" links={SHOP_LINKS} />
+          <FooterLinks title="Help" links={HELP_LINKS} />
 
-          {/* Contact column */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-green-50 mb-4">
-              Get in touch
-            </h3>
-            <ul className="space-y-3">
+            <h2 className="eyebrow eyebrow-on-dark mb-4">Get in touch</h2>
+            <ul className="space-y-1">
               <li>
-                <a
-                  href="mailto:info@swkghana.org"
-                  className="inline-flex items-center gap-2 min-h-[44px] text-sm text-green-50 hover:text-white transition-colors"
-                >
-                  <Mail className="w-4 h-4 flex-shrink-0" />
+                <a href="mailto:info@swkghana.org" className="inline-flex items-center min-h-[40px] text-sm text-green-50/90 hover:text-white transition-colors">
                   info@swkghana.org
                 </a>
               </li>
@@ -93,10 +82,14 @@ export function Footer() {
                   href="https://chat.whatsapp.com/LrSVJrNFHGY6kdPnW8xoTu"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 min-h-[44px] text-sm text-green-50 hover:text-white transition-colors"
+                  className="inline-flex items-center min-h-[40px] text-sm text-green-50/90 hover:text-white transition-colors"
                 >
-                  <MessageCircle className="w-4 h-4 flex-shrink-0" />
-                  WhatsApp Community
+                  WhatsApp community<span className="sr-only"> (opens WhatsApp)</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://swkghana.org" className="inline-flex items-center min-h-[40px] text-sm text-green-50/90 hover:text-white transition-colors">
+                  swkghana.org
                 </a>
               </li>
             </ul>
@@ -104,15 +97,10 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar */}
       <div className="border-t border-white/10">
-        <div className="container-app py-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-green-50">
-            &copy; {new Date().getFullYear()} SWK Ghana. All rights reserved.
-          </p>
-          <p className="text-xs text-green-50 font-medium italic">
-            Powered by youth, for the planet.
-          </p>
+        <div className="container-app py-5 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between text-xs text-green-100">
+          <p>&copy; {new Date().getFullYear()} SWK Ghana. All rights reserved.</p>
+          <p>Powered by youth, for the planet.</p>
         </div>
       </div>
     </footer>

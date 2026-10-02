@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, FlaskConical, Loader2, RotateCcw } from 'lucide-react'
+import { Eye, EyeOff, Loader2, RotateCcw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { SampleDataStatus } from '@/lib/admin/sample-data'
@@ -44,10 +44,7 @@ export function SampleDataPanel({ initial }: { initial: SampleDataStatus }) {
   return (
     <section aria-labelledby="sample-data-heading" className="bg-white rounded-xl border-2 border-dashed border-gold-200 p-5 mb-8">
       <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-        <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 rounded-lg bg-gold-50 flex items-center justify-center flex-shrink-0">
-            <FlaskConical className="w-5 h-5 text-gold-600" aria-hidden="true" />
-          </div>
+        <div className="flex-1 min-w-0">
           <div className="min-w-0">
             <h2 id="sample-data-heading" className="flex flex-wrap items-center gap-2 text-sm font-bold text-sand-900">
               Sample shops

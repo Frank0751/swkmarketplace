@@ -36,7 +36,7 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
     return (
       <span
         className={cn(
-          'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-sand-100 text-sand-600',
+          'inline-flex items-center min-h-[40px] px-3 rounded-lg text-xs font-semibold bg-sand-100 text-sand-600',
           className,
         )}
       >
@@ -51,7 +51,7 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
       onClick={handleAdd}
       aria-label={inCart > 0 ? `Add another ${product.title} to cart (${inCart} in cart)` : `Add ${product.title} to cart`}
       className={cn(
-        'inline-flex items-center gap-1 min-h-[36px] px-3 rounded-lg text-xs font-semibold shadow-card transition-colors',
+        'inline-flex items-center gap-1.5 min-h-[40px] px-3 rounded-lg text-xs font-semibold shadow-card transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2',
         justAdded ? 'bg-green-700 text-white' : 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800',
         className,
@@ -62,7 +62,7 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
       ) : (
         <ShoppingBag className="w-3.5 h-3.5" aria-hidden="true" />
       )}
-      {justAdded ? 'Added' : 'Add'}
+      {justAdded ? 'Added' : 'Add to cart'}
     </button>
   )
 }

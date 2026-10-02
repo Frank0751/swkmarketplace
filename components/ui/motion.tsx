@@ -154,3 +154,24 @@ export function CountUp({ end, prefix = '', suffix = '', duration = 1.6, classNa
     </span>
   )
 }
+
+// ─── DrawLine ──────────────────────────────────────────────────────────────────
+
+/**
+ * A line that draws itself from left to right when it scrolls into view, for
+ * connecting the steps of a process. Decorative: hidden from screen readers.
+ */
+export function DrawLine({ className }: { className?: string }) {
+  const reduce = useReducedMotion()
+  return (
+    <motion.span
+      aria-hidden="true"
+      className={className}
+      style={{ transformOrigin: 'left center', display: 'block' }}
+      initial={reduce ? { scaleX: 1 } : { scaleX: 0 }}
+      whileInView={{ scaleX: 1 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 1.4, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+    />
+  )
+}

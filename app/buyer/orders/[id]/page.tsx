@@ -5,9 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft,
-  MapPin,
   Package,
-  Store,
   ShieldCheck,
   AlertTriangle,
   CheckCircle2,
@@ -442,13 +440,13 @@ export default function BuyerOrderDetailPage() {
 
             {/* Order timeline */}
             <div className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
-              <h2 className="text-base font-display font-semibold text-sand-900 mb-5">Order Progress</h2>
+              <h2 className="eyebrow mb-5">Order progress</h2>
               <OrderTimeline order={order} />
             </div>
 
             {/* Order info */}
             <div className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
-              <h2 className="text-base font-display font-semibold text-sand-900 mb-4">Order Details</h2>
+              <h2 className="eyebrow mb-4">Order details</h2>
               <dl className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
                 <div>
                   <dt className="text-sand-600 text-xs mb-0.5">Order reference</dt>
@@ -521,10 +519,7 @@ export default function BuyerOrderDetailPage() {
 
             {/* Delivery details */}
             <div className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="w-4 h-4 text-sand-600" aria-hidden="true" />
-                <h2 className="text-base font-display font-semibold text-sand-900">Delivery Details</h2>
-              </div>
+              <h2 className="eyebrow mb-3">Delivery details</h2>
               <p className="text-sm text-sand-700">{order.delivery_address}</p>
               <p className="text-sm text-sand-600 mt-1">{order.delivery_region}, Ghana</p>
               {order.delivery_phone && (
@@ -542,7 +537,7 @@ export default function BuyerOrderDetailPage() {
 
             {/* Order summary card */}
             <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
-              <h2 className="text-base font-display font-semibold text-sand-900 mb-4">Order Summary</h2>
+              <h2 className="eyebrow mb-4">Order summary</h2>
 
               {product && (
                 <Link
@@ -596,10 +591,7 @@ export default function BuyerOrderDetailPage() {
             {/* Escrow status */}
             {payout && (
               <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
-                <div className="flex items-center gap-2 mb-3">
-                  <ShieldCheck className="w-4 h-4 text-teal-600" aria-hidden="true" />
-                  <h2 className="text-base font-display font-semibold text-sand-900">Escrow Status</h2>
-                </div>
+                <h2 className="eyebrow mb-3">Escrow status</h2>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-sand-600">Status</span>
@@ -634,10 +626,7 @@ export default function BuyerOrderDetailPage() {
             {/* Vendor info */}
             {vendor && (
               <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
-                <div className="flex items-center gap-2 mb-3">
-                  <Store className="w-4 h-4 text-sand-600" aria-hidden="true" />
-                  <h2 className="text-base font-display font-semibold text-sand-900">Sold By</h2>
-                </div>
+                <h2 className="eyebrow mb-3">Sold by</h2>
                 <div className="flex items-center gap-3">
                   {vendor.logo_url ? (
                     <img

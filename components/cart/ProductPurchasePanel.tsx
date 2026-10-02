@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { AlertCircle, Check, ShieldCheck, ShoppingBag, Truck, Zap, FlaskConical } from 'lucide-react'
+import { AlertCircle, Check, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useCart } from '@/lib/cart/CartProvider'
 import { QuantityStepper } from '@/components/cart/QuantityStepper'
@@ -136,28 +136,32 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
           onClick={handleBuyNow}
           className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 rounded-xl border-2 border-green-600 bg-white text-green-700 text-sm font-semibold hover:bg-green-50 active:bg-green-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
         >
-          <Zap className="w-4 h-4" aria-hidden="true" />
           Buy now
         </button>
       </div>
 
-      <ul className="space-y-2 text-xs text-sand-700">
-        <li className="flex items-start gap-2">
-          <Truck className="w-4 h-4 text-green-600 flex-shrink-0" aria-hidden="true" />
+      <ul className="space-y-2.5 text-sm text-sand-700 border-t border-sand-200 pt-4">
+        <li className="flex gap-2.5">
+          <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gold-400 flex-shrink-0" aria-hidden="true" />
           <span>
-            Delivered anywhere in Ghana for {formatCurrency(DELIVERY_FEE_GHS)} per shop. The shop calls you to arrange it.
+            <strong className="font-semibold text-sand-900">Delivery anywhere in Ghana</strong> for{' '}
+            {formatCurrency(DELIVERY_FEE_GHS)} per shop. The shop calls you to arrange it.
           </span>
         </li>
-        <li className="flex items-start gap-2">
-          <ShieldCheck className="w-4 h-4 text-teal-600 flex-shrink-0" aria-hidden="true" />
-          <span>Your payment is held in escrow and released to the shop only after you confirm delivery.</span>
+        <li className="flex gap-2.5">
+          <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gold-400 flex-shrink-0" aria-hidden="true" />
+          <span>
+            <strong className="font-semibold text-sand-900">Escrow protected.</strong> The shop is paid only after you
+            confirm delivery.
+          </span>
         </li>
         {product.is_demo && (
-          <li className="flex items-start gap-2 text-gold-800">
-            <FlaskConical className="w-4 h-4 text-gold-600 flex-shrink-0" aria-hidden="true" />
+          <li className="flex gap-2.5">
+            <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gold-400 flex-shrink-0" aria-hidden="true" />
             <span>
-              Sample product: checkout works end to end with a test card or mobile money, and no real money is taken.{' '}
-              <Link href="/how-it-works" className="underline underline-offset-2">How it works</Link>
+              <strong className="font-semibold text-sand-900">Sample product.</strong> Checkout works end to end with a
+              test card or mobile money; no real money is taken.{' '}
+              <Link href="/how-it-works" className="text-green-700 underline underline-offset-2">How it works</Link>
             </span>
           </li>
         )}

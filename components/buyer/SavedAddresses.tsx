@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Loader2, MapPin, Plus, Star, Trash2 } from 'lucide-react'
+import { Loader2, Plus, Star, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { formatGhanaPhone, normalizeGhanaPhone } from '@/lib/marketplace/phone'
@@ -89,9 +89,7 @@ export function SavedAddresses() {
 
   return (
     <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card mb-6" aria-labelledby="addresses-heading">
-      <h2 id="addresses-heading" className="text-base font-display font-semibold text-sand-900 mb-1 flex items-center gap-2">
-        <MapPin className="w-4 h-4 text-green-600" aria-hidden="true" /> Saved delivery addresses
-      </h2>
+      <h2 id="addresses-heading" className="text-lg font-display font-bold text-sand-900 mb-1">Saved delivery addresses</h2>
       <p className="text-sm text-sand-600 mb-4">Choose one at checkout instead of typing it again.</p>
 
       {addresses === null ? (

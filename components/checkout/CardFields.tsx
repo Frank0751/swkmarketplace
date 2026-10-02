@@ -1,6 +1,5 @@
 'use client'
 
-import { Lock, FlaskConical } from 'lucide-react'
 import {
   TEST_CARDS,
   detectBrand,
@@ -127,10 +126,7 @@ export function CardFields({ value, onChange, errors, idPrefix, defaultName }: C
       </div>
 
       <div className="rounded-xl border border-gold-200 bg-gold-50/70 p-3">
-        <p className="flex items-center gap-1.5 text-xs font-semibold text-gold-900">
-          <FlaskConical className="w-3.5 h-3.5 text-gold-600" aria-hidden="true" />
-          Test cards: pick one to fill the form
-        </p>
+        <p className="text-xs font-semibold text-gold-900">Test cards: pick one to fill the form</p>
         <ul className="mt-2 space-y-1.5">
           {TEST_CARDS.map(card => (
             <li key={card.id}>
@@ -151,8 +147,7 @@ export function CardFields({ value, onChange, errors, idPrefix, defaultName }: C
         </ul>
       </div>
 
-      <p className="flex items-start gap-1.5 text-[11px] text-sand-600">
-        <Lock className="w-3 h-3 mt-0.5 flex-shrink-0" aria-hidden="true" />
+      <p className="text-xs text-sand-600 leading-relaxed">
         Your card number and security code never leave this page. Only the card type, last 4 digits and
         expiry are kept, so you can pay faster next time.
       </p>

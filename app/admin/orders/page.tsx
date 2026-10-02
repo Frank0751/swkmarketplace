@@ -3,7 +3,6 @@ import { OrderManagement } from '@/components/admin/OrderManagement'
 import { createClient } from '@/lib/supabase/server'
 import { formatCurrency } from '@/lib/utils'
 import { isConfirmationOverdue, CONFIRMATION_WINDOW_DAYS } from '@/lib/marketplace/orders'
-import { ShoppingCart, Wallet, AlertTriangle, Clock } from 'lucide-react'
 import type { Order } from '@/types'
 
 export const metadata = { title: 'Order Management' }
@@ -51,52 +50,23 @@ export default async function AdminOrdersPage() {
   return (
     <AdminLayout title="Order Management">
       {/* Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <ShoppingCart className="w-5 h-5 text-blue-600" />
+      <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {[
+          { label: 'Total orders', value: String(totalOrders), note: 'Every order placed', alert: false },
+          { label: 'Held in escrow', value: formatCurrency(escrowBalance), note: 'Paid, not yet released', alert: false },
+          { label: 'Problems reported', value: String(disputedCount), note: disputedCount > 0 ? 'Needs attention now' : 'None open', alert: disputedCount > 0 },
+          { label: `Awaiting buyer ${CONFIRMATION_WINDOW_DAYS}+ days`, value: String(overdueCount), note: 'Dispatched, not confirmed', alert: false },
+        ].map(stat => (
+          <div
+            key={stat.label}
+            className={`flex flex-col bg-white rounded-xl border border-sand-200 border-t-4 p-4 ${stat.alert ? 'border-t-red-600' : 'border-t-green-600'}`}
+          >
+            <dt className="eyebrow text-sand-600 order-1">{stat.label}</dt>
+            <dd className="order-2 mt-2 text-2xl font-bold tracking-tight text-sand-900">{stat.value}</dd>
+            <dd className={`order-3 text-xs mt-1 ${stat.alert ? 'text-red-700 font-semibold' : 'text-sand-600'}`}>{stat.note}</dd>
           </div>
-          <div>
-            <div className="text-xs font-medium text-sand-600">Total Orders</div>
-            <div className="text-2xl font-bold text-sand-900">{totalOrders}</div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center flex-shrink-0">
-            <Wallet className="w-5 h-5 text-teal-600" />
-          </div>
-          <div>
-            <div className="text-xs font-medium text-sand-600">Escrow Balance</div>
-            <div className="text-2xl font-bold text-sand-900">{formatCurrency(escrowBalance)}</div>
-            <div className="text-xs text-sand-600 mt-0.5">Paid + confirmed + dispatched</div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="w-5 h-5 text-red-600" />
-          </div>
-          <div>
-            <div className="text-xs font-medium text-sand-600">Active Disputes</div>
-            <div className="text-2xl font-bold text-sand-900">{disputedCount}</div>
-            {disputedCount > 0 && (
-              <div className="text-xs text-red-600 mt-0.5">Requires immediate attention</div>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gold-100 flex items-center justify-center flex-shrink-0">
-            <Clock className="w-5 h-5 text-gold-600" aria-hidden="true" />
-          </div>
-          <div>
-            <div className="text-xs font-medium text-sand-600">Awaiting buyer {CONFIRMATION_WINDOW_DAYS}+ days</div>
-            <div className="text-2xl font-bold text-sand-900">{overdueCount}</div>
-            <div className="text-xs text-sand-600 mt-0.5">Dispatched but not confirmed</div>
-          </div>
-        </div>
-      </div>
+        ))}
+      </dl>
 
       <OrderManagement orders={orders} />
     </AdminLayout>

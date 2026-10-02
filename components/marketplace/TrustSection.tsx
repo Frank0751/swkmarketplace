@@ -1,164 +1,102 @@
 import Image from 'next/image'
-import { ShoppingCart, ShieldCheck, PackageCheck, Banknote, ArrowDown, Lock, Lightbulb, BadgeCheck, Globe } from 'lucide-react'
-import { FadeIn, Stagger, StaggerItem, CountUp } from '@/components/ui/motion'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
+import { FadeIn, Stagger, StaggerItem, DrawLine } from '@/components/ui/motion'
+import { SectionHeading } from '@/components/marketplace/SectionHeading'
 
-// ─── Escrow flow (infographic) ─────────────────────────────────────────────────
-
-const ESCROW_STEPS = [
+// How buying works, told as the escrow it rests on. Replaces two home-page
+// sections (an escrow infographic and a separate "how it works") that said the
+// same thing twice.
+const STEPS = [
   {
-    icon: ShoppingCart,
-    title: 'You order & pay',
-    description: 'Checkout securely with mobile money or card via Paystack.',
-    accent: 'bg-green-50 text-green-600 border-green-100',
+    title: 'Fill your cart',
+    body: 'Add products from as many youth-led shops as you like, then check out once.',
   },
   {
-    icon: ShieldCheck,
-    title: 'SWK holds your money',
-    description: 'Funds sit safely in escrow, the vendor is not paid yet.',
-    accent: 'bg-teal-50 text-teal-600 border-teal-100',
+    title: 'Pay by MoMo or card',
+    body: 'SWK Ghana holds your payment in escrow. The shop isn’t paid yet.',
   },
   {
-    icon: PackageCheck,
-    title: 'Vendor delivers',
-    description: 'Your order is prepared, dispatched and delivered to you.',
-    accent: 'bg-gold-50 text-gold-500 border-gold-100',
+    title: 'The shop delivers',
+    body: 'Each shop calls you to arrange delivery, anywhere in Ghana.',
   },
   {
-    icon: Banknote,
-    title: 'You confirm, vendor gets paid',
-    description: 'Only after you confirm delivery is the payout released.',
-    accent: 'bg-green-50 text-green-600 border-green-100',
+    title: 'You confirm, the shop is paid',
+    body: 'Confirm delivery from your account. Only then is the shop’s share released.',
   },
-] as const
-
-// ─── Impact stats (Jamii-style "Did you know?" band) ───────────────────────────
-
-const IMPACT_STATS = [
-  { end: 236, suffix: '+', label: 'Youth empowered through SWK programmes' },
-  { end: 9, suffix: '+', label: 'Countries reached across Africa & beyond' },
-  { end: 100, suffix: '%', label: 'Of orders protected by escrow' },
-  { end: 15, suffix: '%', label: 'Commission reinvested in youth development' },
-] as const
+]
 
 export function TrustSection() {
   return (
-    <section className="section bg-teal-50 overflow-hidden">
+    <section className="section bg-sand-100">
       <div className="container-app">
-        {/* Headline */}
-        <FadeIn className="text-center mb-12">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-100 text-teal-700 text-xs font-semibold mb-4">
-            <Lock className="w-3.5 h-3.5" aria-hidden="true" />
-            How your money stays safe
-          </span>
-          <h2 className="text-3xl md:text-4xl font-display font-semibold text-sand-900 text-balance">
-            Escrow protection, from checkout to doorstep
-          </h2>
-          <p className="mt-3 text-base text-sand-600 max-w-2xl mx-auto">
-            SWK Ghana acts as your trusted intermediary on every single order. The vendor is only
-            paid after you confirm your delivery arrived as described.
-          </p>
+        <FadeIn>
+          <SectionHeading
+            eyebrow="How buying works"
+            title={<>Your money waits <span className="text-green-600">until your order arrives</span></>}
+            subtitle="Every payment is held by SWK Ghana, a youth nonprofit, and released to the shop only when you say your order arrived as described."
+          />
         </FadeIn>
 
-        {/* Escrow flow infographic */}
-        <div className="relative mb-16">
-          {/* Connecting line, desktop */}
-          <div
-            className="hidden lg:block absolute top-10 h-0.5 bg-gradient-to-r from-green-200 via-teal-300 to-green-200"
-            style={{ left: '12%', right: '12%' }}
-            aria-hidden="true"
-          />
-
-          <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {ESCROW_STEPS.map((step, idx) => {
-              const Icon = step.icon
-              return (
-                <StaggerItem key={step.title} className="relative">
-                  <div className="flex flex-col items-center text-center bg-white rounded-2xl border border-sand-200 shadow-card p-6 h-full">
-                    <div className={`relative z-10 w-14 h-14 rounded-2xl border flex items-center justify-center mb-4 ${step.accent}`}>
-                      <Icon className="w-6 h-6" aria-hidden="true" />
-                      <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-sand-900 text-white text-xs font-bold flex items-center justify-center">
-                        {idx + 1}
-                      </span>
-                    </div>
-                    <h3 className="text-sm font-bold text-sand-900 mb-1.5">{step.title}</h3>
-                    <p className="text-xs text-sand-600 leading-relaxed">{step.description}</p>
-                  </div>
-                  {/* Mobile connector */}
-                  {idx < ESCROW_STEPS.length - 1 && (
-                    <div className="sm:hidden flex justify-center py-2 text-teal-300" aria-hidden="true">
-                      <ArrowDown className="w-5 h-5" />
-                    </div>
-                  )}
-                </StaggerItem>
-              )
-            })}
+        <div className="relative mt-12 md:mt-14">
+          <Stagger className="relative grid gap-8 lg:grid-cols-4 lg:gap-8">
+            {STEPS.map((step, i) => (
+              <StaggerItem key={step.title} className="relative flex lg:block gap-5">
+                {/* Each step joins the next: across on desktop (drawn as it
+                    scrolls in), down on phones */}
+                {i < STEPS.length - 1 && (
+                  <>
+                    <span className="hidden lg:block absolute top-[21px] left-11 -right-8 h-0.5 bg-sand-300" aria-hidden="true">
+                      <DrawLine className="h-full w-full bg-green-600" />
+                    </span>
+                    <span className="lg:hidden absolute left-[21px] top-11 -bottom-8 w-0.5 bg-sand-300" aria-hidden="true" />
+                  </>
+                )}
+                <span className="relative z-10 flex-shrink-0 w-11 h-11 rounded-full bg-white border-2 border-green-600 text-green-700 font-mono font-bold text-sm flex items-center justify-center">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="lg:mt-6 pb-1">
+                  <h3 className="text-lg font-bold text-sand-900 leading-snug">{step.title}</h3>
+                  <p className="mt-1.5 text-[15px] leading-relaxed text-sand-700 max-w-xs">{step.body}</p>
+                </div>
+              </StaggerItem>
+            ))}
           </Stagger>
         </div>
 
-        {/* "Did you know?" impact band */}
-        <FadeIn>
-          <div className="relative overflow-hidden rounded-3xl bg-green-800">
-            {/* Photo side */}
-            <div className="grid lg:grid-cols-[380px,1fr]">
-              <div className="relative min-h-[220px] lg:min-h-0">
-                <Image
-                  src="/images/impact-seedling.jpg"
-                  alt="Seedlings growing, SWK youth impact"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 380px"
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-green-800/60 hidden lg:block" />
-                <div className="absolute inset-0 bg-gradient-to-t from-green-800/70 to-transparent lg:hidden" />
-              </div>
-
-              {/* Stats side */}
-              <div className="relative p-8 md:p-10">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-semibold mb-4">
-                  <Lightbulb className="w-3.5 h-3.5" aria-hidden="true" />
-                  Did you know?
-                </span>
-                <h3 className="text-2xl md:text-3xl font-display font-semibold text-white mb-2 text-balance">
-                  Every purchase powers youth-led green enterprise
-                </h3>
-                <p className="text-sm text-white/70 max-w-xl mb-8">
-                  SWK Marketplace is run by SWK Ghana, a youth-focused nonprofit. The platform&rsquo;s
-                  commission goes straight back into training, onboarding and growing young
-                  entrepreneurs across Ghana and Africa.
-                </p>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  {IMPACT_STATS.map(stat => (
-                    <div key={stat.label}>
-                      <div className="text-3xl md:text-4xl font-display font-bold text-white">
-                        <CountUp end={stat.end} suffix={stat.suffix} />
-                      </div>
-                      <div className="mt-1 text-[11px] leading-snug text-white/60 font-medium">
-                        {stat.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+        {/* Why it matters */}
+        <FadeIn className="mt-16 md:mt-20">
+          <div className="grid lg:grid-cols-2 overflow-hidden rounded-3xl bg-green-900">
+            <div className="relative min-h-[240px] lg:min-h-[380px]">
+              <Image
+                src="/images/impact-seedling.jpg"
+                alt="A seedling growing in a young entrepreneur's nursery"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="p-8 md:p-12 flex flex-col justify-center">
+              <p className="eyebrow eyebrow-on-dark mb-3">Why it matters</p>
+              <h3 className="text-2xl md:text-3xl font-bold text-white leading-tight text-balance">
+                Every purchase powers youth-led green enterprise
+              </h3>
+              <span className="rule mt-4" aria-hidden="true" />
+              <p className="mt-4 text-base leading-relaxed text-green-50/90 max-w-lg">
+                SWK Marketplace is run by SWK Ghana, a youth-focused nonprofit. The platform’s 15%
+                commission goes back into training, onboarding and growing young entrepreneurs across
+                Ghana and Africa.
+              </p>
+              <Link
+                href="https://swkghana.org"
+                className="mt-7 inline-flex items-center gap-2 self-start min-h-[44px] text-sm font-semibold text-green-100 hover:text-white transition-colors group"
+              >
+                About SWK Ghana
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </FadeIn>
-
-        {/* Trust badge row */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <span className="trust-badge">
-            <Lock className="w-3.5 h-3.5" aria-hidden="true" />
-            100% Escrow Protected
-          </span>
-          <span className="trust-badge">
-            <BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" />
-            SDG 12 Verified Listings
-          </span>
-          <span className="trust-badge">
-            <Globe className="w-3.5 h-3.5" aria-hidden="true" />
-            Youth-Led Vendors
-          </span>
-        </div>
       </div>
     </section>
   )

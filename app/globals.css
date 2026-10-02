@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* SIGNATURE: a kente-inspired woven band in SWK's greens and gold (.kente-band).
+   It closes the hero, opens the footer and frames the order confirmation: the one
+   element that says SWK Ghana, not template. */
+
+/* ─── Palette (SWK Ghana brand) ─────────────────────────────────────
+   bg-primary    #173404  forest green: footer, proof bar, closing CTA
+   bg-secondary  #F3F0E8  sand-100: alternate sections
+   bg-light      #FAF8F3  sand-50: page background, card-heavy sections
+   accent        #3B6D11  SWK green: buttons, highlighted words, active states
+   accent-warm   #BA7517  gold: kente details, SDG marks and hairlines, sparingly
+   text-primary  #2A2823  on light backgrounds; white on forest
+   text-muted    #6B6454  captions and secondary text (4.5:1 on white and sand)
+   border        #E8E4D8  card borders and dividers
+   Highlighted words in headings are coloured, never italic. */
+
 /* ─── Design tokens ─────────────────────────────────────────────── */
 :root {
   --green-50:  #EAF3DE;
@@ -43,6 +58,11 @@
     @apply font-display font-bold tracking-tight;
   }
 
+  /* Emphasis is colour and weight, never slant: SWK's titles stay upright */
+  em, i, cite, dfn, address {
+    font-style: normal;
+  }
+
   /* Focus visible only on keyboard nav */
   :focus-visible {
     @apply outline-none ring-2 ring-green-600 ring-offset-2;
@@ -59,6 +79,11 @@
 }
 
 /* ─── Motion graphics ───────────────────────────────────────────── */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
@@ -181,6 +206,67 @@
   .announce-item {
     @apply flex items-center gap-2 whitespace-nowrap text-sm;
   }
+
+  /* ─── Section label (eyebrow), above every section title ─────── */
+  .eyebrow {
+    @apply font-mono text-xs font-bold uppercase leading-tight text-green-700;
+    letter-spacing: 0.18em;
+  }
+  .eyebrow-on-dark {
+    @apply text-green-100;
+  }
+
+  /* Gold hairline between a section title and its subtitle */
+  .rule {
+    @apply block h-0.5 w-12 rounded-full bg-gold-400;
+  }
+
+  /* ─── SIGNATURE: kente-inspired band ────────────────────────────
+     Blocks of SWK forest, green, leaf and gold, crossed by a fine weft
+     line so it reads as woven cloth rather than a flat stripe. */
+  .kente-band {
+    @apply block w-full;
+    height: 10px;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg,
+        #173404 0 20px,
+        #3B6D11 20px 46px,
+        #BA7517 46px 52px,
+        #97C459 52px 64px,
+        #173404 64px 70px,
+        #0F6E56 70px 88px,
+        #EF9F27 88px 92px,
+        #3B6D11 92px 116px,
+        #FAC775 116px 120px);
+  }
+
+  /* ─── Cards: a green line draws across the top on hover/focus ─── */
+  .card-accent {
+    @apply relative overflow-hidden;
+  }
+  .card-accent::before {
+    content: '';
+    @apply absolute inset-x-0 top-0 z-10 h-[3px] bg-green-600;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+  .card-accent:hover::before,
+  .card-accent:focus-within::before {
+    transform: scaleX(1);
+  }
+
+  /* ─── Hero entrance: CSS only, so it plays before any script ──── */
+  .rise {
+    animation: rise 0.7s cubic-bezier(0.21, 0.65, 0.35, 1) both;
+  }
+  .rise-1 { animation-delay: 0.05s; }
+  .rise-2 { animation-delay: 0.12s; }
+  .rise-3 { animation-delay: 0.2s; }
+  .rise-4 { animation-delay: 0.28s; }
+  .rise-5 { animation-delay: 0.36s; }
 
   /* Order timeline step */
   .timeline-step {

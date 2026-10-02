@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 // styled names rather than the networks' artwork.
 
 const BADGES = [
-  { label: 'VISA',         className: 'text-[#1a1f71] italic font-black tracking-tight' },
+  { label: 'VISA',         className: 'text-[#1a1f71] font-black tracking-tight' },
   { label: 'Mastercard',   className: 'text-[#eb001b] font-bold' },
   { label: 'MTN MoMo',     className: 'text-sand-900 bg-[#ffcc00] border-[#ffcc00] font-bold' },
   { label: 'Telecel Cash', className: 'text-white bg-[#e40000] border-[#e40000] font-bold' },

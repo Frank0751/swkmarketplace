@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // SWK Green — primary brand colour
+        // SWK Green: primary brand colour
         green: {
           50:  '#EAF3DE',
           100: '#C0DD97',
@@ -65,9 +65,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans:    ['var(--font-body)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
-        mono:    ['var(--font-mono)', 'monospace'],
+        // Ubuntu throughout (SWK Ghana's brand typeface); Ubuntu Mono for
+        // references, card numbers and eyebrow labels
+        sans:    ['var(--font-body)', 'Ubuntu', 'system-ui', 'sans-serif'],
+        display: ['var(--font-body)', 'Ubuntu', 'system-ui', 'sans-serif'],
+        mono:    ['var(--font-mono)', 'Ubuntu Mono', 'ui-monospace', 'monospace'],
       },
       fontSize: {
         'xs':   ['0.75rem',  { lineHeight: '1rem' }],

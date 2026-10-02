@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { CreditCard, Loader2, Plus, ShieldCheck, Smartphone, Star, Trash2, FlaskConical, Lock } from 'lucide-react'
+import { Loader2, Plus, Smartphone, Star, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Modal } from '@/components/ui/Modal'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -141,8 +141,7 @@ export function PaymentMethodsManager({ initialMethods, defaultName }: { initial
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start gap-2.5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-900">
-        <FlaskConical className="w-5 h-5 flex-shrink-0 text-gold-600" aria-hidden="true" />
+      <div className="rounded-xl border border-gold-200 border-l-4 border-l-gold-400 bg-gold-50 px-4 py-3 text-sm text-gold-900">
         <p>
           Payments are in test mode while our first vendors join, so only test cards can be saved here and they
           pay for sample orders. When live payments start, cards are kept securely by our payment provider.
@@ -151,8 +150,8 @@ export function PaymentMethodsManager({ initialMethods, defaultName }: { initial
 
       {methods.length === 0 ? (
         <div className="bg-white rounded-2xl border border-sand-200 shadow-card px-6 py-12 text-center">
-          <CreditCard className="w-10 h-10 text-green-600 mx-auto mb-3" aria-hidden="true" />
-          <p className="text-base font-semibold text-sand-900">No saved payment methods yet</p>
+          <p className="eyebrow mb-3">Nothing saved yet</p>
+          <p className="text-lg font-bold text-sand-900">No saved payment methods</p>
           <p className="text-sm text-sand-600 mt-1 max-w-sm mx-auto">
             Save a card or mobile money number to check out in one tap. You can also save one while paying.
           </p>
@@ -242,8 +241,7 @@ export function PaymentMethodsManager({ initialMethods, defaultName }: { initial
         </button>
       </div>
 
-      <p className="flex items-start gap-2 text-xs text-sand-600">
-        <ShieldCheck className="w-4 h-4 flex-shrink-0 text-teal-600" aria-hidden="true" />
+      <p className="text-xs text-sand-600 leading-relaxed">
         SWK Marketplace never stores a full card number or security code. We keep only the card type, last 4
         digits and expiry, or your mobile money network and number.
       </p>
@@ -263,9 +261,7 @@ export function PaymentMethodsManager({ initialMethods, defaultName }: { initial
 
           {otp.needed && (
             <div className="rounded-xl border border-teal-100 bg-teal-50 p-3">
-              <label htmlFor="add-card-otp" className="form-label flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5" aria-hidden="true" /> One-time code
-              </label>
+              <label htmlFor="add-card-otp" className="form-label">One-time code</label>
               <p className="text-xs text-teal-800 mb-2">{otp.message}</p>
               <input
                 id="add-card-otp"

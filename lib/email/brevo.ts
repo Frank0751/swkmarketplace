@@ -74,10 +74,10 @@ function baseTemplate(title: string, bodyHtml: string): string {
   <title>${e(title)}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; background: #FAF8F3; color: #2A2823; }
+    body { font-family: 'Ubuntu', 'Segoe UI', Arial, sans-serif; background: #FAF8F3; color: #2A2823; }
     .wrapper { max-width: 600px; margin: 0 auto; padding: 24px 16px; }
     .card { background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #E8E4D8; }
-    .header { background: #3B6D11; padding: 28px 32px; text-align: center; }
+    .header { background: #173404; padding: 28px 32px; text-align: center; border-bottom: 4px solid #BA7517; }
     .header-logo { color: #ffffff; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
     .header-tagline { color: #C0DD97; font-size: 12px; margin-top: 2px; }
     .body { padding: 32px; }
@@ -110,7 +110,7 @@ function baseTemplate(title: string, bodyHtml: string): string {
       </div>
       <div class="footer">
         <p>&copy; ${new Date().getFullYear()} SWK Ghana &middot; <a href="${MARKETPLACE_URL}">marketplace.swkghana.org</a></p>
-        <p class="sdg-note">Supporting SDG 12 &mdash; Responsible Consumption &amp; Production</p>
+        <p class="sdg-note">Supporting SDG 12: Responsible Consumption &amp; Production</p>
       </div>
     </div>
   </div>

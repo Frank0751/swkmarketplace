@@ -23,7 +23,7 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     // The add button sits beside the link, not inside it: a button nested in
     // a link is invalid, and screen readers and keyboards trip over it.
-    <div className="product-card group relative flex flex-col">
+    <div className="product-card card-accent group relative flex flex-col">
       <Link
         href={`/marketplace/${product.slug}`}
         className="block flex-1 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600"
@@ -119,10 +119,9 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
 
-          {/* Price, leaving room for the add button that sits over this corner.
-              min-w-0 + truncate: at 360px a card is ~156px wide and a long
-              price plus unit would otherwise push into the button. */}
-          <div className="min-w-0 truncate pr-[4.75rem] min-h-[36px] flex items-center">
+          {/* Price. min-w-0 + truncate: at 360px a card is ~156px wide and a
+              long price plus unit would otherwise overflow it. */}
+          <div className="min-w-0 truncate">
             <span className="text-base font-bold text-sand-900">
               {formatCurrency(product.price_ghs)}
             </span>
@@ -133,8 +132,11 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
 
-      <div className="absolute bottom-3 right-3">
+      {/* Below the price rather than beside it: on a two-column phone grid the
+          button covered the end of the price */}
+      <div className="px-3 pb-3">
         <AddToCartButton
+          className="w-full justify-center"
           product={{
             id: product.id,
             slug: product.slug,

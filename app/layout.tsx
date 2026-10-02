@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Ubuntu } from 'next/font/google'
+import { Ubuntu, Ubuntu_Mono } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -8,21 +8,23 @@ import { CartProvider } from '@/lib/cart/CartProvider'
 import { CartDrawer } from '@/components/cart/CartDrawer'
 import './globals.css'
 
-// Brand font: Ubuntu everywhere (body + display)
-const bodyFont = Ubuntu({
+// SWK Ghana's brand typeface, Ubuntu, for everything: headings and body share
+// one family, so it loads once. Upright only: SWK titles are never italic, and
+// skipping the italic files saves four downloads on a mobile connection.
+const ubuntu = Ubuntu({
   subsets: ['latin'],
   variable: '--font-body',
   display: 'swap',
   weight: ['300', '400', '500', '700'],
-  style: ['normal', 'italic'],
+  style: ['normal'],
 })
 
-const displayFont = Ubuntu({
+// Its monospace cut, for order references, card numbers and small labels
+const ubuntuMono = Ubuntu_Mono({
   subsets: ['latin'],
-  variable: '--font-display',
+  variable: '--font-mono',
   display: 'swap',
-  weight: ['400', '500', '700'],
-  style: ['normal', 'italic'],
+  weight: ['400', '700'],
 })
 
 export const metadata: Metadata = {
@@ -53,7 +55,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`}>
+    <html lang="en" className={`${ubuntu.variable} ${ubuntuMono.variable}`}>
       <body className="min-h-screen bg-sand-50 font-sans antialiased">
         {/* Lets keyboard users jump the marquee, logo, nav links, search and
             filter pills that precede content on every page. */}

@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SlidersHorizontal, ChevronLeft, ChevronRight, Search, Sparkles } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
 import { Navbar } from '@/components/layout/Navbar'
@@ -168,10 +168,7 @@ export default async function MarketplacePage({
           <aside className="hidden lg:block w-56 flex-shrink-0">
             <div className="sticky top-36 space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-sand-900 flex items-center gap-2">
-                  <SlidersHorizontal className="w-4 h-4 text-green-600" />
-                  Filters
-                </h2>
+                <h2 className="eyebrow">Refine</h2>
                 {hasActiveFilters && (
                   <Link
                     href="/marketplace"
@@ -184,7 +181,7 @@ export default async function MarketplacePage({
 
               {/* Sort */}
               <div>
-                <p className="text-xs font-semibold text-sand-600 uppercase tracking-wide mb-2">Sort by</p>
+                <p className="text-sm font-bold text-sand-900 mb-2">Sort by</p>
                 <div className="space-y-1">
                   {[
                     { value: 'newest', label: 'Newest first' },
@@ -197,7 +194,7 @@ export default async function MarketplacePage({
                       href={buildUrl({ sort: opt.value, page: '1' })}
                       className={`block w-full px-3 py-2 text-sm rounded-lg transition-colors ${
                         sort === opt.value
-                          ? 'bg-green-600 text-white font-medium'
+                          ? 'bg-green-50 text-green-800 font-semibold'
                           : 'text-sand-600 hover:bg-sand-100'
                       }`}
                     >
@@ -209,12 +206,12 @@ export default async function MarketplacePage({
 
               {/* Region */}
               <div>
-                <p className="text-xs font-semibold text-sand-600 uppercase tracking-wide mb-2">Region</p>
+                <p className="text-sm font-bold text-sand-900 mb-2">Region</p>
                 <div className="space-y-1 max-h-48 overflow-y-auto scrollbar-hide">
                   <Link
                     href={buildUrl({ region: '', page: '1' })}
                     className={`block w-full px-3 py-2 text-sm rounded-lg transition-colors ${
-                      !region ? 'bg-green-600 text-white font-medium' : 'text-sand-600 hover:bg-sand-100'
+                      !region ? 'bg-green-50 text-green-800 font-semibold' : 'text-sand-600 hover:bg-sand-100'
                     }`}
                   >
                     All regions
@@ -224,7 +221,7 @@ export default async function MarketplacePage({
                       key={r}
                       href={buildUrl({ region: r, page: '1' })}
                       className={`block w-full px-3 py-2 text-sm rounded-lg transition-colors ${
-                        region === r ? 'bg-green-600 text-white font-medium' : 'text-sand-600 hover:bg-sand-100'
+                        region === r ? 'bg-green-50 text-green-800 font-semibold' : 'text-sand-600 hover:bg-sand-100'
                       }`}
                     >
                       {r}
@@ -235,7 +232,7 @@ export default async function MarketplacePage({
 
               {/* Price range */}
               <div>
-                <p className="text-xs font-semibold text-sand-600 uppercase tracking-wide mb-2">Price (GHS)</p>
+                <p className="text-sm font-bold text-sand-900 mb-2">Price (GHS)</p>
                 <div className="space-y-1">
                   {[
                     { label: 'Under GHS 50', min: undefined, max: 50 },
@@ -253,7 +250,7 @@ export default async function MarketplacePage({
                           page: '1',
                         })}
                         className={`block w-full px-3 py-2 text-sm rounded-lg transition-colors ${
-                          isActive ? 'bg-green-600 text-white font-medium' : 'text-sand-600 hover:bg-sand-100'
+                          isActive ? 'bg-green-50 text-green-800 font-semibold' : 'text-sand-600 hover:bg-sand-100'
                         }`}
                       >
                         {range.label}
@@ -269,9 +266,10 @@ export default async function MarketplacePage({
           <div className="flex-1 min-w-0">
 
             {/* Header row */}
-            <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+            <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
               <div>
-                <h1 className="text-xl font-display font-bold text-sand-900">
+                <p className="eyebrow mb-2">{search ? 'Search results' : 'The marketplace'}</p>
+                <h1 className="text-2xl md:text-3xl font-display font-bold tracking-tight text-sand-900">
                   {category ? CATEGORY_META[category as ProductCategory]?.label : 'All products'}
                 </h1>
                 <p className="text-sm text-sand-600 mt-0.5">
@@ -334,8 +332,7 @@ export default async function MarketplacePage({
             {/* Say plainly that these are samples, and turn visitors who sell
                 into applicants */}
             {showingSamples && (
-              <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border border-gold-200 bg-gold-50">
-                <Sparkles className="w-5 h-5 flex-shrink-0 text-gold-600" aria-hidden="true" />
+              <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 px-5 py-4 rounded-xl bg-white border border-sand-200 border-l-4 border-l-gold-400">
                 <p className="flex-1 text-sm text-sand-800 leading-relaxed">
                   <strong>You&rsquo;re browsing our sample shops.</strong> Add anything to your cart and check
                   out: it all works, but payment is a test (use a test card or mobile money), so no real
@@ -343,7 +340,7 @@ export default async function MarketplacePage({
                 </p>
                 <Link
                   href="/vendor/apply"
-                  className="inline-flex items-center justify-center min-h-[44px] px-4 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors whitespace-nowrap"
+                  className="inline-flex items-center justify-center min-h-[44px] px-4 rounded-lg border-2 border-green-600 text-green-700 text-sm font-semibold hover:bg-green-50 transition-colors whitespace-nowrap"
                 >
                   Become a founding vendor
                 </Link>

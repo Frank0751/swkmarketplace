@@ -1,18 +1,20 @@
 import { Suspense } from 'react'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 import { AnnouncementBar }  from '@/components/layout/AnnouncementBar'
 import { Navbar }           from '@/components/layout/Navbar'
 import { HeroSection }      from '@/components/marketplace/HeroSection'
-import { BrandMarquee }     from '@/components/marketplace/BrandMarquee'
+import { ProofBar }         from '@/components/marketplace/ProofBar'
 import { CategoryShowcase } from '@/components/marketplace/CategoryShowcase'
-import { ValueFilterStrip } from '@/components/marketplace/ValueFilterStrip'
 import { ProductGrid }      from '@/components/marketplace/ProductGrid'
 import { TrustSection }     from '@/components/marketplace/TrustSection'
-import { HowItWorksSnippet }from '@/components/marketplace/HowItWorksSnippet'
 import { VendorCTA }        from '@/components/marketplace/VendorCTA'
+import { SectionHeading }   from '@/components/marketplace/SectionHeading'
 import { Footer }           from '@/components/layout/Footer'
 import { MobileBottomNav }  from '@/components/layout/MobileBottomNav'
 import { ProductGridSkeleton } from '@/components/marketplace/ProductGridSkeleton'
 
+// Hero, proof, what's for sale, how buying works, the call to vendors, footer
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-sand-50">
@@ -21,30 +23,24 @@ export default function HomePage() {
 
       <main id="main">
         <HeroSection />
-        <BrandMarquee />
+        <ProofBar />
         <CategoryShowcase />
-        <ValueFilterStrip />
 
-        <section className="section">
+        <section className="section bg-sand-50">
           <div className="container-app">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-display font-semibold text-sand-900">
-                  Featured products
-                </h2>
-                <p className="text-sand-600 text-sm mt-1">
-                  Every listing is SDG 12-verified before going live
-                </p>
-              </div>
-              <a
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+              <SectionHeading
+                eyebrow="From the shops"
+                title="Featured products"
+                subtitle="Fresh listings from youth-led businesses across Ghana, each checked before it went live."
+              />
+              <Link
                 href="/marketplace"
-                className="text-sm font-medium text-green-600 hover:text-green-700 flex items-center gap-1 transition-colors"
+                className="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-semibold text-green-700 hover:text-green-800 transition-colors group flex-shrink-0"
               >
-                View all
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
+                View all products
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </Link>
             </div>
 
             <Suspense fallback={<ProductGridSkeleton />}>
@@ -54,7 +50,6 @@ export default function HomePage() {
         </section>
 
         <TrustSection />
-        <HowItWorksSnippet />
         <VendorCTA />
       </main>
 

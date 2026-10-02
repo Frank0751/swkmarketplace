@@ -6,16 +6,11 @@ import {
   MapPin,
   Phone,
   Star,
-  ShieldCheck,
-  BadgeCheck,
-  Users,
-  CalendarDays,
   Globe,
   Instagram,
   Facebook,
   Twitter,
   Leaf,
-  Quote,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
@@ -118,11 +113,11 @@ export default async function StorePage({ params }: StorePageProps) {
     ?? (vendor.phone?.trim().startsWith('+') ? vendor.phone.replace(/\D/g, '') : null)
 
   const facts = [
-    vendor.year_founded && { icon: CalendarDays, label: 'Founded', value: String(vendor.year_founded) },
-    vendor.team_size && { icon: Users, label: 'Team', value: `${vendor.team_size} people` },
-    vendor.total_sales > 0 && { icon: BadgeCheck, label: 'Orders fulfilled', value: `${vendor.total_sales}+` },
-    vendor.review_count > 0 && { icon: Star, label: 'Rating', value: `${vendor.rating.toFixed(1)} (${vendor.review_count} reviews)` },
-  ].filter(Boolean) as { icon: typeof Users; label: string; value: string }[]
+    vendor.year_founded && { label: 'Founded', value: String(vendor.year_founded) },
+    vendor.team_size && { label: 'Team', value: `${vendor.team_size} people` },
+    vendor.total_sales > 0 && { label: 'Orders fulfilled', value: `${vendor.total_sales}+` },
+    vendor.review_count > 0 && { label: 'Rating', value: `${vendor.rating.toFixed(1)} (${vendor.review_count})` },
+  ].filter(Boolean) as { label: string; value: string }[]
 
   const socials = [
     vendor.website && { icon: Globe, href: vendor.website, label: 'Website' },
@@ -233,34 +228,27 @@ export default async function StorePage({ params }: StorePageProps) {
 
             {/* Facts row */}
             {facts.length > 0 && (
-              <div className="mt-6 pt-5 border-t border-sand-100 grid grid-cols-2 md:grid-cols-4 gap-4">
-                {facts.map(fact => {
-                  const Icon = fact.icon
-                  return (
-                    <div key={fact.label} className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-4 h-4 text-green-600" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-sm font-bold text-sand-900 truncate">{fact.value}</div>
-                        <div className="text-[11px] text-sand-600 font-medium">{fact.label}</div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+              <dl className="mt-6 pt-5 border-t border-sand-100 grid grid-cols-2 md:grid-cols-4 gap-y-4">
+                {facts.map((fact, i) => (
+                  <div key={fact.label} className={`flex flex-col px-4 first:pl-0 ${i % 2 === 1 ? 'border-l border-sand-200' : ''} ${i >= 2 ? 'md:border-l md:border-sand-200' : ''} ${i === 2 ? 'pl-0 md:pl-4' : ''}`}>
+                    <dt className="order-2 text-xs text-sand-600">{fact.label}</dt>
+                    <dd className="order-1 text-lg font-bold text-sand-900 truncate">{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
             )}
           </div>
         </div>
 
         {/* ── Products ───────────────────────────────────────────── */}
         <section className="container-app mt-10" aria-label="Products">
-          <FadeIn className="flex items-end justify-between mb-5">
+          <FadeIn className="flex items-end justify-between mb-6">
             <div>
+              <p className="eyebrow mb-2">The shop</p>
               <h2 className="text-xl md:text-2xl font-display font-bold text-sand-900">
                 Products from {vendor.business_name}
               </h2>
-              <p className="text-sm text-sand-600 mt-0.5">
+              <p className="text-sm text-sand-600 mt-1">
                 {products.length} product{products.length !== 1 ? 's' : ''} · every order escrow-protected by SWK Ghana
               </p>
             </div>
@@ -301,17 +289,12 @@ export default async function StorePage({ params }: StorePageProps) {
               {/* Sustainability statement */}
               {vendor.sustainability_statement && (
                 <FadeIn className="mt-8">
-                  <div className="relative bg-green-50 border border-green-100 rounded-2xl p-6 md:p-7">
-                    <Quote className="w-6 h-6 text-green-300 absolute top-5 left-5" aria-hidden="true" />
-                    <div className="pl-9">
-                      <h3 className="text-sm font-bold text-green-800 mb-2 flex items-center gap-1.5">
-                        <Leaf className="w-4 h-4" /> Our sustainability commitment
-                      </h3>
-                      <p className="text-sm text-green-900/80 leading-relaxed italic">
-                        {vendor.sustainability_statement}
-                      </p>
-                    </div>
-                  </div>
+                  <figure className="rounded-2xl bg-green-50 border-l-4 border-gold-400 px-6 py-6 md:px-8">
+                    <figcaption className="eyebrow mb-3">Our sustainability commitment</figcaption>
+                    <blockquote className="text-base md:text-lg font-medium text-green-900 leading-relaxed">
+                      {vendor.sustainability_statement}
+                    </blockquote>
+                  </figure>
                 </FadeIn>
               )}
 
@@ -344,7 +327,7 @@ export default async function StorePage({ params }: StorePageProps) {
             </div>
 
             {/* ── Contact sidebar ─────────────────────────────────── */}
-            <FadeIn direction="left" className="lg:sticky lg:top-24">
+            <FadeIn className="lg:sticky lg:top-24">
               <div className="bg-white rounded-2xl border border-sand-200 shadow-card p-6">
                 <h3 className="text-sm font-bold text-sand-900 mb-4">Contact & links</h3>
 
@@ -401,11 +384,8 @@ export default async function StorePage({ params }: StorePageProps) {
                 )}
 
                 <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 mb-5">
-                  <div className="flex items-center gap-2 mb-1">
-                    <ShieldCheck className="w-4 h-4 text-teal-600" />
-                    <span className="text-xs font-bold text-teal-800">Buy with confidence</span>
-                  </div>
-                  <p className="text-[11px] text-teal-700/90 leading-relaxed">
+                  <p className="text-xs font-bold text-teal-800 mb-1">Buy with confidence</p>
+                  <p className="text-xs text-teal-800 leading-relaxed">
                     All orders are placed and paid through SWK Marketplace. Your money is held in
                     escrow by SWK Ghana until you confirm delivery.
                   </p>
@@ -421,11 +401,11 @@ export default async function StorePage({ params }: StorePageProps) {
         <div className="container-app mt-14 mb-10">
           <div className="text-center border-t border-sand-200 pt-8">
             <p className="text-xs text-sand-600 mb-2">
-              This store is powered by{' '}
-              <Link href="/" className="text-green-600 font-semibold hover:underline">
+              This shop is powered by{' '}
+              <Link href="/" className="text-green-700 font-semibold hover:underline">
                 SWK Marketplace
-              </Link>{' '}
-             , Ghana&rsquo;s youth-powered sustainable marketplace.
+              </Link>
+              , Ghana&rsquo;s youth-powered sustainable marketplace.
             </p>
             <Link
               href="/vendor/apply"

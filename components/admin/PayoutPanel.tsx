@@ -105,12 +105,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
     <div className="space-y-6">
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-start gap-3">
-          <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center flex-shrink-0">
-            <Clock className="w-5 h-5 text-teal-600" aria-hidden="true" />
-          </div>
+        <div className="bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-4 flex items-start gap-3">
           <div>
-            <div className="text-xs font-medium text-sand-600">Held in escrow</div>
+            <div className="eyebrow text-sand-600">Held in escrow</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalHeld)}</div>
             <div className="text-xs text-sand-600 mt-0.5">
               {readyCount > 0 ? `${readyCount} ready to release` : 'None ready to release'}
@@ -118,12 +115,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-start gap-3">
-          <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-            <CheckCircle className="w-5 h-5 text-green-600" aria-hidden="true" />
-          </div>
+        <div className="bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-4 flex items-start gap-3">
           <div>
-            <div className="text-xs font-medium text-sand-600">Paid to vendors</div>
+            <div className="eyebrow text-sand-600">Paid to vendors</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalReleased)}</div>
             <div className="text-xs text-sand-600 mt-0.5">
               {payouts.filter(p => p.status === 'released').length} payouts
@@ -131,12 +125,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-start gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gold-100 flex items-center justify-center flex-shrink-0">
-            <TrendingUp className="w-5 h-5 text-gold-600" aria-hidden="true" />
-          </div>
+        <div className="bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-4 flex items-start gap-3">
           <div>
-            <div className="text-xs font-medium text-sand-600">Commission earned</div>
+            <div className="eyebrow text-sand-600">Commission earned</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalCommission)}</div>
             <div className="text-xs text-sand-600 mt-0.5">15% of released payouts</div>
           </div>
@@ -280,7 +271,7 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
           ? 'This is a sample order paid with the test payment, so there is no money to send. Releasing completes the sample order.'
           : 'Do this after you have sent the money. The vendor gets an email saying it is on its way.'}
         details={pendingRelease ? [
-          { label: 'Vendor',           value: pendingRelease.vendor?.business_name ?? '—' },
+          { label: 'Vendor',           value: pendingRelease.vendor?.business_name ?? 'Unknown' },
           { label: 'Send to',          value: destination ?? 'No payout details on file' },
           { label: 'Gross',            value: formatCurrency(pendingRelease.gross_amount) },
           { label: 'Commission (15%)', value: `-${formatCurrency(pendingRelease.commission_amount)}` },

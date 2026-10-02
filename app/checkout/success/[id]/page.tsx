@@ -2,20 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import {
-  ArrowRight,
-  CheckCircle2,
-  CircleAlert,
-  FlaskConical,
-  Mail,
-  MapPin,
-  Package,
-  Phone,
-  ShieldCheck,
-  Store,
-  Truck,
-  Wallet,
-} from 'lucide-react'
+import { ArrowRight, CircleAlert, Package } from 'lucide-react'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { paymentsMode } from '@/lib/paystack/client'
 import { settleCheckoutPayment } from '@/lib/paystack/confirm'
@@ -45,10 +32,10 @@ type OrderRow = {
 }
 
 const NEXT_STEPS = [
-  { icon: Store,       title: 'Each shop confirms your order', body: 'Usually within 24 hours. You’ll get an email.' },
-  { icon: Truck,       title: 'The shop calls you and delivers', body: 'They use the phone number you gave to arrange a time.' },
-  { icon: CheckCircle2, title: 'You confirm delivery', body: 'From your order page, once everything has arrived as described.' },
-  { icon: Wallet,      title: 'SWK Ghana pays the shop', body: 'Only then is your money released to them.' },
+  { title: 'Each shop confirms your order', body: 'Usually within 24 hours. You’ll get an email.' },
+  { title: 'The shop calls you and delivers', body: 'They use the phone number you gave to arrange a time.' },
+  { title: 'You confirm delivery', body: 'From your order page, once everything has arrived as described.' },
+  { title: 'SWK Ghana pays the shop', body: 'Only then is your money released to them.' },
 ]
 
 export default async function CheckoutSuccessPage({ params }: { params: { id: string } }) {
@@ -120,6 +107,7 @@ export default async function CheckoutSuccessPage({ params }: { params: { id: st
   return (
     <div className="min-h-screen bg-sand-50">
       <CheckoutHeader />
+      <span className="kente-band" aria-hidden="true" />
       <main id="main" className="container-app max-w-3xl py-8 md:py-12 pb-16">
         {/* ── Confirmation ─────────────────────────────────────────── */}
         <section className="text-center">
@@ -146,15 +134,12 @@ export default async function CheckoutSuccessPage({ params }: { params: { id: st
             {checkout.paid_at ? <> · {formatDateTime(checkout.paid_at)}</> : null}
           </p>
           {profile?.email && (
-            <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-sand-600">
-              <Mail className="w-4 h-4" aria-hidden="true" /> We’ve emailed your receipt to {profile.email}
-            </p>
+            <p className="mt-2 text-sm text-sand-600">We’ve emailed your receipt to {profile.email}</p>
           )}
         </section>
 
         {checkout.is_demo && (
-          <div className="mt-6 flex items-start gap-3 rounded-2xl border border-gold-200 bg-gold-50 px-5 py-4 text-sm text-gold-900">
-            <FlaskConical className="w-5 h-5 flex-shrink-0 text-gold-600" aria-hidden="true" />
+          <div className="mt-6 rounded-2xl border border-gold-200 border-l-4 border-l-gold-400 bg-gold-50 px-5 py-4 text-sm text-gold-900">
             <div>
               <p className="font-semibold">This was a sample order, so no money was taken.</p>
               <p className="mt-0.5 leading-relaxed">
@@ -228,23 +213,15 @@ export default async function CheckoutSuccessPage({ params }: { params: { id: st
         {/* ── Delivery + escrow ────────────────────────────────────── */}
         <div className="mt-6 grid sm:grid-cols-2 gap-4">
           <section aria-labelledby="delivery-heading" className="bg-white rounded-2xl border border-sand-200 shadow-card p-5">
-            <h2 id="delivery-heading" className="text-sm font-bold text-sand-900 mb-3">Delivering to</h2>
-            <p className="flex items-start gap-2 text-sm text-sand-700">
-              <MapPin className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" aria-hidden="true" />
-              <span>{checkout.delivery_address}, {checkout.delivery_region}</span>
-            </p>
-            <p className="flex items-center gap-2 text-sm text-sand-700 mt-2">
-              <Phone className="w-4 h-4 text-green-600 flex-shrink-0" aria-hidden="true" />
-              {formatGhanaPhone(checkout.delivery_phone)}
-            </p>
+            <h2 id="delivery-heading" className="eyebrow mb-3">Delivering to</h2>
+            <p className="text-sm text-sand-800 leading-relaxed">{checkout.delivery_address}, {checkout.delivery_region}</p>
+            <p className="text-sm text-sand-700 mt-1">{formatGhanaPhone(checkout.delivery_phone)}</p>
             {checkout.buyer_notes && (
-              <p className="mt-2 text-xs text-sand-600 italic">“{checkout.buyer_notes}”</p>
+              <p className="mt-3 border-l-2 border-gold-400 pl-3 text-xs text-sand-600">{checkout.buyer_notes}</p>
             )}
           </section>
           <section aria-labelledby="escrow-heading" className="bg-teal-50 rounded-2xl border border-teal-100 p-5 text-teal-900">
-            <h2 id="escrow-heading" className="flex items-center gap-2 text-sm font-bold">
-              <ShieldCheck className="w-4 h-4" aria-hidden="true" /> Your money is protected
-            </h2>
+            <h2 id="escrow-heading" className="text-sm font-bold">Your money is protected</h2>
             <p className="mt-2 text-sm leading-relaxed">
               SWK Ghana is holding {formatCurrency(checkout.total_amount)}. No shop is paid until you confirm your
               delivery, and if something’s wrong you can report a problem from the order page.
@@ -254,15 +231,12 @@ export default async function CheckoutSuccessPage({ params }: { params: { id: st
 
         {/* ── What happens next ────────────────────────────────────── */}
         <section aria-labelledby="next-heading" className="mt-6 bg-white rounded-2xl border border-sand-200 shadow-card p-5">
-          <h2 id="next-heading" className="text-sm font-bold text-sand-900 mb-4">What happens next</h2>
-          <ol className="grid sm:grid-cols-2 gap-4">
-            {NEXT_STEPS.map(({ icon: Icon, title, body }, i) => (
+          <h2 id="next-heading" className="eyebrow mb-4">What happens next</h2>
+          <ol className="grid sm:grid-cols-2 gap-5">
+            {NEXT_STEPS.map(({ title, body }, i) => (
               <li key={title} className="flex items-start gap-3">
-                <span className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0 relative">
-                  <Icon className="w-4 h-4 text-green-700" aria-hidden="true" />
-                  <span className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-green-600 text-white text-[10px] font-bold flex items-center justify-center" aria-hidden="true">
-                    {i + 1}
-                  </span>
+                <span className="w-9 h-9 rounded-full border-2 border-green-600 text-green-700 font-mono font-bold text-xs flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
                 </span>
                 <span>
                   <span className="block text-sm font-semibold text-sand-900">{title}</span>

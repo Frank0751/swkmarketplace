@@ -2,12 +2,9 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import {
   ShoppingBag,
-  Clock,
-  DollarSign,
   LayoutDashboard,
   User,
   ArrowRight,
-  PackageOpen,
   CreditCard,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
@@ -108,46 +105,28 @@ export default async function BuyerDashboardPage() {
         <main id="main" className="flex-1 p-6 md:p-8 min-w-0">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-2xl font-display font-bold text-sand-900">
-              Welcome back{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}!
+            <p className="eyebrow mb-2">Your account</p>
+            <h1 className="text-3xl font-display font-bold tracking-tight text-sand-900">
+              Welcome back{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}
             </h1>
             <p className="text-sand-600 text-sm mt-1">
               Here&rsquo;s a summary of your activity on SWK Marketplace.
             </p>
           </div>
 
-          {/* Stats cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Total Orders</span>
-                <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
-                  <ShoppingBag className="w-4 h-4 text-green-600" />
-                </div>
+          {/* Stats */}
+          <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            {[
+              { label: 'Total orders', value: String(totalOrders) },
+              { label: 'In progress', value: String(activeOrders) },
+              { label: 'Total spent', value: formatCurrency(totalSpent) },
+            ].map(stat => (
+              <div key={stat.label} className="flex flex-col bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-5 shadow-card">
+                <dt className="eyebrow order-1">{stat.label}</dt>
+                <dd className="order-2 mt-2 text-3xl font-display font-bold tracking-tight text-sand-900">{stat.value}</dd>
               </div>
-              <p className="text-3xl font-display font-bold text-sand-900">{totalOrders}</p>
-            </div>
-
-            <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Active Orders</span>
-                <div className="w-9 h-9 rounded-lg bg-gold-50 flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-gold-600" />
-                </div>
-              </div>
-              <p className="text-3xl font-display font-bold text-sand-900">{activeOrders}</p>
-            </div>
-
-            <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-sand-600 uppercase tracking-wide">Total Spent</span>
-                <div className="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center">
-                  <DollarSign className="w-4 h-4 text-teal-600" />
-                </div>
-              </div>
-              <p className="text-2xl font-display font-bold text-sand-900">{formatCurrency(totalSpent)}</p>
-            </div>
-          </div>
+            ))}
+          </dl>
 
           {/* Recent orders */}
           <div className="bg-white rounded-xl border border-sand-200 shadow-card">
@@ -165,10 +144,7 @@ export default async function BuyerDashboardPage() {
 
             {recent.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-                <div className="w-16 h-16 rounded-full bg-sand-100 flex items-center justify-center mb-4">
-                  <PackageOpen className="w-8 h-8 text-sand-600" />
-                </div>
-                <h3 className="text-base font-semibold text-sand-700 mb-1">No orders yet</h3>
+                <h3 className="text-lg font-bold text-sand-900 mb-1">No orders yet</h3>
                 <p className="text-sm text-sand-600 mb-6 max-w-xs">
                   You haven&rsquo;t placed any orders yet. Start shopping for sustainable products.
                 </p>

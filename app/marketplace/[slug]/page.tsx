@@ -9,14 +9,11 @@ import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  MapPin,
   Star,
-  ShieldCheck,
-  Package,
   ChevronLeft,
   ChevronRight,
   Leaf,
-  ExternalLink,
+  ArrowRight,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/layout/Navbar'
@@ -295,10 +292,7 @@ export default function ProductDetailPage() {
                 </span>
               )}
               {hasSDG12 && (
-                <span className="sdg-badge">
-                  <Leaf className="w-3 h-3" aria-hidden="true" />
-                  SDG 12 Verified
-                </span>
+                <span className="sdg-badge">SDG 12 verified</span>
               )}
               {isSample && (
                 <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-gold-50 text-gold-800 text-xs font-semibold border border-gold-100">
@@ -318,13 +312,13 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Title */}
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-sand-900 leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-[-0.02em] text-sand-900 leading-[1.1] text-balance">
               {product.title}
             </h1>
 
             {/* Price */}
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-green-700">
+              <span className="text-3xl font-bold tracking-tight text-sand-900">
                 {formatCurrency(product.price_ghs)}
               </span>
               {product.unit && (
@@ -334,17 +328,16 @@ export default function ProductDetailPage() {
 
             {/* Short description */}
             {product.short_description && (
-              <p className="text-sm text-sand-600 leading-relaxed">
+              <p className="text-base text-sand-700 leading-relaxed">
                 {product.short_description}
               </p>
             )}
 
             {/* Location */}
             {product.location && (
-              <div className="flex items-center gap-1.5 text-sm text-sand-600">
-                <MapPin className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                {product.location}{product.region ? `, ${product.region}` : ''}
-              </div>
+              <p className="text-sm text-sand-600">
+                Made in {product.location}{product.region ? `, ${product.region}` : ''}
+              </p>
             )}
 
             {/* Value tags */}
@@ -367,10 +360,9 @@ export default function ProductDetailPage() {
 
             {/* Min order info */}
             {product.minimum_order && product.minimum_order > 1 && (
-              <div className="flex items-center gap-2 text-xs text-sand-600">
-                <Package className="w-4 h-4" aria-hidden="true" />
+              <p className="text-xs text-sand-600">
                 Minimum order: {product.minimum_order} {product.unit || 'units'}
-              </div>
+              </p>
             )}
 
             {/* Divider */}
@@ -401,13 +393,10 @@ export default function ProductDetailPage() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-sand-600 font-medium mb-0.5">Sold by</p>
-                  <h2 className="text-sm font-semibold text-sand-900 truncate">{vendor.business_name}</h2>
+                  <p className="eyebrow mb-1">Sold by</p>
+                  <h2 className="text-base font-bold text-sand-900 truncate">{vendor.business_name}</h2>
                   {vendor.location && (
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3 h-3 text-sand-600" aria-hidden="true" />
-                      <span className="text-xs text-sand-600">{vendor.location}</span>
-                    </div>
+                    <p className="text-xs text-sand-600 mt-0.5">{vendor.location}</p>
                   )}
                   {vendor.rating > 0 && (
                     <div className="flex items-center gap-1 mt-1">
@@ -421,7 +410,7 @@ export default function ProductDetailPage() {
                   href={`/store/${vendor.slug ?? vendor.id}`}
                   className="flex-shrink-0 inline-flex items-center gap-1 min-h-[44px] text-xs text-green-700 font-medium hover:text-green-800 transition-colors"
                 >
-                  Visit store <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                  Visit shop <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </Link>
               </div>
             )}
@@ -429,7 +418,7 @@ export default function ProductDetailPage() {
             {/* Share: previews on WhatsApp show this product's photo and price */}
             {!isSample && (
               <div>
-                <h2 className="text-xs font-semibold text-sand-600 uppercase tracking-wide mb-2">Share this product</h2>
+                <h2 className="eyebrow mb-2">Share this product</h2>
                 <ShareButtons
                   url={`${APP_URL}/marketplace/${product.slug}`}
                   title={product.title}
@@ -442,9 +431,11 @@ export default function ProductDetailPage() {
 
         {/* Full description */}
         {product.description && (
-          <div className="mt-12 max-w-3xl">
-            <h2 className="text-xl font-display font-bold text-sand-900 mb-4">About this product</h2>
-            <div className="prose prose-sm max-w-none text-sand-600 leading-relaxed space-y-3">
+          <div className="mt-14 max-w-3xl">
+            <p className="eyebrow mb-2">Product details</p>
+            <h2 className="text-2xl font-display font-bold tracking-tight text-sand-900">About this product</h2>
+            <span className="rule mt-3 mb-5" aria-hidden="true" />
+            <div className="max-w-none text-base text-sand-700 leading-[1.75] space-y-4">
               {product.description.split('\n').filter(Boolean).map((para, i) => (
                 <p key={i}>{para}</p>
               ))}

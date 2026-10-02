@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, ShieldCheck, ShoppingBag, Store, Truck, Info, Lock } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Lock } from 'lucide-react'
 import { useCart } from '@/lib/cart/CartProvider'
 import { useCartSync } from '@/lib/cart/useCartSync'
 import { summarizeCart } from '@/lib/cart/summary'
@@ -32,10 +32,8 @@ export function CartView() {
   if (items.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-sand-200 shadow-card px-6 py-16 text-center">
-        <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-5">
-          <ShoppingBag className="w-10 h-10 text-green-600" aria-hidden="true" />
-        </div>
-        <h2 className="text-xl font-display font-bold text-sand-900">Your cart is empty</h2>
+        <p className="eyebrow mb-3">Nothing here yet</p>
+        <h2 className="text-2xl font-display font-bold text-sand-900">Your cart is empty</h2>
         <p className="text-sm text-sand-600 mt-2 mb-7 max-w-sm mx-auto">
           Every product here is checked for sustainability before it goes live. Find something you’ll love.
         </p>
@@ -56,7 +54,6 @@ export function CartView() {
 
         {summary.kind === 'mixed' && (
           <div role="alert" className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-            <Info className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
             <p className="flex-1">
               Your cart has sample products and real products. Samples are paid with a test payment, so
               they’re checked out separately.
@@ -78,16 +75,14 @@ export function CartView() {
             className="bg-white rounded-2xl border border-sand-200 shadow-card"
           >
             <header className="flex flex-wrap items-center justify-between gap-2 px-5 pt-4 pb-3 border-b border-sand-100">
-              <h2 id={`shop-${shop.vendor_id}`} className="flex items-center gap-2 text-sm font-bold text-sand-900">
-                <Store className="w-4 h-4 text-green-600" aria-hidden="true" />
+              <h2 id={`shop-${shop.vendor_id}`} className="text-sm font-bold text-sand-900">
                 {shop.vendor_slug ? (
                   <Link href={`/store/${shop.vendor_slug}`} className="hover:text-green-700 transition-colors">
                     {shop.vendor_name}
                   </Link>
                 ) : shop.vendor_name}
               </h2>
-              <p className="flex items-center gap-1.5 text-xs text-sand-600">
-                <Truck className="w-3.5 h-3.5" aria-hidden="true" />
+              <p className="text-xs text-sand-600">
                 Delivery {formatCurrency(shop.delivery_fee)}
               </p>
             </header>
@@ -166,21 +161,16 @@ export function CartView() {
           </p>
         )}
 
-        <div className="flex items-start gap-2 rounded-xl bg-teal-50 border border-teal-100 px-3 py-2.5 text-xs text-teal-800">
-          <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-px" aria-hidden="true" />
-          <span>
-            Your payment is held by SWK Ghana and released to each shop only after you confirm delivery.
-          </span>
-        </div>
+        <p className="rounded-xl bg-teal-50 border border-teal-100 px-3.5 py-3 text-xs leading-relaxed text-teal-800">
+          <strong className="font-semibold">Escrow protected.</strong> Your payment is held by SWK Ghana and
+          released to each shop only after you confirm delivery.
+        </p>
 
         {summary.kind === 'sample' && (
-          <div className="flex items-start gap-2 rounded-xl bg-gold-50 border border-gold-100 px-3 py-2.5 text-xs text-gold-900">
-            <Info className="w-4 h-4 flex-shrink-0 mt-px text-gold-600" aria-hidden="true" />
-            <span>
-              These are sample products. You’ll pay with a test card or mobile money, so no real money is
-              taken, but every other step works exactly as it will for real orders.
-            </span>
-          </div>
+          <p className="rounded-xl bg-gold-50 border border-gold-100 px-3.5 py-3 text-xs leading-relaxed text-gold-900">
+            <strong className="font-semibold">Sample products.</strong> You’ll pay with a test card or mobile
+            money, so no real money is taken. Every other step works exactly as it will for real orders.
+          </p>
         )}
 
         <div>

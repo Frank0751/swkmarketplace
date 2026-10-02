@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import * as Dialog from '@radix-ui/react-dialog'
-import { X, ShoppingBag, ShieldCheck, ArrowRight, Info } from 'lucide-react'
+import { X, ArrowRight } from 'lucide-react'
 import { useCart } from '@/lib/cart/CartProvider'
 import { useCartSync } from '@/lib/cart/useCartSync'
 import { summarizeCart } from '@/lib/cart/summary'
@@ -33,8 +33,7 @@ export function CartDrawer() {
           aria-describedby={undefined}
         >
           <div className="sticky top-0 z-10 bg-white flex items-center justify-between gap-3 px-5 h-16 border-b border-sand-200 flex-shrink-0">
-            <Dialog.Title className="flex items-center gap-2 text-lg font-display font-bold text-sand-900">
-              <ShoppingBag className="w-5 h-5 text-green-600" aria-hidden="true" />
+            <Dialog.Title className="flex items-baseline gap-2 text-lg font-display font-bold text-sand-900">
               Your cart
               {summary.item_count > 0 && (
                 <span className="text-sm font-medium text-sand-600">
@@ -68,10 +67,8 @@ export function CartDrawer() {
             </div>
           ) : items.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-4">
-                <ShoppingBag className="w-8 h-8 text-green-600" aria-hidden="true" />
-              </div>
-              <p className="text-base font-semibold text-sand-900">Your cart is empty</p>
+              <p className="eyebrow mb-3">Nothing here yet</p>
+              <p className="text-lg font-bold text-sand-900">Your cart is empty</p>
               <p className="text-sm text-sand-600 mt-1 mb-6 max-w-xs">
                 Browse sustainable products from youth-led shops across Ghana.
               </p>
@@ -120,14 +117,10 @@ export function CartDrawer() {
                 </dl>
 
                 {summary.kind === 'sample' && (
-                  <p className="flex items-start gap-1.5 text-xs text-gold-800">
-                    <Info className="w-3.5 h-3.5 mt-px flex-shrink-0" aria-hidden="true" />
-                    Sample products: test payment, no real money taken.
-                  </p>
+                  <p className="text-xs text-gold-800">Sample products: test payment, no real money taken.</p>
                 )}
                 {summary.kind === 'mixed' && (
-                  <p className="flex items-start gap-1.5 text-xs text-red-700">
-                    <Info className="w-3.5 h-3.5 mt-px flex-shrink-0" aria-hidden="true" />
+                  <p className="text-xs text-red-700">
                     Sample and real products are paid separately. Open your cart to sort them.
                   </p>
                 )}
@@ -160,9 +153,7 @@ export function CartDrawer() {
                   >
                     View full cart
                   </Link>
-                  <span className="inline-flex items-center gap-1 text-xs text-teal-700">
-                    <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" /> Escrow protected
-                  </span>
+                  <span className="text-xs font-medium text-teal-700">Escrow protected</span>
                 </div>
               </div>
             </>

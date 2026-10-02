@@ -57,9 +57,6 @@ function ValueFilterStripInner() {
                 )}
                 aria-pressed={isActive}
               >
-                <span role="img" aria-hidden="true" className="text-sm">
-                  
-                </span>
                 {meta.label}
               </button>
             )

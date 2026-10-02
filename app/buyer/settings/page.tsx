@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, Loader2, UserRound, KeyRound } from 'lucide-react'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/layout/Navbar'
@@ -113,16 +113,15 @@ export default function AccountSettingsPage() {
         >
           <ArrowLeft className="w-4 h-4" /> Dashboard
         </Link>
-        <h1 className="text-2xl font-display font-bold text-sand-900 mb-1">Account settings</h1>
+        <p className="eyebrow mb-2">Your account</p>
+        <h1 className="text-3xl font-display font-bold tracking-tight text-sand-900 mb-1">Account settings</h1>
         <p className="text-sm text-sand-600 mb-8">
           Signed in as <span className="font-medium text-sand-700">{profile?.email}</span>
         </p>
 
         {/* Profile */}
         <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card mb-6">
-          <h2 className="text-base font-display font-semibold text-sand-900 mb-4 flex items-center gap-2">
-            <UserRound className="w-4 h-4 text-green-600" /> Your details
-          </h2>
+          <h2 className="text-lg font-display font-bold text-sand-900 mb-4">Your details</h2>
           <form onSubmit={profileForm.handleSubmit(saveProfile)} className="space-y-4" noValidate>
             <div>
               <label className="form-label" htmlFor="full_name">Full name</label>
@@ -151,7 +150,7 @@ export default function AccountSettingsPage() {
         <SavedAddresses />
 
         <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card mb-6">
-          <h2 className="text-base font-display font-semibold text-sand-900 mb-1">Payment methods</h2>
+          <h2 className="text-lg font-display font-bold text-sand-900 mb-1">Payment methods</h2>
           <p className="text-sm text-sand-600 mb-3">Saved cards and mobile money for one-tap checkout.</p>
           <Link href="/buyer/payment-methods" className="inline-flex items-center min-h-[44px] text-sm font-semibold text-green-700 hover:text-green-800">
             Manage payment methods →
@@ -160,9 +159,7 @@ export default function AccountSettingsPage() {
 
         {/* Password */}
         <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
-          <h2 className="text-base font-display font-semibold text-sand-900 mb-4 flex items-center gap-2">
-            <KeyRound className="w-4 h-4 text-green-600" /> Change password
-          </h2>
+          <h2 className="text-lg font-display font-bold text-sand-900 mb-4">Change password</h2>
           <form onSubmit={passwordForm.handleSubmit(savePassword)} className="space-y-4" noValidate>
             <div>
               <label className="form-label" htmlFor="password">New password</label>
