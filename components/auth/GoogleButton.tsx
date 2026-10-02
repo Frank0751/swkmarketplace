@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+import { rememberAuthNext } from '@/lib/auth/next-cookie'
 import { cn } from '@/lib/utils'
 
 interface GoogleButtonProps {
@@ -18,15 +19,14 @@ export function GoogleButton({ redirect, label = 'Continue with Google' }: Googl
     setLoading(true)
     const supabase = createClient()
 
-    const callbackUrl = new URL('/auth/callback', window.location.origin)
-    if (redirect && redirect.startsWith('/')) {
-      callbackUrl.searchParams.set('next', redirect)
-    }
+    // The page to return to goes in a cookie, and the callback address stays
+    // bare: Supabase only accepts return addresses that match its list exactly
+    rememberAuthNext(redirect)
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: callbackUrl.toString(),
+        redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: {
           access_type: 'offline',
           prompt: 'select_account',

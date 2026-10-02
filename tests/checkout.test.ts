@@ -295,3 +295,15 @@ describe('sign-in redirects', () => {
     expect(safeRedirect(null)).toBeNull()
   })
 })
+
+describe('the page to return to after Google sign-in', () => {
+  it('reads back only paths on this site', async () => {
+    const { readAuthNext } = await import('@/lib/auth/next-cookie')
+    expect(readAuthNext(encodeURIComponent('/checkout'))).toBe('/checkout')
+    expect(readAuthNext(encodeURIComponent('/buyer/orders/abc?x=1'))).toBe('/buyer/orders/abc?x=1')
+    expect(readAuthNext(encodeURIComponent('https://evil.example'))).toBeNull()
+    expect(readAuthNext(encodeURIComponent('//evil.example'))).toBeNull()
+    expect(readAuthNext('%E0%A4%A')).toBeNull()
+    expect(readAuthNext(undefined)).toBeNull()
+  })
+})

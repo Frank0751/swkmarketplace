@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { AUTH_NEXT_COOKIE, readAuthNext } from '@/lib/auth/next-cookie'
+import { safeRedirect } from '@/lib/utils'
 
 const ROLE_REDIRECTS: Record<string, string> = {
   admin: '/admin/dashboard',
@@ -13,9 +15,10 @@ const ROLE_REDIRECTS: Record<string, string> = {
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const nextParam = searchParams.get('next')
-  // Only allow internal paths, never external redirect targets
-  const next = nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : null
+  // Where they were headed: remembered by the Google button in a cookie (an
+  // older link may still carry ?next=). Only paths on this site, never an
+  // outside address.
+  const next = safeRedirect(searchParams.get('next')) ?? readAuthNext(request.cookies.get(AUTH_NEXT_COOKIE)?.value)
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=oauth`)
@@ -58,5 +61,7 @@ export async function GET(request: NextRequest) {
   }
 
   const destination = next ?? ROLE_REDIRECTS[profile.role as string] ?? '/buyer/dashboard'
-  return NextResponse.redirect(`${origin}${destination}`)
+  const response = NextResponse.redirect(`${origin}${destination}`)
+  response.cookies.set(AUTH_NEXT_COOKIE, '', { path: '/', maxAge: 0 })
+  return response
 }
