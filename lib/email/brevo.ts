@@ -381,7 +381,82 @@ export async function sendListingRejected(
   return sendEmail(to, subject, baseTemplate(subject, body))
 }
 
-// ─── 12. Admin alerts (to the SWK team) ───────────────────────────────────────
+// ─── 12. Checkout receipt (to buyer) ──────────────────────────────────────────
+
+/** One receipt for a whole cart, however many shops and orders it became */
+export async function sendCheckoutReceipt(
+  to: string,
+  receipt: {
+    checkout_id: string
+    reference: string
+    buyer_name: string
+    items: { title: string; quantity: number; total: number; vendor_name: string; order_reference?: string }[]
+    subtotal: number
+    delivery_total: number
+    total: number
+    payment_label: string
+    delivery_address: string
+    delivery_region: string
+    is_demo: boolean
+  },
+) {
+  const subject = receipt.is_demo
+    ? `Sample order confirmed: ${receipt.reference}`
+    : `Order confirmed: ${receipt.reference}`
+  const items = receipt.items
+    .map(i => row(`${i.quantity} × ${i.title}${i.order_reference ? ` (${i.order_reference})` : ''}`, formatCurrency(i.total)))
+    .join('')
+  const body = `
+    <h1>Thank you, your order is confirmed</h1>
+    <p>Hi ${e(receipt.buyer_name)}, we've received your payment. It's held safely by SWK Ghana and only goes to each shop after you confirm your delivery.</p>
+    ${receipt.is_demo ? `<div class="quote">This was a sample order from SWK Marketplace's demo shops, paid with a test payment. No money was taken and nothing will be delivered.</div>` : ''}
+    <div class="detail-box">
+      ${items}
+      ${row('Delivery', formatCurrency(receipt.delivery_total))}
+      ${row('Total paid', formatCurrency(receipt.total))}
+    </div>
+    <div class="detail-box">
+      ${row('Payment reference', receipt.reference)}
+      ${row('Paid with', receipt.payment_label)}
+      ${row('Deliver to', `${receipt.delivery_address}, ${receipt.delivery_region}`)}
+    </div>
+    <div class="trust-badge">Payment securely held in escrow</div>
+    <p>Each shop will call you to arrange delivery. You can follow every order from your account.</p>
+    <a href="${MARKETPLACE_URL}/checkout/success/${encodeURIComponent(receipt.checkout_id)}" class="cta-btn">View my order</a>
+    <p class="muted">Need help? Reply to this email or contact us at info@swkghana.org</p>
+  `
+  return sendEmail(to, subject, baseTemplate(subject, body))
+}
+
+// ─── 13. New orders from a checkout (to a vendor) ─────────────────────────────
+
+export async function sendVendorCheckoutNotification(
+  to: string,
+  notice: {
+    buyer_name: string
+    delivery_region: string
+    orders: { reference: string; title: string; quantity: number; total: number }[]
+  },
+) {
+  const count = notice.orders.length
+  const subject = count === 1
+    ? `New order received: ${notice.orders[0].reference}`
+    : `${count} new orders received`
+  const body = `
+    <h1>You have ${count === 1 ? 'a new order' : `${count} new orders`}</h1>
+    <p>A buyer has paid for ${count === 1 ? 'one of your products' : 'some of your products'}. Please confirm within 24 hours.</p>
+    <div class="detail-box">
+      ${notice.orders.map(o => row(`${o.reference}: ${o.quantity} × ${o.title}`, formatCurrency(o.total))).join('')}
+      ${row('Buyer', notice.buyer_name)}
+      ${row('Deliver to', notice.delivery_region)}
+    </div>
+    <p>The payment is secured in escrow. The buyer's address and phone number are on each order. Confirm and dispatch to receive your payout (after SWK's 15% platform fee).</p>
+    <a href="${MARKETPLACE_URL}/vendor/orders" class="cta-btn">Manage orders</a>
+  `
+  return sendEmail(to, subject, baseTemplate(subject, body))
+}
+
+// ─── 14. Admin alerts (to the SWK team) ───────────────────────────────────────
 
 /**
  * Something needs an admin: a new application, a listing to review, a problem
@@ -408,7 +483,7 @@ export async function sendAdminAlert(alert: {
   return sendEmail(ADMIN_EMAIL, subject, baseTemplate(subject, body))
 }
 
-// ─── 13. Contact form message (to the SWK team) ───────────────────────────────
+// ─── 15. Contact form message (to the SWK team) ───────────────────────────────
 
 export async function sendContactMessage(message: {
   name: string

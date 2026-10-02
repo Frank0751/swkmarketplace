@@ -11,9 +11,8 @@ import { CategoryStrip } from '@/components/marketplace/CategoryStrip'
 import { ValueFilterStrip } from '@/components/marketplace/ValueFilterStrip'
 import { ProductGrid } from '@/components/marketplace/ProductGrid'
 import { MobileSortSelect } from '@/components/marketplace/MobileSortSelect'
-import { demoEnabled, getDemoProducts } from '@/lib/demo/data'
 import { productSearchFilter } from '@/lib/marketplace/search'
-import { hasLiveProducts } from '@/lib/marketplace/catalogue'
+import { sampleCatalogueVisible } from '@/lib/marketplace/catalogue'
 import { CATEGORY_META, GHANA_REGIONS, VALUE_TAG_META, type ProductCategory, type GhanaRegion, type ValueTag } from '@/types'
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
@@ -120,7 +119,7 @@ export default async function MarketplacePage({
 
   const LIMIT = 24
 
-  let totalCount = await fetchProductCount({
+  const totalCount = await fetchProductCount({
     category,
     valueTags,
     search,
@@ -129,20 +128,7 @@ export default async function MarketplacePage({
     maxPrice,
   })
 
-  // Mirror the ProductGrid sample-data fallback so the header count matches:
-  // samples appear only while the shop has no real products at all
-  const showingSamples = totalCount === 0 && demoEnabled() && !(await hasLiveProducts())
-  if (showingSamples) {
-    totalCount = getDemoProducts({
-      limit: 1000,
-      category,
-      valueTags,
-      search,
-      region,
-      minPrice,
-      maxPrice,
-    }).length
-  }
+  const showingSamples = await sampleCatalogueVisible()
 
   const totalPages = Math.ceil(totalCount / LIMIT)
 
@@ -351,8 +337,9 @@ export default async function MarketplacePage({
               <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border border-gold-200 bg-gold-50">
                 <Sparkles className="w-5 h-5 flex-shrink-0 text-gold-600" aria-hidden="true" />
                 <p className="flex-1 text-sm text-sand-800 leading-relaxed">
-                  <strong>You&rsquo;re looking at sample listings.</strong> They show how the marketplace
-                  works while our first verified vendors join, and can&rsquo;t be ordered.
+                  <strong>You&rsquo;re browsing our sample shops.</strong> Add anything to your cart and check
+                  out: it all works, but payment is a test (use a test card or mobile money), so no real
+                  money is taken. Our first verified vendors are joining now.
                 </p>
                 <Link
                   href="/vendor/apply"

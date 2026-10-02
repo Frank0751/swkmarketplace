@@ -2,12 +2,18 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import Link from 'next/link'
 import LoginForm from '@/components/auth/LoginForm'
+import { safeRedirect } from '@/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Sign in',
 }
 
-export default function LoginPage() {
+export default function LoginPage({ searchParams }: { searchParams: { redirect?: string } }) {
+  // A buyer sent here from checkout who signs up instead should still end up
+  // back at checkout
+  const redirect = safeRedirect(searchParams.redirect)
+  const signupHref = redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : '/signup'
+
   return (
     <div>
       {/* Heading */}
@@ -15,7 +21,9 @@ export default function LoginPage() {
         <h1 className="font-display text-2xl font-semibold text-sand-900 mb-1">
           Welcome back
         </h1>
-        <p className="text-sm text-sand-600">Sign in to your SWK account</p>
+        <p className="text-sm text-sand-600">
+          {redirect === '/checkout' ? 'Sign in to finish checking out. Your cart is saved.' : 'Sign in to your SWK account'}
+        </p>
       </div>
 
       {/* useSearchParams (redirect param) requires a Suspense boundary for prerender */}
@@ -28,7 +36,7 @@ export default function LoginPage() {
         <p className="text-sand-600">
           Don&apos;t have an account?{' '}
           <Link
-            href="/signup"
+            href={signupHref}
             className="text-green-600 font-medium hover:text-green-700 hover:underline transition-colors"
           >
             Sign up

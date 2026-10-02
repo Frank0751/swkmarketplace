@@ -106,6 +106,9 @@ const config: Config = {
         'shimmer':       'shimmer 1.8s infinite',
         'pulse-slow':    'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'marquee':       'marquee 28s linear infinite',
+        'drawer-in':     'drawerIn 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
+        'pop-in':        'popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+        'draw':          'draw 0.5s 0.25s ease-out forwards',
       },
       keyframes: {
         fadeIn:   { from: { opacity: '0' }, to: { opacity: '1' } },
@@ -114,6 +117,9 @@ const config: Config = {
         scaleIn:  { from: { opacity: '0', transform: 'scale(0.95)' }, to: { opacity: '1', transform: 'scale(1)' } },
         shimmer:  { from: { backgroundPosition: '-200% 0' }, to: { backgroundPosition: '200% 0' } },
         marquee:  { from: { transform: 'translateX(0%)' }, to: { transform: 'translateX(-50%)' } },
+        drawerIn: { from: { transform: 'translateX(100%)' }, to: { transform: 'translateX(0)' } },
+        popIn:    { '0%': { opacity: '0', transform: 'scale(0.6)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+        draw:     { to: { strokeDashoffset: '0' } },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

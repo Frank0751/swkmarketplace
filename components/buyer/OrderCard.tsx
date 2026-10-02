@@ -41,8 +41,15 @@ export function OrderCard({ order }: Props) {
       <div className="flex-1 min-w-0">
         {/* Reference + date */}
         <div className="flex items-center justify-between gap-2 mb-1">
-          <span className="text-xs font-mono font-medium text-sand-600 bg-sand-100 px-2 py-0.5 rounded">
-            {order.reference}
+          <span className="flex items-center gap-1.5 min-w-0">
+            <span className="text-xs font-mono font-medium text-sand-600 bg-sand-100 px-2 py-0.5 rounded">
+              {order.reference}
+            </span>
+            {order.is_demo && (
+              <span className="text-[10px] font-semibold text-gold-800 bg-gold-50 border border-gold-100 px-1.5 py-px rounded-full">
+                Sample
+              </span>
+            )}
           </span>
           <span className="text-xs text-sand-600 flex-shrink-0">
             {formatRelativeTime(order.created_at)}

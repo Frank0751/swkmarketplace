@@ -157,6 +157,11 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                       >
                         <td className="px-4 py-3 font-mono text-xs font-semibold text-green-700">
                           {order.reference}
+                          {order.is_demo && (
+                            <span className="ml-1.5 inline-block font-sans text-[10px] font-semibold text-gold-800 bg-gold-50 border border-gold-100 px-1.5 py-px rounded-full align-middle">
+                              Sample
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-sand-700">
                           <div className="font-medium">{order.buyer?.full_name ?? '-'}</div>
@@ -370,6 +375,20 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
                                 {order.paystack_reference && (
                                   <div className="text-xs text-sand-600">
                                     Paystack ref: <span className="font-mono">{order.paystack_reference}</span>
+                                  </div>
+                                )}
+
+                                {order.checkout && (
+                                  <div className="text-xs text-sand-600">
+                                    Payment <span className="font-mono">{order.checkout.reference}</span>
+                                    {order.checkout.payment_label ? ` · ${order.checkout.payment_label}` : ''}
+                                  </div>
+                                )}
+
+                                {order.is_demo && (
+                                  <div className="text-xs text-gold-800 bg-gold-50 border border-gold-100 rounded-lg px-3 py-2">
+                                    Sample order, paid with the test payment. No money was taken, so its payout
+                                    needs no transfer.
                                   </div>
                                 )}
                               </div>

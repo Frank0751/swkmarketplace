@@ -18,7 +18,8 @@ async function getOrderData() {
       *,
       buyer:users(*),
       vendor:vendor_profiles(id, business_name, user:users(email)),
-      product:products(id, title, images, slug)
+      product:products(id, title, images, slug),
+      checkout:checkouts(id, reference, payment_label, payment_channel, paid_at, total_amount)
     `)
     .order('created_at', { ascending: false })
 

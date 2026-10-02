@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { formatCurrency, formatRelativeTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils'
 import { CATEGORY_META } from '@/types'
 import { HBarChart, SplitBar, TrendArea } from '@/components/admin/charts/Charts'
+import { SampleDataPanel } from '@/components/admin/SampleDataPanel'
+import { loadSampleDataStatus } from '@/lib/admin/sample-data'
 import Link from 'next/link'
 import {
   Users,
@@ -93,6 +95,8 @@ export default async function AdminDashboardPage() {
     recentOrders,
     pendingListings,
   } = await getDashboardData()
+  // Null when migration 008 isn't in yet: the panel simply doesn't show
+  const sampleStatus = await loadSampleDataStatus().catch(() => null)
 
   // Compute vendor counts
   const vendorCounts = vendorStats.reduce((acc: Record<string, number>, v) => {
@@ -254,6 +258,8 @@ export default async function AdminDashboardPage() {
 
   return (
     <AdminLayout title="Dashboard">
+      {sampleStatus && <SampleDataPanel initial={sampleStatus} />}
+
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
         {statCards.map(card => {

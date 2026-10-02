@@ -9,7 +9,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { GoogleButton, AuthDivider } from '@/components/auth/GoogleButton'
-import { cn } from '@/lib/utils'
+import { cn, safeRedirect } from '@/lib/utils'
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
@@ -68,8 +68,8 @@ export default function LoginForm() {
       return
     }
 
-    // 2. Check for ?redirect= param first
-    const redirectParam = searchParams.get('redirect')
+    // 2. Back to where they were (checkout, an order page), if it's on this site
+    const redirectParam = safeRedirect(searchParams.get('redirect'))
     if (redirectParam) {
       router.push(redirectParam)
       router.refresh()
@@ -95,7 +95,7 @@ export default function LoginForm() {
 
   return (
     <div>
-      <GoogleButton redirect={searchParams.get('redirect')} label="Sign in with Google" />
+      <GoogleButton redirect={safeRedirect(searchParams.get('redirect'))} label="Sign in with Google" />
       {oauthFailed && (
         <div className="mt-3 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           Google sign-in did not complete. Please try again, or use your email and password.

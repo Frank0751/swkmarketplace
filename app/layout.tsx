@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { CartProvider } from '@/lib/cart/CartProvider'
+import { CartDrawer } from '@/components/cart/CartDrawer'
 import './globals.css'
 
 // Brand font: Ubuntu everywhere (body + display)
@@ -84,7 +86,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             },
           }}
         />
-        {children}
+        {/* One cart for the whole site, kept in the browser so it survives
+            signing in and refreshing */}
+        <CartProvider>
+          {children}
+          <CartDrawer />
+        </CartProvider>
         <Toaster
           position="top-center"
           toastOptions={{

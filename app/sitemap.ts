@@ -18,6 +18,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .from('products')
       .select('slug, updated_at')
       .eq('status', 'approved')
+      // Sample listings are for demonstrations, not search results
+      .eq('is_demo', false)
       .order('updated_at', { ascending: false })
       .limit(1000)
 

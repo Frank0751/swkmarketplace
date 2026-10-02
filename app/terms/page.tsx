@@ -33,7 +33,7 @@ export default function TermsPage() {
             Terms &amp; Conditions
           </h1>
           <p className="text-sand-600 mb-8">
-            Last updated: September 2026 · These terms govern your use of SWK Marketplace,
+            Last updated: October 2026 · These terms govern your use of SWK Marketplace,
             operated by SWK Ghana, a youth-focused nonprofit organisation based in Accra, Ghana.
           </p>
 
@@ -41,7 +41,7 @@ export default function TermsPage() {
             <h2 className="text-sm font-bold text-sand-900 mb-2">In brief</h2>
             <ul className="list-disc ml-5 space-y-1.5 text-sm text-sand-700">
               <li>You pay SWK Ghana, not the vendor. We hold the money until you confirm delivery.</li>
-              <li>Delivery anywhere in Ghana is a flat GHS {DELIVERY_FEE_GHS}. The vendor calls you to arrange it.</li>
+              <li>Delivery anywhere in Ghana is a flat GHS {DELIVERY_FEE_GHS} per shop in your cart. Each shop calls you to arrange it.</li>
               <li>
                 Something wrong? Don&rsquo;t confirm delivery. Press &ldquo;Report a problem&rdquo; on your order
                 within {CONFIRMATION_WINDOW_DAYS} days of dispatch and we&rsquo;ll step in.
@@ -105,6 +105,10 @@ export default function TermsPage() {
           <Section number="4" title="Buyer terms">
             <ul className="list-disc ml-5 space-y-1.5">
               <li>Pay at checkout through Paystack. Your money is held in escrow until you confirm delivery.</li>
+              <li>
+                Products marked &ldquo;Sample&rdquo; are demonstrations. Their checkout uses a test payment: no
+                money is taken, nothing is delivered, and no contract of sale is formed.
+              </li>
               <li>Give an accurate delivery address and a phone number the vendor can reach.</li>
               <li>Check your order when it arrives, and confirm delivery once it matches its description.</li>
             </ul>
@@ -112,9 +116,10 @@ export default function TermsPage() {
 
           <Section number="5" title="Delivery">
             <p>
-              SWK Marketplace currently delivers within Ghana. Delivery costs a flat GHS {DELIVERY_FEE_GHS} per
-              order, shown before you pay. The vendor arranges delivery and will call the phone number you
-              gave at checkout. Vendors aim to dispatch within 1–3 business days of confirming an order, and
+              SWK Marketplace currently delivers within Ghana. Delivery costs a flat GHS {DELIVERY_FEE_GHS} for
+              each shop in your cart, however many of that shop&rsquo;s products you buy, and is shown before you
+              pay. Each item from a cart becomes its own order; each shop arranges its delivery and will call
+              the phone number you gave at checkout. Vendors aim to dispatch within 1–3 business days of confirming an order, and
               you&rsquo;ll get an email when it&rsquo;s on its way.
             </p>
           </Section>

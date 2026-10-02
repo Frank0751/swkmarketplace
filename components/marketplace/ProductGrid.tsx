@@ -1,9 +1,7 @@
 import { Leaf } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Product, ProductCategory } from '@/types'
-import { demoEnabled, getDemoProducts } from '@/lib/demo/data'
 import { productSearchFilter } from '@/lib/marketplace/search'
-import { hasLiveProducts } from '@/lib/marketplace/catalogue'
 import { ProductCard } from './ProductCard'
 
 interface ProductGridProps {
@@ -37,6 +35,7 @@ async function fetchProducts({
       vendor:vendor_profiles (
         id,
         business_name,
+        slug,
         location,
         region,
         logo_url,
@@ -102,23 +101,9 @@ async function fetchProducts({
 }
 
 export async function ProductGrid(props: ProductGridProps) {
-  let products = await fetchProducts(props)
-
-  // Until the first real product is approved, sample data keeps the shop
-  // presentable (off with NEXT_PUBLIC_DEMO_MODE=false). Once any real product
-  // exists, an empty search shows the empty state rather than samples.
-  if (products.length === 0 && demoEnabled() && !(await hasLiveProducts())) {
-    products = getDemoProducts({
-      limit: props.limit,
-      category: props.category,
-      valueTags: props.valueTags,
-      search: props.search,
-      sort: props.sort,
-      region: props.region,
-      minPrice: props.minPrice,
-      maxPrice: props.maxPrice,
-    })
-  }
+  // The sample shops are ordinary database rows (is_demo), shown alongside any
+  // real products until an admin hides them from the dashboard
+  const products = await fetchProducts(props)
 
   if (products.length === 0) {
     return (

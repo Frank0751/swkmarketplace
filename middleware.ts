@@ -10,9 +10,12 @@ export async function middleware(request: NextRequest) {
   // vendor, so gating it on role === 'vendor' would lock out every applicant.
   // The page itself sends anonymous users to /login and existing vendors to
   // their dashboard.
+  // The cart is open to everyone; paying needs an account so orders can be
+  // tracked and escrow released to the right person
   const isProtected = (
     pathname.startsWith('/admin') ||
     pathname.startsWith('/buyer') ||
+    pathname.startsWith('/checkout') ||
     pathname.startsWith('/vendor/dashboard') ||
     pathname.startsWith('/vendor/listings') ||
     pathname.startsWith('/vendor/store') ||

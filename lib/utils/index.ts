@@ -107,3 +107,13 @@ export function getProductImageUrl(images: string[], index = 0): string {
 export function formatNumber(n: number): string {
   return new Intl.NumberFormat('en-GH').format(n)
 }
+
+// ─── Redirects ────────────────────────────────────────────────────
+/**
+ * A ?redirect= value that is safe to send someone to after signing in: a path
+ * on this site. "//evil.com" and "/\evil.com" are other sites to a browser.
+ */
+export function safeRedirect(path: string | null | undefined): string | null {
+  if (!path || !path.startsWith('/') || path.startsWith('//') || path.startsWith('/\\')) return null
+  return path
+}

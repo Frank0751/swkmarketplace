@@ -25,7 +25,6 @@ import { ProductCard } from '@/components/marketplace/ProductCard'
 import { ShareStoreLink } from '@/components/vendor/ShareStoreLink'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { FadeIn, Stagger, StaggerItem } from '@/components/ui/motion'
-import { demoEnabled, getDemoVendor, getDemoProducts, isDemoId } from '@/lib/demo/data'
 import { whatsappDigits, formatGhanaPhone } from '@/lib/marketplace/phone'
 import { CATEGORY_META, type Product, type VendorProfile } from '@/types'
 
@@ -59,17 +58,10 @@ async function fetchVendor(slug: string): Promise<VendorProfile | null> {
     if (byId) return byId as VendorProfile
   }
 
-  if (demoEnabled()) {
-    return getDemoVendor(slug) ?? null
-  }
   return null
 }
 
 async function fetchVendorProducts(vendor: VendorProfile): Promise<Product[]> {
-  if (isDemoId(vendor.id)) {
-    return getDemoProducts({ vendorId: vendor.id, limit: 48 })
-  }
-
   const supabase = await createClient()
   const { data } = await supabase
     .from('products')
@@ -96,6 +88,8 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
   return {
     title,
     description,
+    // Sample shops are for demonstrations, not search results
+    robots: vendor.is_demo ? { index: false, follow: true } : undefined,
     openGraph: {
       title,
       description,
@@ -116,7 +110,7 @@ export default async function StorePage({ params }: StorePageProps) {
   const catMeta = CATEGORY_META[vendor.category]
   const founders = vendor.founders ?? []
   const slug = vendor.slug ?? vendor.id
-  const isSample = isDemoId(vendor.id)
+  const isSample = !!vendor.is_demo
 
   // wa.me needs the international number with no + or leading 0: a local
   // "024…" number used to produce a link that opened nobody's chat
@@ -140,7 +134,7 @@ export default async function StorePage({ params }: StorePageProps) {
 
   return (
     <>
-      <JsonLd
+      {!isSample && <JsonLd
         data={{
           '@context': 'https://schema.org',
           '@type': 'LocalBusiness',
@@ -166,7 +160,7 @@ export default async function StorePage({ params }: StorePageProps) {
               }
             : {}),
         }}
-      />
+      />}
       <Navbar />
 
       <main id="main" className="pb-24 md:pb-0">
@@ -183,7 +177,7 @@ export default async function StorePage({ params }: StorePageProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-sand-900/60 via-sand-900/10 to-transparent" />
           {isSample && (
             <span className="absolute top-4 right-4 px-2.5 py-1 text-[11px] font-semibold bg-sand-900/70 backdrop-blur-sm text-white rounded-full">
-              Sample store, for demonstration
+              Sample shop: checkout works with a test payment
             </span>
           )}
         </div>

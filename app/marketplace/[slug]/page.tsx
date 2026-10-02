@@ -5,7 +5,7 @@
 // metadata come from the server layout next to this file (layout.tsx).
 
 import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -15,31 +15,23 @@ import {
   Package,
   ChevronLeft,
   ChevronRight,
-  Plus,
-  Minus,
   Leaf,
-  AlertCircle,
   ExternalLink,
-  ShoppingBag,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { demoEnabled, getDemoProductBySlug, isDemoId } from '@/lib/demo/data'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { ReviewSection } from '@/components/marketplace/ReviewSection'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { ShareButtons } from '@/components/ui/ShareButtons'
+import { ProductPurchasePanel } from '@/components/cart/ProductPurchasePanel'
 import { formatCurrency } from '@/lib/utils'
-import { DELIVERY_FEE_GHS } from '@/lib/marketplace/orders'
-import { normalizeGhanaPhone, formatGhanaPhone } from '@/lib/marketplace/phone'
 import { canOptimizeImage } from '@/lib/marketplace/images'
 import {
   CATEGORY_META,
   VALUE_TAG_META,
-  GHANA_REGIONS,
   type Product,
-  type GhanaRegion,
   type ValueTag,
 } from '@/types'
 
@@ -140,268 +132,6 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
   )
 }
 
-// ─── Order form ────────────────────────────────────────────────────────────────
-
-function OrderForm({ product }: { product: Product }) {
-  const [quantity, setQuantity] = useState(product.minimum_order || 1)
-  const [region, setRegion] = useState<GhanaRegion | ''>('')
-  const [address, setAddress] = useState('')
-  const [phone, setPhone] = useState('')
-  const [notes, setNotes] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const router = useRouter()
-
-  const min = product.minimum_order || 1
-  const max = product.stock_quantity
-  const subtotal = product.price_ghs * quantity
-  const total = subtotal + DELIVERY_FEE_GHS
-
-  const isOutOfStock = max === 0
-  const isSample = isDemoId(product.id)
-
-  // Save a signed-in buyer retyping the number they already gave us
-  useEffect(() => {
-    if (isSample) return
-    const supabase = createClient()
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) return
-      const { data } = await supabase.from('users').select('phone').eq('id', user.id).maybeSingle()
-      const saved = data?.phone as string | null | undefined
-      if (saved && normalizeGhanaPhone(saved)) {
-        setPhone(current => current || formatGhanaPhone(saved))
-      }
-    })
-  }, [isSample])
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!region) { setError('Please select a delivery region.'); return }
-    if (address.trim().length < 5) { setError('Please enter a fuller delivery address.'); return }
-    if (!normalizeGhanaPhone(phone)) {
-      setError('Enter a Ghana phone number the vendor can call, e.g. 024 123 4567.')
-      return
-    }
-    setError('')
-    setLoading(true)
-
-    try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product_id: product.id,
-          quantity,
-          delivery_region: region,
-          delivery_address: address,
-          delivery_phone: phone,
-          buyer_notes: notes,
-        }),
-      })
-
-      const json = await res.json().catch(() => ({}))
-
-      if (res.status === 401) {
-        router.push(`/login?redirect=${encodeURIComponent(`/marketplace/${product.slug}`)}`)
-        return
-      }
-
-      if (!res.ok) {
-        setError(json.error || 'Failed to place order. Please try again.')
-        setLoading(false)
-        return
-      }
-
-      // Off to Paystack. When the buyer comes back, their order page
-      // reconciles the payment.
-      if (json.payment_url) {
-        window.location.href = json.payment_url
-      } else {
-        router.push(json.order_id ? `/buyer/orders/${json.order_id}` : '/buyer/orders')
-      }
-    } catch {
-      setError('Something went wrong. Please check your connection and try again.')
-      setLoading(false)
-    }
-  }
-
-  if (isSample) {
-    return (
-      <div className="flex items-start gap-3 p-4 rounded-xl bg-gold-50 border border-gold-100">
-        <AlertCircle className="w-5 h-5 text-gold-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
-        <div>
-          <p className="text-sm font-semibold text-gold-800">Sample product</p>
-          <p className="text-xs text-gold-800 mt-0.5">
-            This is demonstration data showing how a live listing works, it can&rsquo;t be ordered.
-            Real products from verified vendors will appear here soon.
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  if (isOutOfStock) {
-    return (
-      <div className="flex items-center gap-3 p-4 rounded-xl bg-sand-100 border border-sand-200">
-        <AlertCircle className="w-5 h-5 text-sand-600 flex-shrink-0" aria-hidden="true" />
-        <div>
-          <p className="text-sm font-semibold text-sand-700">Out of stock</p>
-          <p className="text-xs text-sand-600 mt-0.5">This product is temporarily unavailable.</p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-      {/* Quantity */}
-      <div>
-        <p className="form-label" id="quantity-label">Quantity{product.unit ? ` (${product.unit})` : ''}</p>
-        <div className="flex items-center gap-3" role="group" aria-labelledby="quantity-label">
-          <button
-            type="button"
-            onClick={() => setQuantity(q => Math.max(min, q - 1))}
-            disabled={quantity <= min}
-            aria-label="Decrease quantity"
-            className="w-11 h-11 rounded-lg border border-sand-200 flex items-center justify-center text-sand-700 hover:bg-sand-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            <Minus className="w-4 h-4" aria-hidden="true" />
-          </button>
-          <span className="w-12 text-center font-semibold text-sand-900 tabular-nums" aria-live="polite">{quantity}</span>
-          <button
-            type="button"
-            onClick={() => setQuantity(q => Math.min(max, q + 1))}
-            disabled={quantity >= max}
-            aria-label="Increase quantity"
-            className="w-11 h-11 rounded-lg border border-sand-200 flex items-center justify-center text-sand-700 hover:bg-sand-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            <Plus className="w-4 h-4" aria-hidden="true" />
-          </button>
-          {product.minimum_order && product.minimum_order > 1 && (
-            <span className="text-xs text-sand-600">Min order: {product.minimum_order}</span>
-          )}
-        </div>
-      </div>
-
-      {/* Delivery region */}
-      <div>
-        <label htmlFor="region" className="form-label">Delivery region <span className="text-red-600">*</span></label>
-        <select
-          id="region"
-          className="form-input"
-          value={region}
-          onChange={e => setRegion(e.target.value as GhanaRegion)}
-          required
-        >
-          <option value="">Select region…</option>
-          {GHANA_REGIONS.map(r => (
-            <option key={r} value={r}>{r}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Delivery address */}
-      <div>
-        <label htmlFor="address" className="form-label">Delivery address <span className="text-red-600">*</span></label>
-        <textarea
-          id="address"
-          className="form-input min-h-[80px] resize-none"
-          placeholder="Street address, neighbourhood, landmark, or GhanaPost GPS…"
-          value={address}
-          onChange={e => setAddress(e.target.value)}
-          autoComplete="street-address"
-          required
-          maxLength={300}
-        />
-      </div>
-
-      {/* Delivery phone: in Ghana, deliveries run on a phone call */}
-      <div>
-        <label htmlFor="delivery-phone" className="form-label">Phone number for delivery <span className="text-red-600">*</span></label>
-        <input
-          id="delivery-phone"
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          className="form-input"
-          placeholder="024 123 4567"
-          value={phone}
-          onChange={e => setPhone(e.target.value)}
-          aria-describedby="delivery-phone-hint"
-          required
-        />
-        <p id="delivery-phone-hint" className="mt-1 text-xs text-sand-600">
-          The vendor calls this number to arrange delivery.
-        </p>
-      </div>
-
-      {/* Buyer notes */}
-      <div>
-        <label htmlFor="notes" className="form-label">Notes to vendor <span className="text-sand-600 font-normal">(optional)</span></label>
-        <textarea
-          id="notes"
-          className="form-input min-h-[60px] resize-none"
-          placeholder="Any special instructions…"
-          value={notes}
-          onChange={e => setNotes(e.target.value)}
-          maxLength={500}
-        />
-      </div>
-
-      {/* Price summary */}
-      <div className="bg-sand-50 rounded-xl border border-sand-200 p-4 space-y-2 text-sm">
-        <div className="flex justify-between text-sand-600">
-          <span>Subtotal ({quantity} × {formatCurrency(product.price_ghs)})</span>
-          <span className="font-medium text-sand-900">{formatCurrency(subtotal)}</span>
-        </div>
-        <div className="flex justify-between text-sand-600">
-          <span>Delivery (anywhere in Ghana)</span>
-          <span className="font-medium text-sand-900">{formatCurrency(DELIVERY_FEE_GHS)}</span>
-        </div>
-        <div className="flex justify-between pt-2 border-t border-sand-200 font-semibold text-sand-900 text-base">
-          <span>Total</span>
-          <span className="text-green-700">{formatCurrency(total)}</span>
-        </div>
-      </div>
-
-      {/* Escrow note */}
-      <div className="trust-badge w-full justify-center">
-        <ShieldCheck className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-        <span>Payment held in escrow until you confirm delivery</span>
-      </div>
-
-      {error && (
-        <div role="alert" className="flex items-start gap-2 text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-4 py-3">
-          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full min-h-[48px] py-3.5 rounded-xl bg-green-600 text-white font-semibold text-sm hover:bg-green-700 active:bg-green-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-      >
-        {loading ? (
-          <>
-            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true" />
-            Opening secure payment…
-          </>
-        ) : (
-          <>
-            <ShoppingBag className="w-4 h-4" aria-hidden="true" />
-            Place order, {formatCurrency(total)}
-          </>
-        )}
-      </button>
-
-      <p className="text-center text-xs text-sand-600">
-        Pay by mobile money or card through Paystack
-      </p>
-    </form>
-  )
-}
-
 // ─── Skeleton loader ───────────────────────────────────────────────────────────
 
 function ProductDetailSkeleton() {
@@ -463,13 +193,7 @@ export default function ProductDetailPage() {
       if (!isMounted) return
 
       if (error || !data) {
-        // Fall back to sample data so demo links stay browsable
-        const demo = demoEnabled() ? getDemoProductBySlug(slug) : undefined
-        if (demo) {
-          setProduct(demo)
-        } else {
-          setNotFound(true)
-        }
+        setNotFound(true)
       } else {
         setProduct(data as Product)
         // Count the visit (fire and forget)
@@ -509,12 +233,13 @@ export default function ProductDetailPage() {
   const hasSDG12 = product.sdg_tags?.includes('sdg_12_responsible_consumption')
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity < 5
   const isOutOfStock = product.stock_quantity === 0
-  const isSample = isDemoId(product.id)
+  const isSample = !!product.is_demo
   const vendor = product.vendor
 
   return (
     <>
-      <JsonLd
+      {/* Search engines get structured data for real listings only */}
+      {!isSample && <JsonLd
         data={{
           '@context': 'https://schema.org',
           '@type': 'Product',
@@ -535,7 +260,7 @@ export default function ProductDetailPage() {
             url: `${APP_URL}/marketplace/${product.slug}`,
           },
         }}
-      />
+      />}
       <Navbar />
 
       <main id="main" className="container-app py-6 pb-28 md:pb-8">
@@ -573,6 +298,11 @@ export default function ProductDetailPage() {
                 <span className="sdg-badge">
                   <Leaf className="w-3 h-3" aria-hidden="true" />
                   SDG 12 Verified
+                </span>
+              )}
+              {isSample && (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-gold-50 text-gold-800 text-xs font-semibold border border-gold-100">
+                  Sample product
                 </span>
               )}
               {isOutOfStock && (
@@ -646,8 +376,8 @@ export default function ProductDetailPage() {
             {/* Divider */}
             <hr className="border-sand-200" />
 
-            {/* Order form */}
-            <OrderForm product={product} />
+            {/* Quantity, Add to cart, Buy now */}
+            <ProductPurchasePanel product={product} />
 
             {/* Vendor card */}
             {vendor && (

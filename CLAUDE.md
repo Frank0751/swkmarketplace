@@ -36,6 +36,32 @@ SWK Marketplace is a world-class, production-grade sustainable e-commerce platfo
 2. Admin reviews SDG 12 alignment → approves or rejects
 3. Only `approved` products appear on the public storefront
 
+### Cart and checkout (migration 008)
+- The cart lives in the browser (`lib/cart/CartProvider.tsx`, localStorage), so anyone can fill one
+  before signing in. Checkout (`/checkout`) needs an account.
+- `POST /api/checkout` prices the cart from the database (`lib/cart/pricing.ts`, the same function
+  the cart UI uses) and stores it as a `checkouts` row. No order exists yet.
+- `POST /api/checkout/[id]/pay` takes the payment. When it succeeds, `fulfil_checkout()` creates one
+  order per item (vendors ship separately; each order has its own escrow payout) and moves each
+  pending → paid, which fires the existing payout, stock and history triggers. Abandoned checkouts
+  never leave unpaid orders behind.
+- Delivery is `DELIVERY_FEE_GHS` once per shop per checkout, charged on that shop's first line.
+- Saved delivery addresses (`buyer_addresses`) and payment methods (`payment_methods`) are written
+  only through the API. A payment method stores card brand, last 4 and expiry, or a mobile money
+  network and number: never a full card number or security code.
+
+### Sample shops (is_demo)
+- 4 sample shops and 13 sample products are real database rows flagged `is_demo`, seeded by
+  `seed_sample_catalogue()` (migration 008). Sample shops have no owner account (`user_id` null).
+- Sample checkouts are paid with the built-in **test payment** (`lib/payments/demo.ts`): only the test
+  cards in `lib/payments/test-cards.ts` work, mobile money shows an on-screen approval prompt, and no
+  money moves. Real products are paid only through Paystack. The database refuses a checkout that
+  mixes the two, and only SWK Ghana can set `is_demo`.
+- On a sample order the buyer (or an admin) can play the shop from the order page
+  (`/api/orders/[id]/simulate`: confirm, dispatch, release payout).
+- Admin dashboard → Sample shops: reset the sample data (deletes sample orders, restores stock) or
+  hide the sample shops before launch. Sample orders count in the dashboard figures.
+
 ---
 
 ## File structure
@@ -154,7 +180,8 @@ All templates live in `lib/email/brevo.ts`; admin alerts go to `ADMIN_NOTIFICATI
 
 | Event | Recipients |
 |-------|-----------|
-| Order paid | Buyer, vendor, admin |
+| Cart paid (checkout) | Buyer (one receipt), each vendor (one notice), admin |
+| Order paid (single order, pre-cart) | Buyer, vendor, admin |
 | Order confirmed by vendor | Buyer |
 | Order dispatched | Buyer |
 | Delivery confirmed | Vendor, admin (payout ready to release) |
@@ -166,6 +193,8 @@ All templates live in `lib/email/brevo.ts`; admin alerts go to `ADMIN_NOTIFICATI
 | Listing submitted, edited or resubmitted | Admin |
 | Listing approved / rejected | Vendor |
 | Payment amount mismatch | Admin |
+
+Sample orders email the buyer only: sample shops have no inbox and the team needs no alert.
 
 ---
 
@@ -199,7 +228,6 @@ See `.env.local.example` for full list. Required:
 
 Optional:
 - `ADMIN_NOTIFICATION_EMAIL`: where admin alerts go (default info@swkghana.org)
-- `NEXT_PUBLIC_DEMO_MODE=false`: hide the sample listings once real vendors are live
 - `PAYSTACK_ALLOW_TEST_MODE=true`: allow an `sk_test_` key on production (refused by default)
 
 ---
@@ -220,8 +248,10 @@ Optional:
    Postgres and re-runs the attack and workflow checks.
 9. **Order rules live in `lib/marketplace/orders.ts`**: `DELIVERY_FEE_GHS`, the confirmation window,
    and `ORDER_TRANSITIONS` (who may move an order between which statuses). Change them there.
-10. **Payments are settled only by `settleOrderPayment`** (`lib/paystack/confirm.ts`), which asks
-    Paystack for the transaction and checks amount and currency before marking an order paid.
+10. **Payments are settled only by `settleCheckoutPayment` / `settleOrderPayment`**
+    (`lib/paystack/confirm.ts`), which ask Paystack for the transaction and check amount and currency
+    first, or by the test payment for sample checkouts. Orders from a cart are created only by
+    `fulfil_checkout()` (via `fulfilCheckout` in `lib/checkout/server.ts`).
 11. `vendor_profiles.total_sales` counts fulfilled orders (not money); `total_products` counts live
     listings. Both are maintained by triggers.
 

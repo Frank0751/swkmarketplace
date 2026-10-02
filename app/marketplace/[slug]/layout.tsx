@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { demoEnabled, getDemoProductBySlug, isDemoId } from '@/lib/demo/data'
 import { formatCurrency } from '@/lib/utils'
 
 const APP_URL = 'https://marketplace.swkghana.org'
@@ -11,6 +10,7 @@ type ProductForMeta = {
   short_description?: string | null
   images?: string[] | null
   price_ghs: number
+  is_demo?: boolean | null
   vendor?: { business_name?: string } | null
 }
 
@@ -18,13 +18,12 @@ async function findProduct(slug: string): Promise<ProductForMeta | null> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('products')
-    .select('id, title, short_description, images, price_ghs, vendor:vendor_profiles(business_name)')
+    .select('id, title, short_description, images, price_ghs, is_demo, vendor:vendor_profiles(business_name)')
     .eq('slug', slug)
     .eq('status', 'approved')
     .maybeSingle()
 
-  if (data) return data as unknown as ProductForMeta
-  return demoEnabled() ? (getDemoProductBySlug(slug) as ProductForMeta | undefined) ?? null : null
+  return (data as unknown as ProductForMeta | null) ?? null
 }
 
 /**
@@ -39,7 +38,7 @@ export async function generateMetadata(
   if (!product) return { title: 'Product not found' }
 
   const vendorName = product.vendor?.business_name
-  const sample = isDemoId(product.id) ? 'Sample listing. ' : ''
+  const sample = product.is_demo ? 'Sample listing. ' : ''
   const description = [
     `${sample}${formatCurrency(product.price_ghs)}${vendorName ? ` from ${vendorName}` : ''}.`,
     product.short_description ?? '',
@@ -51,6 +50,8 @@ export async function generateMetadata(
     title: product.title,
     description,
     alternates: { canonical: url },
+    // Sample listings are for demonstrations, not search results
+    robots: product.is_demo ? { index: false, follow: true } : undefined,
     openGraph: {
       type: 'website',
       siteName: 'SWK Marketplace',

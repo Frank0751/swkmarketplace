@@ -34,7 +34,8 @@ export interface VendorFounder {
 
 export interface VendorProfile {
   id: string
-  user_id: string
+  user_id: string | null       // null only for SWK's sample shops
+  is_demo?: boolean            // a sample shop: browsable and buyable with the test payment
   business_name: string
   slug?: string                // shareable store URL: /store/[slug]
   business_description: string
@@ -137,6 +138,7 @@ export interface Product {
   rejection_reason?: string
   views: number
   order_count: number
+  is_demo?: boolean         // sample product, paid with the test payment
   created_at: string
   updated_at: string
   // Joined
@@ -188,6 +190,8 @@ export interface Order {
   delivered_at?: string
   released_at?: string
   estimated_delivery?: string
+  checkout_id?: string | null      // the cart payment this order came from
+  is_demo?: boolean                // a sample order: paid with the test payment, no money moved
   created_at: string
   updated_at: string
   // Joined
@@ -195,6 +199,81 @@ export interface Order {
   vendor?: VendorProfile
   product?: Product
   payout?: Payout
+  checkout?: Pick<Checkout, 'id' | 'reference' | 'payment_label' | 'payment_channel' | 'paid_at' | 'total_amount'> | null
+}
+
+// ─── Checkout ─────────────────────────────────────────────────────────────────
+
+export type CheckoutStatus = 'pending' | 'paid' | 'cancelled'
+
+/** One cart line, priced by the server when the buyer pressed Pay */
+export interface CheckoutItem {
+  product_id: string
+  vendor_id: string
+  vendor_name: string
+  title: string
+  slug: string
+  image: string | null
+  unit?: string | null
+  quantity: number
+  unit_price: number
+  subtotal: number
+  delivery_fee: number   // charged once per shop, on that shop's first line
+  total: number
+}
+
+/** One payment for a whole cart. Each item becomes its own order once paid. */
+export interface Checkout {
+  id: string
+  reference: string       // PAY-XXXXXXXX
+  buyer_id: string
+  status: CheckoutStatus
+  is_demo: boolean
+  items: CheckoutItem[]
+  subtotal: number
+  delivery_total: number
+  total_amount: number
+  delivery_phone: string
+  delivery_region: GhanaRegion
+  delivery_address: string
+  buyer_notes?: string | null
+  payment_channel?: 'card' | 'mobile_money' | null
+  payment_label?: string | null
+  paystack_reference?: string | null
+  attempts: number
+  last_error?: string | null
+  paid_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+/** A saved card or mobile money wallet. Never a full card number or security code. */
+export interface PaymentMethod {
+  id: string
+  user_id: string
+  kind: 'card' | 'momo'
+  provider: 'demo' | 'paystack'   // demo = saved from a test payment, for sample orders only
+  brand?: 'visa' | 'mastercard' | 'verve' | null
+  last4: string
+  exp_month?: number | null
+  exp_year?: number | null
+  holder_name?: string | null
+  momo_network?: MomoNetwork | null
+  momo_phone?: string | null
+  is_default: boolean
+  created_at: string
+}
+
+export interface BuyerAddress {
+  id: string
+  user_id: string
+  label?: string | null
+  phone: string
+  region: GhanaRegion
+  address: string
+  is_default: boolean
+  created_at: string
+  updated_at: string
 }
 
 // ─── Payout ───────────────────────────────────────────────────────────────────

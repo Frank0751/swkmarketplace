@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Search, Menu, X, ShoppingBag, User, ChevronDown, Settings, ExternalLink } from 'lucide-react'
+import { Search, Menu, X, ShoppingBag, User, ChevronDown, Settings, ExternalLink, Package, CreditCard } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { CartButton } from '@/components/cart/CartButton'
 import type { User as UserType } from '@/types'
 import { clsx } from 'clsx'
 
@@ -165,6 +166,8 @@ export function Navbar() {
                 <Search className="w-5 h-5" />
               </button>
 
+              <CartButton />
+
               {user ? (
                 /* Click-driven disclosure. This was hover-only with
                    `invisible group-hover:visible`, which removed every item
@@ -201,6 +204,12 @@ export function Navbar() {
                       </div>
                       <Link href={getDashboardLink()} onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
                         <User className="w-4 h-4" aria-hidden="true" /> Dashboard
+                      </Link>
+                      <Link href="/buyer/orders" onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
+                        <Package className="w-4 h-4" aria-hidden="true" /> My orders
+                      </Link>
+                      <Link href="/buyer/payment-methods" onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
+                        <CreditCard className="w-4 h-4" aria-hidden="true" /> Payment methods
                       </Link>
                       <Link href="/buyer/settings" onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
                         <Settings className="w-4 h-4" aria-hidden="true" /> Account settings
@@ -316,6 +325,20 @@ export function Navbar() {
                     className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
                   >
                     <User className="w-4 h-4" aria-hidden="true" /> Dashboard
+                  </Link>
+                  <Link
+                    href="/buyer/orders"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
+                  >
+                    <Package className="w-4 h-4" aria-hidden="true" /> My orders
+                  </Link>
+                  <Link
+                    href="/buyer/payment-methods"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
+                  >
+                    <CreditCard className="w-4 h-4" aria-hidden="true" /> Payment methods
                   </Link>
                   <Link
                     href="/buyer/settings"

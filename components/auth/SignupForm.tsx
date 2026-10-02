@@ -54,7 +54,7 @@ function getStrength(password: string): { score: number; label: string; color: s
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function SignupForm() {
+export default function SignupForm({ redirect }: { redirect?: string | null } = {}) {
   const router = useRouter()
   const [showPassword,        setShowPassword]        = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -132,7 +132,7 @@ export default function SignupForm() {
       router.push('/vendor/apply')
     } else {
       toast.success('Welcome to SWK Marketplace!')
-      router.push('/buyer/dashboard')
+      router.push(redirect ?? '/buyer/dashboard')
     }
     router.refresh()
   }
@@ -158,7 +158,7 @@ export default function SignupForm() {
 
   return (
     <div>
-      <GoogleButton label="Sign up with Google" />
+      <GoogleButton label="Sign up with Google" redirect={redirect} />
       <p className="mt-2 text-center text-xs text-sand-600">
         Google accounts join as buyers. Want to sell? You can apply as a vendor right after.
       </p>

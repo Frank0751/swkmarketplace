@@ -10,6 +10,7 @@ import { ArrowLeft, Loader2, UserRound, KeyRound } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/layout/Navbar'
+import { SavedAddresses } from '@/components/buyer/SavedAddresses'
 import type { User } from '@/types'
 
 const profileSchema = z.object({
@@ -145,6 +146,16 @@ export default function AccountSettingsPage() {
               Save details
             </button>
           </form>
+        </section>
+
+        <SavedAddresses />
+
+        <section className="bg-white rounded-xl border border-sand-200 p-6 shadow-card mb-6">
+          <h2 className="text-base font-display font-semibold text-sand-900 mb-1">Payment methods</h2>
+          <p className="text-sm text-sand-600 mb-3">Saved cards and mobile money for one-tap checkout.</p>
+          <Link href="/buyer/payment-methods" className="inline-flex items-center min-h-[44px] text-sm font-semibold text-green-700 hover:text-green-800">
+            Manage payment methods →
+          </Link>
         </section>
 
         {/* Password */}

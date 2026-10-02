@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyWebhookSignature } from '@/lib/paystack/webhook'
 import { createAdminClient } from '@/lib/supabase/server'
-import { settleOrderPayment } from '@/lib/paystack/confirm'
+import { settleCheckoutPayment, settleOrderPayment } from '@/lib/paystack/confirm'
 
 export const runtime = 'nodejs'
 
@@ -53,10 +53,18 @@ export async function POST(request: NextRequest) {
       // covers the order: anyone can start a payment with the public key and
       // attach any order id. settleOrderPayment re-verifies amount and currency.
       const metadata = readMetadata(event.data?.metadata)
-      const result = await settleOrderPayment(supabase, {
+
+      // A cart checkout first; single orders paid before carts existed after
+      let result = await settleCheckoutPayment(supabase, {
         reference,
-        orderId: typeof metadata.order_id === 'string' ? metadata.order_id : null,
+        checkoutId: typeof metadata.checkout_id === 'string' ? metadata.checkout_id : null,
       })
+      if (result.outcome === 'order_not_found') {
+        result = await settleOrderPayment(supabase, {
+          reference,
+          orderId: typeof metadata.order_id === 'string' ? metadata.order_id : null,
+        })
+      }
       console.log(`[Paystack Webhook] charge.success ${reference}: ${result.outcome}`)
     }
 

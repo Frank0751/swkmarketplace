@@ -31,7 +31,7 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="text-sand-600 mb-10">
-            Last updated: September 2026 · SWK Ghana is committed to protecting the privacy of every buyer
+            Last updated: October 2026 · SWK Ghana is committed to protecting the privacy of every buyer
             and vendor on SWK Marketplace, in line with Ghana&rsquo;s Data Protection Act, 2012 (Act 843).
           </p>
 
@@ -55,7 +55,13 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <strong>Payment data:</strong> payments are processed by Paystack. SWK Ghana never
-                sees or stores your card or mobile money PIN
+                sees or stores your full card number, security code or mobile money PIN
+              </li>
+              <li>
+                <strong>Saved for faster checkout (only if you choose):</strong> delivery addresses with their
+                phone numbers, and payment methods, stored as the card type, its last 4 digits, expiry date and
+                name on the card, or a mobile money network and number. You can remove any of them from your
+                account at any time
               </li>
               <li>
                 <strong>Usage data:</strong> anonymous page-view and performance statistics, collected

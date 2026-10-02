@@ -82,7 +82,8 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
       setPayouts(prev =>
         prev.map(p => p.id === payoutId ? { ...p, ...data.payout } : p),
       )
-      toast.success('Payout marked as released. The vendor has been emailed.')
+      const wasSample = payouts.find(p => p.id === payoutId)?.order?.is_demo
+      toast.success(wasSample ? 'Sample payout released. The sample order is complete.' : 'Payout marked as released. The vendor has been emailed.')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Release failed')
     } finally {
@@ -205,7 +206,11 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
                         <div className="text-xs text-sand-600">
                           {payout.vendor?.user?.email ?? ''}
                         </div>
-                        {dest ? (
+                        {payout.order?.is_demo || payout.vendor?.is_demo ? (
+                          <div className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-gold-800 bg-gold-50 border border-gold-100 rounded-full px-2 py-0.5">
+                            Sample: nothing to send
+                          </div>
+                        ) : dest ? (
                           <div className="mt-1 flex items-center gap-1 text-xs text-sand-700">
                             <DestIcon className="w-3.5 h-3.5 flex-shrink-0 text-teal-600" aria-hidden="true" />
                             <span>{dest}</span>
@@ -271,7 +276,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
           if (pendingRelease) await handleRelease(pendingRelease.id)
         }}
         title="Mark this payout as released?"
-        description="Do this after you have sent the money. The vendor gets an email saying it is on its way."
+        description={pendingRelease?.order?.is_demo
+          ? 'This is a sample order paid with the test payment, so there is no money to send. Releasing completes the sample order.'
+          : 'Do this after you have sent the money. The vendor gets an email saying it is on its way.'}
         details={pendingRelease ? [
           { label: 'Vendor',           value: pendingRelease.vendor?.business_name ?? '—' },
           { label: 'Send to',          value: destination ?? 'No payout details on file' },
@@ -279,9 +286,11 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
           { label: 'Commission (15%)', value: `-${formatCurrency(pendingRelease.commission_amount)}` },
           { label: 'Vendor receives',  value: formatCurrency(pendingRelease.net_amount), emphasis: true },
         ] : []}
-        warning={destination
-          ? 'This is final and cannot be reversed from the admin panel.'
-          : 'This vendor has not added payout details. Only continue if you have paid them another way.'}
+        warning={pendingRelease?.order?.is_demo
+          ? undefined
+          : destination
+            ? 'This is final and cannot be reversed from the admin panel.'
+            : 'This vendor has not added payout details. Only continue if you have paid them another way.'}
         confirmLabel="Yes, it's been sent"
       />
     </div>

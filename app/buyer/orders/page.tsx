@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   User,
   PackageOpen,
+  CreditCard,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
@@ -16,6 +17,7 @@ export const metadata = { title: 'My Orders' }
 const BUYER_NAV = [
   { href: '/buyer/dashboard', label: 'Dashboard',  icon: LayoutDashboard },
   { href: '/buyer/orders',    label: 'My Orders',  icon: ShoppingBag },
+  { href: '/buyer/payment-methods', label: 'Payment methods', icon: CreditCard },
   { href: '/buyer/settings',  label: 'Account settings', icon: User },
 ]
 

@@ -3,8 +3,8 @@ import type { Order, Payout, User, VendorPayoutDetails, VendorProfile } from '@/
 import { formatGhanaPhone } from '@/lib/marketplace/phone'
 
 export type AdminPayout = Omit<Payout, 'vendor' | 'order'> & {
-  order?: Pick<Order, 'id' | 'reference' | 'status'> | null
-  vendor?: (Pick<VendorProfile, 'id' | 'business_name'> & {
+  order?: Pick<Order, 'id' | 'reference' | 'status' | 'is_demo'> | null
+  vendor?: (Pick<VendorProfile, 'id' | 'business_name' | 'is_demo'> & {
     user?: Pick<User, 'email' | 'full_name'> | null
     payout_details?: VendorPayoutDetails | null
   }) | null
@@ -20,8 +20,8 @@ export async function loadAdminPayouts(supabase: SupabaseClient): Promise<AdminP
     .from('payouts')
     .select(`
       *,
-      order:orders(id, reference, status),
-      vendor:vendor_profiles(id, business_name, user:users(email, full_name))
+      order:orders(id, reference, status, is_demo),
+      vendor:vendor_profiles(id, business_name, is_demo, user:users(email, full_name))
     `)
     .order('created_at', { ascending: false })
 

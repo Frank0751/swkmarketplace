@@ -203,8 +203,8 @@ export default function HowItWorksPage() {
                   <StepCard
                     step={2}
                     icon={<ShieldCheck className="w-5 h-5" />}
-                    title="Pay securely via Paystack"
-                    description="Place your order and pay securely using your card, mobile money, or bank transfer. Your payment goes into escrow, held safely by SWK Ghana, not released to the vendor until delivery is confirmed."
+                    title="Add to cart and pay once"
+                    description="Fill one cart from as many shops as you like and pay in a single checkout, by card or mobile money (MTN MoMo, Telecel Cash, AT Money). Save your address and payment method for next time. Your payment goes into escrow, held safely by SWK Ghana, not released to any shop until you confirm delivery."
                     accent="teal"
                   />
                   <StepCard
@@ -498,7 +498,7 @@ export default function HowItWorksPage() {
             <div className="space-y-3">
               <FAQItem
                 question="Is SWK Marketplace only for buyers in Ghana?"
-                answer={`For now, SWK Marketplace delivers within Ghana, to all 16 regions. Delivery is a flat GHS ${DELIVERY_FEE_GHS} per order, shown before you pay. The vendor arranges delivery and calls the phone number you give at checkout.`}
+                answer={`For now, SWK Marketplace delivers within Ghana, to all 16 regions. Delivery is a flat GHS ${DELIVERY_FEE_GHS} per shop in your cart, however many of that shop's products you buy, and it's shown before you pay. Each shop arranges its own delivery and calls the phone number you give at checkout.`}
               />
               <FAQItem
                 question="How do I know my payment is safe?"
@@ -515,6 +515,10 @@ export default function HowItWorksPage() {
               <FAQItem
                 question="How long does delivery take?"
                 answer="Delivery times depend on the vendor's location and your delivery region. Most vendors dispatch within 1–3 business days of order confirmation. You'll receive an email when your order is dispatched, and can track progress in your buyer dashboard. Estimated delivery dates are shown per listing where the vendor has provided them."
+              />
+              <FAQItem
+                question="What are the sample shops?"
+                answer="While our first verified vendors join, the marketplace shows four sample shops so you can try everything: add products to your cart, check out, save a card or mobile money number, and follow your order to delivery. Sample products are marked “Sample”, and their checkout uses a test payment, so no real money is ever taken. Use one of the test cards shown at checkout, or approve the on-screen mobile money prompt."
               />
               <FAQItem
                 question="What is the 15% platform commission?"

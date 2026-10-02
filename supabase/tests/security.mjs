@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 const MIGRATIONS = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'migrations')
+const WHY = process.argv.includes('--why')
 const FILES = readdirSync(MIGRATIONS).filter(f => /^\d+_.*\.sql$/.test(f)).sort()
 
 // What Supabase provides before any migration runs
@@ -54,6 +55,45 @@ const PR = {
   rejected: '20000000-0000-4000-8000-000000000003',
 }
 const ORD = { pending: '30000000-0000-4000-8000-000000000001' }
+
+// The sample catalogue loaded by migration 008
+const SAMPLE = {
+  greenharvest: 'de000000-0000-4000-a000-000000000001',
+  adom:         'de000000-0000-4000-a000-000000000002',
+  honey:        'de000000-0000-4000-b000-000000000001', // GHS 65, stock 40
+  coffee:       'de000000-0000-4000-b000-000000000002', // GHS 48, stock 30
+  vegbox:       'de000000-0000-4000-b000-000000000004', // GHS 120, stock 20
+}
+
+// A cart the way the checkout API prices it: honey x2 and coffee from one
+// shop (one delivery fee), a veggie box from another (a second fee)
+const SAMPLE_ITEMS = [
+  { product_id: SAMPLE.honey,  vendor_id: SAMPLE.greenharvest, quantity: 2, unit_price: 65,  subtotal: 130, delivery_fee: 20, total: 150 },
+  { product_id: SAMPLE.coffee, vendor_id: SAMPLE.greenharvest, quantity: 1, unit_price: 48,  subtotal: 48,  delivery_fee: 0,  total: 48 },
+  { product_id: SAMPLE.vegbox, vendor_id: SAMPLE.adom,         quantity: 1, unit_price: 120, subtotal: 120, delivery_fee: 20, total: 140 },
+]
+
+/** Insert a pending checkout as the API would (service role) and return its id */
+async function createCheckout(t, { buyer = U.buyer, items = SAMPLE_ITEMS, isDemo = true } = {}) {
+  const subtotal = items.reduce((s, i) => s + i.subtotal, 0)
+  const delivery = items.reduce((s, i) => s + i.delivery_fee, 0)
+  await t.as('service_role')
+  const r = await t.q(
+    `insert into public.checkouts
+       (buyer_id, is_demo, items, subtotal, delivery_total, total_amount,
+        delivery_phone, delivery_region, delivery_address)
+     values ($1, $2, $3::jsonb, $4, $5, $6, '+233241234567', 'Greater Accra', 'Osu, Accra')
+     returning id`,
+    [buyer, isDemo, JSON.stringify(items), subtotal, delivery, subtotal + delivery],
+  )
+  return r[0].id
+}
+
+async function fulfil(t, checkoutId) {
+  await t.as('service_role')
+  const r = await t.q(`select public.fulfil_checkout($1, 'card', 'Visa •••• 4081') as result`, [checkoutId])
+  return r[0].result
+}
 
 const SEED = `
   insert into auth.users (id, email, raw_user_meta_data) values
@@ -186,11 +226,201 @@ const CASES = [
     return r.length > 0
   }},
 
+  // ── Attacks on checkout and the sample data (migration 008) ─────────────
+  { kind: 'attack', name: 'Vendor flags their listing as a sample (to "pay" with the test payment)', run: async t => {
+    await t.as('authenticated', U.vendor)
+    const r = await t.q(`update public.products set is_demo = true where id = $1 returning is_demo`, [PR.live])
+    return r[0]?.is_demo === true
+  }},
+  { kind: 'attack', name: 'Vendor creates a listing already flagged as a sample', run: async t => {
+    await t.as('authenticated', U.vendor)
+    const r = await t.q(`insert into public.products
+      (vendor_id, title, slug, description, short_description, price_ghs, stock_quantity, category, location, region, is_demo)
+      values ($1, 'Fake', 'fake', 'd', 's', 10, 1, 'agribusiness', 'Kumasi', 'Ashanti', true) returning is_demo`, [VP.vendor])
+    return r[0]?.is_demo === true
+  }},
+  { kind: 'attack', name: 'Applicant registers their shop as a sample shop', run: async t => {
+    await t.as('authenticated', U.applicant)
+    const r = await t.q(`insert into public.vendor_profiles
+      (user_id, business_name, business_description, category, location, region, phone, sustainability_statement, is_demo)
+      values ($1, 'Fake Co', 'x', 'agribusiness', 'Accra', 'Greater Accra', '0240000009', 'x', true) returning is_demo`, [U.applicant])
+    return r[0]?.is_demo === true
+  }},
+  { kind: 'attack', name: 'Vendor takes over a sample shop', run: async t => {
+    await t.as('authenticated', U.vendor)
+    const r = await t.q(`update public.vendor_profiles set user_id = $1 where id = $2 returning user_id`, [U.vendor, SAMPLE.greenharvest])
+    return r[0]?.user_id === U.vendor
+  }},
+  { kind: 'attack', name: 'Buyer writes a checkout directly (choosing their own prices)', run: async t => {
+    await t.as('authenticated', U.buyer)
+    const r = await t.q(`insert into public.checkouts
+      (buyer_id, is_demo, items, subtotal, delivery_total, total_amount, delivery_phone, delivery_region, delivery_address)
+      values ($1, true, '[{"product_id":"x"}]', 1, 0, 1, '+233241234567', 'Greater Accra', 'Osu') returning id`, [U.buyer])
+    return r.length > 0
+  }},
+  { kind: 'attack', name: 'Buyer marks their own checkout paid', run: async t => {
+    const id = await createCheckout(t)
+    await t.as('authenticated', U.buyer)
+    const r = await t.q(`select public.fulfil_checkout($1, 'card', 'x') as result`, [id])
+    return r[0]?.result?.outcome === 'paid'
+  }},
+  { kind: 'attack', name: 'A stranger reads someone else\'s checkout', run: async t => {
+    await createCheckout(t)
+    await t.as('authenticated', U.applicant)
+    const r = await t.q(`select id from public.checkouts`)
+    return r.length > 0
+  }},
+  { kind: 'attack', name: 'A stranger reads someone else\'s saved cards', run: async t => {
+    await t.as('service_role')
+    await t.q(`insert into public.payment_methods (user_id, kind, brand, last4, exp_month, exp_year)
+               values ($1, 'card', 'visa', '4081', 12, 2030)`, [U.buyer])
+    await t.as('authenticated', U.applicant)
+    const r = await t.q(`select last4 from public.payment_methods`)
+    return r.length > 0
+  }},
+  { kind: 'attack', name: 'Buyer saves a payment method without the API', run: async t => {
+    await t.as('authenticated', U.buyer)
+    const r = await t.q(`insert into public.payment_methods (user_id, kind, brand, last4, exp_month, exp_year)
+               values ($1, 'card', 'visa', '4242', 12, 2030) returning id`, [U.buyer])
+    return r.length > 0
+  }},
+  { kind: 'attack', name: 'A signed-in user wipes the sample orders', run: async t => {
+    await t.as('authenticated', U.buyer)
+    await t.q(`select public.reset_sample_data()`)
+    return true
+  }},
+  { kind: 'attack', name: 'A checkout mixing sample and real items gets fulfilled', run: async t => {
+    const items = [
+      SAMPLE_ITEMS[0],
+      { product_id: PR.live, vendor_id: VP.vendor, quantity: 1, unit_price: 50, subtotal: 50, delivery_fee: 20, total: 70 },
+    ]
+    const id = await createCheckout(t, { items })
+    const result = await fulfil(t, id)
+    return result?.outcome === 'paid'
+  }},
+
   // ── Workflows that must keep working ────────────────────────────────────
   { kind: 'workflow', name: 'Anyone can browse live listings', run: async t => {
     await t.as('anon')
-    const r = await t.q(`select title from public.products`)
+    const r = await t.q(`select title from public.products where not is_demo`)
     return r.length === 1 && r[0].title === 'Raw Honey'
+  }},
+  { kind: 'workflow', name: 'Anyone can browse the 13 sample products and 4 sample shops', run: async t => {
+    await t.as('anon')
+    const p = await t.q(`select id from public.products where is_demo and status = 'approved'`)
+    const v = await t.q(`select id, user_id from public.vendor_profiles where is_demo and status = 'approved'`)
+    return (p.length === 13 && v.length === 4 && v.every(x => x.user_id === null)) || JSON.stringify({ p: p.length, v })
+  }},
+  { kind: 'workflow', name: 'Sample shops count their own live listings', run: async t => {
+    await t.as('postgres')
+    const r = await t.q(`select total_products from public.vendor_profiles where id = $1`, [SAMPLE.greenharvest])
+    return r[0]?.total_products === 3 || `total_products ${r[0]?.total_products}`
+  }},
+  { kind: 'workflow', name: 'A paid sample checkout becomes paid orders with escrow payouts', run: async t => {
+    const id = await createCheckout(t)
+    const result = await fulfil(t, id)
+    await t.as('postgres')
+    const orders = await t.q(`select status, is_demo, total_amount from public.orders where checkout_id = $1 order by total_amount desc`, [id])
+    const payouts = await t.q(`select p.status, p.net_amount from public.payouts p join public.orders o on o.id = p.order_id where o.checkout_id = $1 order by p.net_amount desc`, [id])
+    const co = await t.q(`select status, payment_label, paid_at from public.checkouts where id = $1`, [id])
+    const ok = result.outcome === 'paid'
+      && result.order_ids.length === 3
+      && orders.length === 3 && orders.every(o => o.status === 'paid' && o.is_demo)
+      && payouts.length === 3 && payouts.every(p => p.status === 'held')
+      && Number(payouts[0].net_amount) === 127.5 && Number(payouts[1].net_amount) === 119 && Number(payouts[2].net_amount) === 40.8
+      && co[0].status === 'paid' && co[0].payment_label === 'Visa •••• 4081' && co[0].paid_at !== null
+    return ok || JSON.stringify({ result, orders, payouts, co })
+  }},
+  { kind: 'workflow', name: 'A paid sample checkout takes the stock', run: async t => {
+    const id = await createCheckout(t)
+    await fulfil(t, id)
+    await t.as('postgres')
+    const r = await t.q(`select id, stock_quantity, order_count from public.products where id = any($1::uuid[])`, [[SAMPLE.honey, SAMPLE.coffee, SAMPLE.vegbox]])
+    const by = Object.fromEntries(r.map(x => [x.id, x]))
+    return (by[SAMPLE.honey].stock_quantity === 38 && by[SAMPLE.coffee].stock_quantity === 29
+      && by[SAMPLE.vegbox].stock_quantity === 19 && by[SAMPLE.honey].order_count === 59) || JSON.stringify(r)
+  }},
+  { kind: 'workflow', name: 'Paying the same checkout twice creates its orders once', run: async t => {
+    const id = await createCheckout(t)
+    const first = await fulfil(t, id)
+    const second = await fulfil(t, id)
+    await t.as('postgres')
+    const n = await t.q(`select count(*)::int as n from public.orders where checkout_id = $1`, [id])
+    const same = JSON.stringify([...first.order_ids].sort()) === JSON.stringify([...second.order_ids].sort())
+    return (second.outcome === 'already_paid' && same && n[0].n === 3) || JSON.stringify({ first, second, n })
+  }},
+  { kind: 'workflow', name: 'A cancelled checkout can\'t be paid', run: async t => {
+    const id = await createCheckout(t)
+    await t.q(`update public.checkouts set status = 'cancelled' where id = $1`, [id])
+    const result = await fulfil(t, id)
+    return result.outcome === 'not_pending' || JSON.stringify(result)
+  }},
+  { kind: 'workflow', name: 'Buyer sees their checkout and the orders it created', run: async t => {
+    const id = await createCheckout(t)
+    await fulfil(t, id)
+    await t.as('authenticated', U.buyer)
+    const co = await t.q(`select reference from public.checkouts where id = $1`, [id])
+    const orders = await t.q(`select id from public.orders where checkout_id = $1`, [id])
+    return (co.length === 1 && /^PAY-[0-9A-F]{8}$/.test(co[0].reference) && orders.length === 3) || JSON.stringify({ co, orders: orders.length })
+  }},
+  { kind: 'workflow', name: 'Buyer reviews a delivered sample order', run: async t => {
+    const id = await createCheckout(t)
+    const { order_ids } = await fulfil(t, id)
+    await t.as('service_role')
+    const orderId = (await t.q(`select id from public.orders where id = any($1::uuid[]) and product_id = $2`, [order_ids, SAMPLE.vegbox]))[0].id
+    for (const s of ['confirmed', 'dispatched', 'delivered']) {
+      await t.q(`update public.orders set status = $2 where id = $1`, [orderId, s])
+    }
+    await t.as('authenticated', U.buyer)
+    const r = await t.q(`insert into public.product_reviews (product_id, order_id, buyer_id, rating, comment)
+                         values ($1, $2, $3, 5, 'Fresh and lovely') returning rating`, [SAMPLE.vegbox, orderId, U.buyer])
+    return r[0]?.rating === 5
+  }},
+  { kind: 'workflow', name: 'Resetting the sample data clears sample orders and restores stock', run: async t => {
+    const id = await createCheckout(t)
+    await fulfil(t, id)
+    await t.as('service_role')
+    await t.q(`update public.orders set status = 'paid' where id = $1`, [ORD.pending])
+    const result = (await t.q(`select public.reset_sample_data() as r`))[0].r
+    await t.as('postgres')
+    const sampleOrders = await t.q(`select id from public.orders where is_demo`)
+    const realOrders = await t.q(`select id from public.orders where not is_demo`)
+    const honey = await t.q(`select stock_quantity, order_count from public.products where id = $1`, [SAMPLE.honey])
+    const checkouts = await t.q(`select id from public.checkouts where is_demo`)
+    return (result.orders_removed === 3 && sampleOrders.length === 0 && realOrders.length === 1
+      && checkouts.length === 0 && honey[0].stock_quantity === 40 && honey[0].order_count === 58)
+      || JSON.stringify({ result, sampleOrders, realOrders, honey, checkouts })
+  }},
+  { kind: 'workflow', name: 'Admin hides the sample shops, then shows them again', run: async t => {
+    await t.as('service_role')
+    await t.q(`select public.set_sample_visibility(false)`)
+    await t.as('anon')
+    const hidden = await t.q(`select id from public.products where is_demo`)
+    const shops = await t.q(`select id from public.vendor_profiles where is_demo`)
+    await t.as('service_role')
+    await t.q(`select public.set_sample_visibility(true)`)
+    await t.as('anon')
+    const shown = await t.q(`select id from public.products where is_demo`)
+    return (hidden.length === 0 && shops.length === 0 && shown.length === 13) || JSON.stringify({ hidden: hidden.length, shops: shops.length, shown: shown.length })
+  }},
+  { kind: 'workflow', name: 'Loading the sample catalogue again doesn\'t duplicate it', run: async t => {
+    await t.as('service_role')
+    await t.q(`select public.seed_sample_catalogue()`)
+    await t.q(`select public.seed_sample_catalogue()`)
+    await t.as('postgres')
+    const r = await t.q(`select (select count(*)::int from public.products where is_demo) as p, (select count(*)::int from public.vendor_profiles where is_demo) as v`)
+    return (r[0].p === 13 && r[0].v === 4) || JSON.stringify(r[0])
+  }},
+  { kind: 'workflow', name: 'Buyer reads their own saved payment methods and addresses', run: async t => {
+    await t.as('service_role')
+    await t.q(`insert into public.payment_methods (user_id, kind, momo_network, momo_phone, last4, is_default)
+               values ($1, 'momo', 'MTN MoMo', '+233241234567', '4567', true)`, [U.buyer])
+    await t.q(`insert into public.buyer_addresses (user_id, label, phone, region, address, is_default)
+               values ($1, 'Home', '+233241234567', 'Greater Accra', 'House 12, Osu', true)`, [U.buyer])
+    await t.as('authenticated', U.buyer)
+    const m = await t.q(`select last4 from public.payment_methods`)
+    const a = await t.q(`select label from public.buyer_addresses`)
+    return (m.length === 1 && a.length === 1) || JSON.stringify({ m, a })
   }},
   { kind: 'workflow', name: 'Buyer edits their name and phone', run: async t => {
     await t.as('authenticated', U.buyer)
@@ -365,7 +595,10 @@ async function main() {
     const verdict = c.kind === 'attack'
       ? (passed ? 'blocked   ' : 'ATTACK OK ')
       : (passed ? 'works     ' : 'BROKEN    ')
-    console.log(`${passed ? 'ok  ' : 'FAIL'} ${verdict} ${c.name}${!passed && r.detail ? `  (${r.detail})` : ''}`)
+    // --why prints what stopped each attack, to check it was the rule under
+    // test and not a typo in the test's own SQL
+    const why = !passed || (WHY && c.kind === 'attack')
+    console.log(`${passed ? 'ok  ' : 'FAIL'} ${verdict} ${c.name}${why && r.detail ? `  (${r.detail})` : ''}`)
   }
   await db.close()
 

@@ -21,6 +21,7 @@ import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/layout/Navbar'
 import { OrderTimeline } from '@/components/buyer/OrderTimeline'
+import { SampleOrderControls } from '@/components/buyer/SampleOrderControls'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Modal } from '@/components/ui/Modal'
 import {
@@ -108,7 +109,8 @@ export default function BuyerOrderDetailPage() {
         *,
         product:products(id, title, slug, images, price_ghs, short_description),
         vendor:vendor_profiles(id, business_name, logo_url, phone, location, region),
-        payout:payouts(id, status, gross_amount, commission_amount, net_amount, released_at)
+        payout:payouts(id, status, gross_amount, commission_amount, net_amount, released_at),
+        checkout:checkouts(id, reference, payment_label, payment_channel, paid_at, total_amount)
       `)
       .eq('id', orderId)
       .eq('buyer_id', user.id)
@@ -260,6 +262,11 @@ export default function BuyerOrderDetailPage() {
                 <span className={cn('status-badge', order.status, statusColor)}>
                   {statusLabel}
                 </span>
+                {order.is_demo && (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-gold-50 text-gold-800 border border-gold-100 text-xs font-semibold">
+                    Sample order
+                  </span>
+                )}
               </div>
               <p className="text-sm text-sand-600">Placed on {formatDate(order.created_at)}</p>
             </div>
@@ -429,6 +436,10 @@ export default function BuyerOrderDetailPage() {
               </div>
             )}
 
+            {order.is_demo && (
+              <SampleOrderControls orderId={order.id} status={order.status} onChanged={fetchOrder} />
+            )}
+
             {/* Order timeline */}
             <div className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
               <h2 className="text-base font-display font-semibold text-sand-900 mb-5">Order Progress</h2>
@@ -457,7 +468,23 @@ export default function BuyerOrderDetailPage() {
                     <dd className="font-medium text-sand-900">{order.estimated_delivery}</dd>
                   </div>
                 )}
-                {order.paystack_reference && (
+                {order.checkout?.payment_label && (
+                  <div>
+                    <dt className="text-sand-600 text-xs mb-0.5">Paid with</dt>
+                    <dd className="font-medium text-sand-900">{order.checkout.payment_label}</dd>
+                  </div>
+                )}
+                {order.checkout?.reference && (
+                  <div>
+                    <dt className="text-sand-600 text-xs mb-0.5">Payment</dt>
+                    <dd>
+                      <Link href={`/checkout/success/${order.checkout.id}`} className="font-mono font-medium text-green-700 hover:text-green-800 underline underline-offset-2">
+                        {order.checkout.reference}
+                      </Link>
+                    </dd>
+                  </div>
+                )}
+                {order.paystack_reference && !order.checkout && (
                   <div className="col-span-2">
                     <dt className="text-sand-600 text-xs mb-0.5">Payment reference</dt>
                     <dd className="font-mono text-xs text-sand-600 break-all">{order.paystack_reference}</dd>
@@ -548,13 +575,22 @@ export default function BuyerOrderDetailPage() {
                 </div>
                 <div className="flex justify-between text-sand-600">
                   <span>Delivery fee</span>
-                  <span>{order.delivery_fee > 0 ? formatCurrency(order.delivery_fee) : 'Free'}</span>
+                  <span>
+                    {order.delivery_fee > 0
+                      ? formatCurrency(order.delivery_fee)
+                      : order.checkout_id ? 'Included' : 'Free'}
+                  </span>
                 </div>
                 <div className="flex justify-between font-bold text-sand-900 border-t border-sand-100 pt-2 mt-2">
                   <span>Total</span>
                   <span>{formatCurrency(order.total_amount)}</span>
                 </div>
               </div>
+              {order.delivery_fee === 0 && order.checkout_id && (
+                <p className="mt-2 text-xs text-sand-600">
+                  This shop’s delivery fee was charged once, on another item in the same payment.
+                </p>
+              )}
             </div>
 
             {/* Escrow status */}
