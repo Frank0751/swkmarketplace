@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { AlertCircle, Check, ShoppingBag } from 'lucide-react'
+import { Check, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useCart } from '@/lib/cart/CartProvider'
 import { QuantityStepper } from '@/components/cart/QuantityStepper'
@@ -16,7 +16,17 @@ import type { Product } from '@/types'
  * one-product order form: buyers can now fill a cart from several shops and
  * pay once.
  */
-export function ProductPurchasePanel({ product }: { product: Product }) {
+export function ProductPurchasePanel({
+  product,
+  compact = false,
+  onDone,
+}: {
+  product: Product
+  /** In the quick view: buttons only, without the delivery notes */
+  compact?: boolean
+  /** Called once something was added, so a dialog can close itself */
+  onDone?: () => void
+}) {
   const router = useRouter()
   const { addItem, openDrawer, items } = useCart()
   const min = Math.max(1, product.minimum_order || 1)
@@ -61,22 +71,21 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
     if (!add()) return
     setAdded(true)
     window.setTimeout(() => setAdded(false), 2000)
+    onDone?.()
     openDrawer()
   }
 
   function handleBuyNow() {
     if (!add()) return
+    onDone?.()
     router.push('/checkout')
   }
 
   if (isOutOfStock) {
     return (
-      <div className="flex items-center gap-3 p-4 rounded-xl bg-sand-100 border border-sand-200">
-        <AlertCircle className="w-5 h-5 text-sand-600 flex-shrink-0" aria-hidden="true" />
-        <div>
-          <p className="text-sm font-semibold text-sand-700">Out of stock</p>
-          <p className="text-xs text-sand-600 mt-0.5">This product is temporarily unavailable. Check back soon.</p>
-        </div>
+      <div className="p-4 rounded-xl bg-sand-100 border border-sand-200">
+        <p className="text-sm font-bold text-sand-900">Sold out</p>
+        <p className="text-sm text-sand-700 mt-0.5">Save it and check back: the shop may restock.</p>
       </div>
     )
   }
@@ -112,21 +121,20 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
         </div>
       </div>
 
-      <div className="bg-sand-50 rounded-xl border border-sand-200 px-4 py-3 flex items-center justify-between text-sm">
-        <span className="text-sand-700">
-          {quantity} × {formatCurrency(product.price_ghs)}
-        </span>
-        <span className="text-lg font-bold text-sand-900 tabular-nums">
-          {formatCurrency(product.price_ghs * quantity)}
-        </span>
-      </div>
+      {quantity > 1 && (
+        <p className="flex items-baseline justify-between text-sm text-sand-700">
+          <span>{quantity} × {formatCurrency(product.price_ghs)}</span>
+          <span className="nums text-lg font-bold text-sand-900">{formatCurrency(product.price_ghs * quantity)}</span>
+        </p>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         <button
           type="button"
           onClick={handleAdd}
           disabled={roomLeft === 0}
-          className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+          data-buy-button
+          className="btn btn-primary btn-lg w-full"
         >
           {added ? <Check className="w-4 h-4 animate-pop-in" aria-hidden="true" /> : <ShoppingBag className="w-4 h-4" aria-hidden="true" />}
           {roomLeft === 0 ? 'All stock is in your cart' : added ? 'Added to cart' : 'Add to cart'}
@@ -134,38 +142,37 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
         <button
           type="button"
           onClick={handleBuyNow}
-          className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 rounded-xl border-2 border-green-600 bg-white text-green-700 text-sm font-semibold hover:bg-green-50 active:bg-green-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+          className="btn btn-secondary btn-lg w-full"
         >
           Buy now
         </button>
       </div>
 
-      <ul className="space-y-2.5 text-sm text-sand-700 border-t border-sand-200 pt-4">
-        <li className="flex gap-2.5">
-          <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gold-400 flex-shrink-0" aria-hidden="true" />
-          <span>
-            <strong className="font-semibold text-sand-900">Delivery anywhere in Ghana</strong> for{' '}
-            {formatCurrency(DELIVERY_FEE_GHS)} per shop. The shop calls you to arrange it.
-          </span>
-        </li>
-        <li className="flex gap-2.5">
-          <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gold-400 flex-shrink-0" aria-hidden="true" />
-          <span>
-            <strong className="font-semibold text-sand-900">Escrow protected.</strong> The shop is paid only after you
-            confirm delivery.
-          </span>
-        </li>
-        {product.is_demo && (
-          <li className="flex gap-2.5">
-            <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gold-400 flex-shrink-0" aria-hidden="true" />
-            <span>
-              <strong className="font-semibold text-sand-900">Sample product.</strong> Checkout works end to end with a
-              test card or mobile money; no real money is taken.{' '}
-              <Link href="/how-it-works" className="text-green-700 underline underline-offset-2">How it works</Link>
-            </span>
-          </li>
-        )}
-      </ul>
+      {!compact && (
+        <dl className="border-t border-sand-200 pt-4 space-y-3 text-sm">
+          <div className="grid grid-cols-[6.5rem,1fr] gap-3">
+            <dt className="font-bold text-sand-900">Delivery</dt>
+            <dd className="text-sand-700">
+              Anywhere in Ghana, {formatCurrency(DELIVERY_FEE_GHS)} per shop. The shop calls you to arrange it.
+            </dd>
+          </div>
+          <div className="grid grid-cols-[6.5rem,1fr] gap-3">
+            <dt className="font-bold text-sand-900">Payment</dt>
+            <dd className="text-sand-700">
+              Mobile money or card. SWK Ghana holds it, and the shop is paid only after you confirm delivery.
+            </dd>
+          </div>
+          {product.is_demo && (
+            <div className="grid grid-cols-[6.5rem,1fr] gap-3">
+              <dt className="font-bold text-sand-900">Sample</dt>
+              <dd className="text-sand-700">
+                This is a sample product. Checkout works with a test card or mobile money and no money is taken.{' '}
+                <Link href="/how-it-works#samples" className="link">About the samples</Link>
+              </dd>
+            </div>
+          )}
+        </dl>
+      )}
     </div>
   )
 }

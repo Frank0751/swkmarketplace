@@ -21,6 +21,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { OrderTimeline } from '@/components/buyer/OrderTimeline'
 import { SampleOrderControls } from '@/components/buyer/SampleOrderControls'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { BuyAgainButton } from '@/components/buyer/BuyAgainButton'
 import { Modal } from '@/components/ui/Modal'
 import {
   formatCurrency,
@@ -91,8 +92,19 @@ export default function BuyerOrderDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId])
 
-  async function fetchOrder() {
-    setLoading(true)
+  // While the shop is working on the order, check for news every 20 seconds
+  // (only while the tab is open and visible), so the page moves on by itself
+  useEffect(() => {
+    if (!order || !['paid', 'confirmed', 'dispatched'].includes(order.status)) return
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') fetchOrder({ quiet: true })
+    }, 20000)
+    return () => window.clearInterval(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?.status])
+
+  async function fetchOrder({ quiet = false }: { quiet?: boolean } = {}) {
+    if (!quiet) setLoading(true)
     const supabase = createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -115,9 +127,15 @@ export default function BuyerOrderDetailPage() {
       .single()
 
     if (error || !data) {
-      setNotFound(true)
+      if (!quiet) setNotFound(true)
     } else {
-      setOrder(data as unknown as Order)
+      const next = data as unknown as Order
+      setOrder(prev => {
+        if (quiet && prev && prev.status !== next.status) {
+          toast.success(`Update: ${ORDER_STATUS_LABELS[next.status] ?? next.status}`)
+        }
+        return next
+      })
     }
     setLoading(false)
   }
@@ -267,6 +285,9 @@ export default function BuyerOrderDetailPage() {
                 )}
               </div>
               <p className="text-sm text-sand-600">Placed on {formatDate(order.created_at)}</p>
+              {product && ['delivered', 'released', 'cancelled', 'refunded'].includes(order.status) && (
+                <BuyAgainButton productId={product.id} className="mt-3" />
+              )}
             </div>
 
             {/* Confirm delivery CTA. The consequence is stated here too, not
@@ -435,18 +456,18 @@ export default function BuyerOrderDetailPage() {
             )}
 
             {order.is_demo && (
-              <SampleOrderControls orderId={order.id} status={order.status} onChanged={fetchOrder} />
+              <SampleOrderControls orderId={order.id} status={order.status} onChanged={() => fetchOrder()} />
             )}
 
             {/* Order timeline */}
             <div className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
-              <h2 className="eyebrow mb-5">Order progress</h2>
+              <h2 className="title-card mb-5">Order progress</h2>
               <OrderTimeline order={order} />
             </div>
 
             {/* Order info */}
             <div className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
-              <h2 className="eyebrow mb-4">Order details</h2>
+              <h2 className="title-card mb-4">Order details</h2>
               <dl className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
                 <div>
                   <dt className="text-sand-600 text-xs mb-0.5">Order reference</dt>
@@ -519,7 +540,7 @@ export default function BuyerOrderDetailPage() {
 
             {/* Delivery details */}
             <div className="bg-white rounded-xl border border-sand-200 p-6 shadow-card">
-              <h2 className="eyebrow mb-3">Delivery details</h2>
+              <h2 className="title-card mb-3">Delivery details</h2>
               <p className="text-sm text-sand-700">{order.delivery_address}</p>
               <p className="text-sm text-sand-600 mt-1">{order.delivery_region}, Ghana</p>
               {order.delivery_phone && (
@@ -537,7 +558,7 @@ export default function BuyerOrderDetailPage() {
 
             {/* Order summary card */}
             <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
-              <h2 className="eyebrow mb-4">Order summary</h2>
+              <h2 className="title-card mb-4">Order summary</h2>
 
               {product && (
                 <Link
@@ -591,7 +612,7 @@ export default function BuyerOrderDetailPage() {
             {/* Escrow status */}
             {payout && (
               <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
-                <h2 className="eyebrow mb-3">Escrow status</h2>
+                <h2 className="title-card mb-3">Escrow status</h2>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-sand-600">Status</span>
@@ -626,7 +647,7 @@ export default function BuyerOrderDetailPage() {
             {/* Vendor info */}
             {vendor && (
               <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
-                <h2 className="eyebrow mb-3">Sold by</h2>
+                <h2 className="title-card mb-3">Sold by</h2>
                 <div className="flex items-center gap-3">
                   {vendor.logo_url ? (
                     <img

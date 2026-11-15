@@ -269,7 +269,7 @@ export default async function AdminDashboardPage() {
             className="card-accent bg-white rounded-xl border border-sand-200 p-5 flex items-start gap-4 hover:border-green-300 hover:shadow-card-md transition-all group"
           >
             <div className="flex-1 min-w-0">
-              <div className="eyebrow text-sand-600">{card.label}</div>
+              <div className="text-sm text-sand-600">{card.label}</div>
               <div className="text-3xl font-bold tracking-tight text-sand-900 mt-2 leading-tight">{card.value}</div>
               <div className="text-xs text-sand-600 mt-1.5">{card.sub}</div>
             </div>

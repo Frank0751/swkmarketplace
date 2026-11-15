@@ -123,7 +123,6 @@ export default async function BuyerOrdersPage({ searchParams }: Props) {
         {/* Main content */}
         <main id="main" className="flex-1 p-6 md:p-8 min-w-0">
           <div className="mb-6">
-            <p className="eyebrow mb-2">Your account</p>
             <h1 className="text-3xl font-display font-bold tracking-tight text-sand-900">My orders</h1>
             <p className="text-sand-600 text-sm mt-1">Track every purchase, from payment to delivery.</p>
           </div>

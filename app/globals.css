@@ -3,19 +3,20 @@
 @tailwind utilities;
 
 /* SIGNATURE: a kente-inspired woven band in SWK's greens and gold (.kente-band).
-   It closes the hero, opens the footer and frames the order confirmation: the one
-   element that says SWK Ghana, not template. */
+   It opens the footer and frames the order confirmation: the one element that
+   says SWK Ghana, not template. Its working counterpart is the escrow track
+   (components/escrow/EscrowTrack.tsx), which shows where a buyer's money is. */
 
 /* ─── Palette (SWK Ghana brand) ─────────────────────────────────────
-   bg-primary    #173404  forest green: footer, proof bar, closing CTA
+   bg-primary    #173404  forest green: footer, the seller invitation
    bg-secondary  #F3F0E8  sand-100: alternate sections
-   bg-light      #FAF8F3  sand-50: page background, card-heavy sections
-   accent        #3B6D11  SWK green: buttons, highlighted words, active states
-   accent-warm   #BA7517  gold: kente details, SDG marks and hairlines, sparingly
+   bg-light      #FAF8F3  sand-50: page background
+   accent        #3B6D11  SWK green: buttons, links, active states
+   accent-warm   #BA7517  gold: the page rule and kente details, sparingly
    text-primary  #2A2823  on light backgrounds; white on forest
    text-muted    #6B6454  captions and secondary text (4.5:1 on white and sand)
    border        #E8E4D8  card borders and dividers
-   Highlighted words in headings are coloured, never italic. */
+   Headings are one colour and never italic. */
 
 /* ─── Design tokens ─────────────────────────────────────────────── */
 :root {
@@ -42,6 +43,8 @@
 
   html {
     -webkit-tap-highlight-color: transparent;
+    /* Stops the page jumping sideways when a dialog hides the scrollbar */
+    scrollbar-gutter: stable;
   }
 
   /* Smooth scrolling is a vestibular trigger, so opt in rather than out */
@@ -51,11 +54,12 @@
 
   body {
     @apply text-sand-900 bg-sand-50;
-    font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
+    caret-color: theme('colors.green.600');
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-bold tracking-tight;
+    text-wrap: balance;
   }
 
   /* Emphasis is colour and weight, never slant: SWK's titles stay upright */
@@ -75,33 +79,17 @@
   ::-webkit-scrollbar-thumb:hover { @apply bg-sand-400; }
 
   /* Selection */
-  ::selection { @apply bg-green-100 text-green-800; }
+  ::selection { @apply bg-green-100 text-green-900; }
+
+  /* The browser's own clear button would sit beside ours in search fields */
+  input[type='search']::-webkit-search-cancel-button { appearance: none; }
 }
 
-/* ─── Motion graphics ───────────────────────────────────────────── */
-@keyframes rise {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-.animate-marquee {
-  animation: marquee 28s linear infinite;
-}
-
-.animate-marquee:hover {
-  animation-play-state: paused;
-}
-
-/* Reduced motion previously covered only the marquee, leaving the skeleton
-   shimmer, pulses, spinners and every entrance animation running. */
+/* ─── Motion ────────────────────────────────────────────────────── */
+/* Movement is kept to things that respond to the shopper: the cart drawer,
+   sheets and dialogs, the tick when something is added, and the escrow track.
+   Nothing fades in just because it was scrolled to. */
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee { animation: none; }
-
   *,
   *::before,
   *::after {
@@ -121,10 +109,42 @@
 /* ─── Components ────────────────────────────────────────────────── */
 @layer components {
 
-  /* SDG Verified badge */
+  /* ─── Buttons ─────────────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-lg text-sm font-bold;
+    @apply transition-colors duration-150 select-none;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary   { @apply bg-green-600 text-white hover:bg-green-700 active:bg-green-800; }
+  .btn-secondary { @apply bg-white text-green-800 border border-sand-300 hover:border-green-600 hover:bg-green-50 active:bg-green-100; }
+  /* The quiet green button on product cards: clear, without thirteen solid bars */
+  .btn-tonal     { @apply bg-green-50 text-green-800 hover:bg-green-100 active:bg-green-100; }
+  .btn-ghost     { @apply text-sand-700 hover:bg-sand-100 hover:text-sand-900; }
+  .btn-lg        { @apply min-h-[52px] px-6 text-base; }
+  .btn-sm        { @apply min-h-[40px] px-3.5 text-[13px]; }
+
+  /* A text link inside copy */
+  .link {
+    @apply font-semibold text-green-700 underline decoration-green-600/40 underline-offset-[3px];
+    @apply hover:text-green-800 hover:decoration-green-700 transition-colors;
+  }
+
+  /* ─── Titles ──────────────────────────────────────────────────── */
+  .title-page    { @apply text-[clamp(1.875rem,4.2vw,2.75rem)] leading-[1.1] tracking-[-0.02em] text-sand-900; }
+  .title-section { @apply text-[clamp(1.375rem,2.4vw,1.75rem)] leading-[1.2] tracking-[-0.015em] text-sand-900; }
+  /* The heading of a panel or card */
+  .title-card    { @apply text-sm font-bold text-sand-900 tracking-normal; }
+
+  /* Gold hairline under a page title. One per page. */
+  .rule {
+    @apply block h-0.5 w-12 rounded-full bg-gold-400;
+  }
+
+  /* SDG 12 checked mark */
   .sdg-badge {
     @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
-    @apply bg-green-50 text-green-700 border border-green-100;
+    @apply bg-green-50 text-green-800 border border-green-100;
   }
 
   /* Escrow trust badge */
@@ -133,10 +153,16 @@
     @apply bg-teal-50 text-teal-700 border border-teal-100;
   }
 
-  /* Product card */
+  /* A panel: white, bordered, no shadow */
+  .panel {
+    @apply bg-white rounded-xl border border-sand-200;
+  }
+
+  /* Product card: the photo, then three lines of text. On hover the photo
+     moves in a little and a green line draws across the top. */
   .product-card {
     @apply bg-white rounded-xl border border-sand-200 overflow-hidden;
-    @apply transition-all duration-200 hover:shadow-card-md hover:-translate-y-0.5;
+    @apply transition-colors duration-200 hover:border-sand-300;
   }
 
   /* Category pill */
@@ -145,7 +171,7 @@
        minHeight scale, so this needs the arbitrary value. */
     @apply flex-shrink-0 flex items-center gap-2 min-h-[44px] px-4 py-2 rounded-full text-sm font-medium;
     @apply bg-white border border-sand-200 text-sand-700;
-    @apply transition-all duration-150 hover:border-green-200 hover:text-green-700 hover:bg-green-50;
+    @apply transition-colors duration-150 hover:border-green-600 hover:text-green-800;
   }
   .category-pill.active {
     @apply bg-green-600 text-white border-green-600;
@@ -154,14 +180,11 @@
   /* Value tag */
   .value-tag {
     @apply inline-flex items-center gap-1 min-h-[44px] px-3 py-1 rounded-full text-xs font-medium;
-    @apply bg-sand-100 text-sand-600 border border-sand-200;
-    @apply transition-all duration-150 cursor-pointer hover:bg-green-50 hover:text-green-700 hover:border-green-200;
-  }
-  .value-tag.pointer-events-none {
-    @apply min-h-0 px-1.5 py-0.5;
+    @apply bg-white text-sand-700 border border-sand-200;
+    @apply transition-colors duration-150 cursor-pointer hover:text-green-800 hover:border-green-600;
   }
   .value-tag.active {
-    @apply bg-green-50 text-green-700 border-green-200;
+    @apply bg-green-50 text-green-800 border-green-600;
   }
 
   /* Status badge */
@@ -177,12 +200,12 @@
   .status-badge.released   { @apply bg-green-50 text-green-700 border border-green-100; }
 
   /* Section container */
-  .section { @apply py-16 md:py-24; }
+  .section { @apply py-14 md:py-20; }
   .container-app { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
 
   /* Form input */
   .form-input {
-    @apply w-full px-4 py-3 rounded-lg border border-sand-200 bg-white text-sand-900;
+    @apply w-full px-4 py-3 rounded-lg border border-sand-300 bg-white text-sand-900;
     @apply placeholder:text-sand-600 text-sm;
     @apply focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent;
     @apply transition-shadow duration-150;
@@ -200,25 +223,6 @@
     background: linear-gradient(90deg, #E8E4D8 25%, #F3F0E8 50%, #E8E4D8 75%);
     background-size: 200% 100%;
     animation: shimmer 1.8s infinite;
-  }
-
-  /* Announcement bar item */
-  .announce-item {
-    @apply flex items-center gap-2 whitespace-nowrap text-sm;
-  }
-
-  /* ─── Section label (eyebrow), above every section title ─────── */
-  .eyebrow {
-    @apply font-mono text-xs font-bold uppercase leading-tight text-green-700;
-    letter-spacing: 0.18em;
-  }
-  .eyebrow-on-dark {
-    @apply text-green-100;
-  }
-
-  /* Gold hairline between a section title and its subtitle */
-  .rule {
-    @apply block h-0.5 w-12 rounded-full bg-gold-400;
   }
 
   /* ─── SIGNATURE: kente-inspired band ────────────────────────────
@@ -257,27 +261,6 @@
   .card-accent:focus-within::before {
     transform: scaleX(1);
   }
-
-  /* ─── Hero entrance: CSS only, so it plays before any script ──── */
-  .rise {
-    animation: rise 0.7s cubic-bezier(0.21, 0.65, 0.35, 1) both;
-  }
-  .rise-1 { animation-delay: 0.05s; }
-  .rise-2 { animation-delay: 0.12s; }
-  .rise-3 { animation-delay: 0.2s; }
-  .rise-4 { animation-delay: 0.28s; }
-  .rise-5 { animation-delay: 0.36s; }
-
-  /* Order timeline step */
-  .timeline-step {
-    @apply flex items-start gap-3;
-  }
-  .timeline-dot {
-    @apply w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5;
-  }
-  .timeline-dot.done    { @apply bg-green-600 text-white; }
-  .timeline-dot.active  { @apply bg-gold-400 text-white ring-4 ring-gold-100; }
-  .timeline-dot.pending { @apply bg-sand-200 text-sand-600; }
 }
 
 /* ─── Utilities ─────────────────────────────────────────────────── */
@@ -286,18 +269,8 @@
   .scrollbar-hide   { scrollbar-width: none; -ms-overflow-style: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-  /* Dot pattern background */
-  .dot-bg {
-    background-image: radial-gradient(circle, #C0DD97 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-
-  /* Frosted glass */
-  .glass {
-    backdrop-filter: blur(12px) saturate(1.5);
-    -webkit-backdrop-filter: blur(12px) saturate(1.5);
-    background: rgba(250, 248, 243, 0.85);
-  }
+  /* Prices and counts line up in columns */
+  .nums { font-variant-numeric: tabular-nums; }
 
   /* Line clamp */
   .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }

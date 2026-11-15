@@ -59,9 +59,9 @@ export default async function AdminOrdersPage() {
         ].map(stat => (
           <div
             key={stat.label}
-            className={`flex flex-col bg-white rounded-xl border border-sand-200 border-t-4 p-4 ${stat.alert ? 'border-t-red-600' : 'border-t-green-600'}`}
+            className={`flex flex-col bg-white rounded-xl border border-sand-200 p-4 ${stat.alert ? 'border-t-red-600' : 'border-t-green-600'}`}
           >
-            <dt className="eyebrow text-sand-600 order-1">{stat.label}</dt>
+            <dt className="text-sm text-sand-600 order-1">{stat.label}</dt>
             <dd className="order-2 mt-2 text-2xl font-bold tracking-tight text-sand-900">{stat.value}</dd>
             <dd className={`order-3 text-xs mt-1 ${stat.alert ? 'text-red-700 font-semibold' : 'text-sand-600'}`}>{stat.note}</dd>
           </div>

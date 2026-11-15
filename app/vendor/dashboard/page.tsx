@@ -292,32 +292,32 @@ export default async function VendorDashboardPage() {
 
               {/* Stats */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-5 shadow-card">
+                <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="eyebrow text-sand-600">Orders fulfilled</span>
+                    <span className="text-sm text-sand-600">Orders fulfilled</span>
                   </div>
                   <p className="text-3xl font-display font-bold text-sand-900">
                     {vendor.total_sales ?? 0}
                   </p>
                 </div>
 
-                <div className="bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-5 shadow-card">
+                <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="eyebrow text-sand-600">Active Listings</span>
+                    <span className="text-sm text-sand-600">Active Listings</span>
                   </div>
                   <p className="text-3xl font-display font-bold text-sand-900">{productCounts.approved}</p>
                 </div>
 
-                <div className="bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-5 shadow-card">
+                <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="eyebrow text-sand-600">Total Orders</span>
+                    <span className="text-sm text-sand-600">Total Orders</span>
                   </div>
                   <p className="text-3xl font-display font-bold text-sand-900">{orderCount}</p>
                 </div>
 
-                <div className="bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-5 shadow-card">
+                <div className="bg-white rounded-xl border border-sand-200 p-5 shadow-card">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="eyebrow text-sand-600">Pending Payout</span>
+                    <span className="text-sm text-sand-600">Pending Payout</span>
                   </div>
                   <p className="text-2xl font-display font-bold text-sand-900">{formatCurrency(pendingPayouts)}</p>
                   {/* This figure is net, so state the deduction rather than

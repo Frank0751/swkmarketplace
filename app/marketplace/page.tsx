@@ -1,72 +1,42 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
+import { SampleNotice } from '@/components/layout/SampleNotice'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { CategoryStrip } from '@/components/marketplace/CategoryStrip'
-import { ValueFilterStrip } from '@/components/marketplace/ValueFilterStrip'
 import { ProductGrid } from '@/components/marketplace/ProductGrid'
-import { MobileSortSelect } from '@/components/marketplace/MobileSortSelect'
-import { productSearchFilter } from '@/lib/marketplace/search'
-import { sampleCatalogueVisible } from '@/lib/marketplace/catalogue'
-import { CATEGORY_META, GHANA_REGIONS, VALUE_TAG_META, type ProductCategory, type GhanaRegion, type ValueTag } from '@/types'
-
-// ─── Metadata ─────────────────────────────────────────────────────────────────
+import { ProductGridSkeleton } from '@/components/marketplace/ProductGridSkeleton'
+import { FilterSheet } from '@/components/marketplace/FilterSheet'
+import { searchProductIds } from '@/lib/search/index'
+import {
+  PRICE_RANGES,
+  SORT_OPTIONS,
+  marketplaceUrl,
+  parseMarketplaceFilters,
+  type MarketplaceFilters,
+} from '@/lib/marketplace/filters'
+import { cn } from '@/lib/utils'
+import { CATEGORY_META, GHANA_REGIONS, VALUE_TAG_META, type ValueTag } from '@/types'
 
 export const metadata: Metadata = {
-  title: 'Shop sustainable products',
+  title: 'All products',
   description:
-    'Discover eco-friendly, SDG 12-verified products from verified youth-led green entrepreneurs across Ghana and Africa.',
+    'Honey, produce, crafts and upcycled goods from youth-led green businesses in Ghana, each checked against SDG 12.',
   openGraph: {
-    title: 'Shop sustainable products | SWK Marketplace',
-    description:
-      'Browse organic, recycled, handmade, and agribusiness products supporting responsible consumption.',
+    title: 'All products | SWK Marketplace',
+    description: 'Honey, produce, crafts and upcycled goods from youth-led green businesses in Ghana.',
     url: 'https://marketplace.swkghana.org/marketplace',
     siteName: 'SWK Marketplace',
   },
 }
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
+const LIMIT = 24
 
-function ProductGridSkeleton() {
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-      {Array.from({ length: 12 }).map((_, i) => (
-        <div key={i} className="product-card overflow-hidden">
-          <div className="skeleton w-full" style={{ aspectRatio: '4/3' }} />
-          <div className="p-3 space-y-2">
-            <div className="skeleton h-3 w-2/3 rounded" />
-            <div className="skeleton h-4 w-full rounded" />
-            <div className="skeleton h-3 w-1/2 rounded" />
-            <div className="skeleton h-8 w-full rounded mt-2" />
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ─── Product count (server) ───────────────────────────────────────────────────
-
-async function fetchProductCount({
-  category,
-  valueTags,
-  search,
-  region,
-  minPrice,
-  maxPrice,
-}: {
-  category?: string
-  valueTags?: string[]
-  search?: string
-  region?: string
-  minPrice?: number
-  maxPrice?: number
-}): Promise<number> {
+async function fetchProductCount(filters: MarketplaceFilters): Promise<number> {
   const supabase = await createClient()
 
   let query = supabase
@@ -74,330 +44,217 @@ async function fetchProductCount({
     .select('id', { count: 'exact', head: true })
     .eq('status', 'approved')
 
-  if (category) query = query.eq('category', category)
-  if (region) query = query.eq('region', region)
-  if (valueTags && valueTags.length > 0) query = query.contains('value_tags', valueTags)
-  const searchFilter = productSearchFilter(search)
-  if (searchFilter) query = query.or(searchFilter)
-  if (typeof minPrice === 'number') query = query.gte('price_ghs', minPrice)
-  if (typeof maxPrice === 'number') query = query.lte('price_ghs', maxPrice)
+  if (filters.category) query = query.eq('category', filters.category)
+  if (filters.region) query = query.eq('region', filters.region)
+  if (filters.values.length > 0) query = query.contains('value_tags', filters.values)
+  if (filters.minPrice !== undefined) query = query.gte('price_ghs', filters.minPrice)
+  if (filters.maxPrice !== undefined) query = query.lte('price_ghs', filters.maxPrice)
+
+  const matchedIds = await searchProductIds(filters.search)
+  if (matchedIds) {
+    if (matchedIds.length === 0) return 0
+    query = query.in('id', matchedIds)
+  }
 
   const { count } = await query
   return count || 0
 }
 
-// ─── Page params ──────────────────────────────────────────────────────────────
-
-interface MarketplaceSearchParams {
-  category?: string
-  values?: string
-  search?: string
-  sort?: string
-  page?: string
-  region?: string
-  min_price?: string
-  max_price?: string
+function FilterLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? 'true' : undefined}
+      className={cn(
+        'block w-full px-3 py-2 text-sm rounded-lg transition-colors',
+        active ? 'bg-green-50 text-green-800 font-bold' : 'text-sand-700 hover:bg-sand-100',
+      )}
+    >
+      {children}
+    </Link>
+  )
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+function Chip({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center gap-1.5 min-h-[36px] pl-3 pr-2 rounded-full bg-white border border-sand-300 text-xs font-medium text-sand-800 hover:border-sand-900 transition-colors"
+    >
+      {label}
+      <X className="w-3.5 h-3.5 text-sand-600" aria-hidden="true" />
+      <span className="sr-only">(remove filter)</span>
+    </Link>
+  )
+}
 
 export default async function MarketplacePage({
   searchParams,
 }: {
-  searchParams: MarketplaceSearchParams
+  searchParams: Record<string, string | string[] | undefined>
 }) {
-  const category = searchParams.category as ProductCategory | undefined
-  const valueTags = searchParams.values
-    ? (searchParams.values.split(',').filter(Boolean) as ValueTag[])
-    : []
-  const search = searchParams.search || ''
-  const sort = searchParams.sort || 'newest'
-  const page = Math.max(1, parseInt(searchParams.page || '1', 10))
-  const region = searchParams.region as GhanaRegion | undefined
-  const minPrice = searchParams.min_price ? parseFloat(searchParams.min_price) : undefined
-  const maxPrice = searchParams.max_price ? parseFloat(searchParams.max_price) : undefined
+  const filters = parseMarketplaceFilters(searchParams)
+  const { category, values, search, region, minPrice, maxPrice, page } = filters
+  const sort = filters.sort ?? (search ? 'relevance' : 'newest')
+  const url = (overrides: Partial<MarketplaceFilters>) => marketplaceUrl({ ...filters, page: 1, ...overrides })
 
-  const LIMIT = 24
-
-  const totalCount = await fetchProductCount({
-    category,
-    valueTags,
-    search,
-    region,
-    minPrice,
-    maxPrice,
-  })
-
-  const showingSamples = await sampleCatalogueVisible()
-
+  const totalCount = await fetchProductCount(filters)
   const totalPages = Math.ceil(totalCount / LIMIT)
+  const hasPrice = minPrice !== undefined || maxPrice !== undefined
+  const hasActiveFilters = !!(category || values.length || search || region || hasPrice)
+  const sortOptions = SORT_OPTIONS.filter(o => o.value !== 'relevance' || !!search)
 
-  // Build URL helper for pagination / filter changes
-  function buildUrl(overrides: Partial<MarketplaceSearchParams>): string {
-    const params = new URLSearchParams()
-    const merged = {
-      category: category || '',
-      values: valueTags.join(','),
-      search,
-      sort,
-      page: String(page),
-      region: region || '',
-      min_price: minPrice !== undefined ? String(minPrice) : '',
-      max_price: maxPrice !== undefined ? String(maxPrice) : '',
-      ...overrides,
-    }
-    Object.entries(merged).forEach(([k, v]) => {
-      if (v) params.set(k, v)
-    })
-    return `/marketplace?${params.toString()}`
-  }
-
-  const hasActiveFilters = !!(category || valueTags.length || search || region || minPrice || maxPrice)
+  const title = search
+    ? `Results for “${search}”`
+    : category ? CATEGORY_META[category].label : 'All products'
 
   return (
     <>
-      <AnnouncementBar />
+      <SampleNotice />
       <Navbar />
       <CategoryStrip />
-      <ValueFilterStrip />
 
-      <main id="main" className="container-app py-6 pb-24 md:pb-6">
-        <div className="flex gap-6">
+      <main id="main" className="container-app py-6 md:py-8 pb-24 md:pb-12">
+        <div className="flex gap-8">
 
-          {/* ── Desktop filter sidebar ─────────────────────────────── */}
-          <aside className="hidden lg:block w-56 flex-shrink-0">
-            <div className="sticky top-36 space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="eyebrow">Refine</h2>
-                {hasActiveFilters && (
-                  <Link
-                    href="/marketplace"
-                    className="text-xs text-sand-600 hover:text-sand-900 underline underline-offset-2 transition-colors"
-                  >
-                    Clear all
-                  </Link>
-                )}
-              </div>
-
-              {/* Sort */}
+          {/* ── Desktop filters ─────────────────────────────────────── */}
+          <aside className="hidden lg:block w-56 flex-shrink-0" aria-label="Filters">
+            <div className="sticky top-40 space-y-6 max-h-[calc(100vh-11rem)] overflow-y-auto pr-1">
               <div>
-                <p className="text-sm font-bold text-sand-900 mb-2">Sort by</p>
-                <div className="space-y-1">
-                  {[
-                    { value: 'newest', label: 'Newest first' },
-                    { value: 'popular', label: 'Most popular' },
-                    { value: 'price_asc', label: 'Price: low to high' },
-                    { value: 'price_desc', label: 'Price: high to low' },
-                  ].map(opt => (
-                    <Link
-                      key={opt.value}
-                      href={buildUrl({ sort: opt.value, page: '1' })}
-                      className={`block w-full px-3 py-2 text-sm rounded-lg transition-colors ${
-                        sort === opt.value
-                          ? 'bg-green-50 text-green-800 font-semibold'
-                          : 'text-sand-600 hover:bg-sand-100'
-                      }`}
-                    >
+                <h2 className="title-card mb-2">Sort by</h2>
+                <div className="space-y-0.5">
+                  {sortOptions.map(opt => (
+                    <FilterLink key={opt.value} href={url({ sort: opt.value })} active={sort === opt.value}>
                       {opt.label}
-                    </Link>
+                    </FilterLink>
                   ))}
                 </div>
               </div>
 
-              {/* Region */}
               <div>
-                <p className="text-sm font-bold text-sand-900 mb-2">Region</p>
-                <div className="space-y-1 max-h-48 overflow-y-auto scrollbar-hide">
-                  <Link
-                    href={buildUrl({ region: '', page: '1' })}
-                    className={`block w-full px-3 py-2 text-sm rounded-lg transition-colors ${
-                      !region ? 'bg-green-50 text-green-800 font-semibold' : 'text-sand-600 hover:bg-sand-100'
-                    }`}
-                  >
-                    All regions
-                  </Link>
-                  {GHANA_REGIONS.map(r => (
-                    <Link
-                      key={r}
-                      href={buildUrl({ region: r, page: '1' })}
-                      className={`block w-full px-3 py-2 text-sm rounded-lg transition-colors ${
-                        region === r ? 'bg-green-50 text-green-800 font-semibold' : 'text-sand-600 hover:bg-sand-100'
-                      }`}
-                    >
-                      {r}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price range */}
-              <div>
-                <p className="text-sm font-bold text-sand-900 mb-2">Price (GHS)</p>
-                <div className="space-y-1">
-                  {[
-                    { label: 'Under GHS 50', min: undefined, max: 50 },
-                    { label: 'GHS 50 – 200', min: 50, max: 200 },
-                    { label: 'GHS 200 – 500', min: 200, max: 500 },
-                    { label: 'Over GHS 500', min: 500, max: undefined },
-                  ].map(range => {
-                    const isActive = minPrice === range.min && maxPrice === range.max
+                <h2 className="title-card mb-2">Price</h2>
+                <div className="space-y-0.5">
+                  {PRICE_RANGES.map(range => {
+                    const active = minPrice === range.min && maxPrice === range.max
                     return (
-                      <Link
+                      <FilterLink
                         key={range.label}
-                        href={buildUrl({
-                          min_price: range.min !== undefined ? String(range.min) : '',
-                          max_price: range.max !== undefined ? String(range.max) : '',
-                          page: '1',
-                        })}
-                        className={`block w-full px-3 py-2 text-sm rounded-lg transition-colors ${
-                          isActive ? 'bg-green-50 text-green-800 font-semibold' : 'text-sand-600 hover:bg-sand-100'
-                        }`}
+                        href={url(active ? { minPrice: undefined, maxPrice: undefined } : { minPrice: range.min, maxPrice: range.max })}
+                        active={active}
                       >
                         {range.label}
-                      </Link>
+                      </FilterLink>
                     )
                   })}
+                </div>
+              </div>
+
+              <div>
+                <h2 className="title-card mb-2">Made this way</h2>
+                <div className="space-y-0.5">
+                  {(Object.keys(VALUE_TAG_META) as ValueTag[]).map(tag => {
+                    const active = values.includes(tag)
+                    return (
+                      <FilterLink
+                        key={tag}
+                        href={url({ values: active ? values.filter(v => v !== tag) : [...values, tag] })}
+                        active={active}
+                      >
+                        {VALUE_TAG_META[tag].label}
+                      </FilterLink>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <h2 className="title-card mb-2">Region</h2>
+                <div className="space-y-0.5">
+                  <FilterLink href={url({ region: undefined })} active={!region}>All regions</FilterLink>
+                  {GHANA_REGIONS.map(r => (
+                    <FilterLink key={r} href={url({ region: r })} active={region === r}>{r}</FilterLink>
+                  ))}
                 </div>
               </div>
             </div>
           </aside>
 
-          {/* ── Main content ────────────────────────────────────────── */}
+          {/* ── Products ────────────────────────────────────────────── */}
           <div className="flex-1 min-w-0">
-
-            {/* Header row */}
-            <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
+            <div className="flex items-end justify-between gap-4 flex-wrap mb-5">
               <div>
-                <p className="eyebrow mb-2">{search ? 'Search results' : 'The marketplace'}</p>
-                <h1 className="text-2xl md:text-3xl font-display font-bold tracking-tight text-sand-900">
-                  {category ? CATEGORY_META[category as ProductCategory]?.label : 'All products'}
-                </h1>
-                <p className="text-sm text-sand-600 mt-0.5">
+                <h1 className="title-page">{title}</h1>
+                <p className="text-sm text-sand-600 mt-1.5" role="status">
                   {totalCount === 0
-                    ? 'No products found'
-                    : `Showing ${((page - 1) * LIMIT) + 1}–${Math.min(page * LIMIT, totalCount)} of ${totalCount} product${totalCount !== 1 ? 's' : ''}`}
+                    ? 'No products'
+                    : totalPages > 1
+                      ? `${(page - 1) * LIMIT + 1} to ${Math.min(page * LIMIT, totalCount)} of ${totalCount} products`
+                      : `${totalCount} ${totalCount === 1 ? 'product' : 'products'}`}
                 </p>
               </div>
-
-              {/* Mobile sort */}
               <div className="lg:hidden">
-                <MobileSortSelect sort={sort} />
+                <FilterSheet filters={filters} />
               </div>
             </div>
 
-            {/* Active filter chips */}
             {hasActiveFilters && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {category && (
-                  <Link
-                    href={buildUrl({ category: '', page: '1' })}
-                    className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-xs font-medium hover:bg-green-100 transition-colors"
-                  >
-                    
-                    {CATEGORY_META[category as ProductCategory]?.label}
-                    <span className="ml-0.5 opacity-60">×</span>
-                  </Link>
+              <div className="flex flex-wrap items-center gap-2 mb-5">
+                {search && <Chip href={url({ search: '', sort: undefined })} label={`“${search}”`} />}
+                {category && <Chip href={url({ category: undefined })} label={CATEGORY_META[category].label} />}
+                {values.map(tag => (
+                  <Chip key={tag} href={url({ values: values.filter(v => v !== tag) })} label={VALUE_TAG_META[tag].label} />
+                ))}
+                {region && <Chip href={url({ region: undefined })} label={region} />}
+                {hasPrice && (
+                  <Chip
+                    href={url({ minPrice: undefined, maxPrice: undefined })}
+                    label={PRICE_RANGES.find(r => r.min === minPrice && r.max === maxPrice)?.label ?? 'Price'}
+                  />
                 )}
-                {region && (
-                  <Link
-                    href={buildUrl({ region: '', page: '1' })}
-                    className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-xs font-medium hover:bg-green-100 transition-colors"
-                  >
-                    {region}
-                    <span className="ml-0.5 opacity-60">×</span>
-                  </Link>
-                )}
-                {(minPrice !== undefined || maxPrice !== undefined) && (
-                  <Link
-                    href={buildUrl({ min_price: '', max_price: '', page: '1' })}
-                    className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-xs font-medium hover:bg-green-100 transition-colors"
-                  >
-                    GHS {minPrice ?? 0} – {maxPrice ?? '∞'}
-                    <span className="ml-0.5 opacity-60">×</span>
-                  </Link>
-                )}
-                {search && (
-                  <Link
-                    href={buildUrl({ search: '', page: '1' })}
-                    className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-xs font-medium hover:bg-green-100 transition-colors"
-                  >
-                    <Search className="w-3 h-3" />
-                    &ldquo;{search}&rdquo;
-                    <span className="ml-0.5 opacity-60">×</span>
-                  </Link>
-                )}
+                <Link href="/marketplace" className="link text-xs ml-1 inline-flex items-center min-h-[36px]">Clear all</Link>
               </div>
             )}
 
-            {/* Say plainly that these are samples, and turn visitors who sell
-                into applicants */}
-            {showingSamples && (
-              <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 px-5 py-4 rounded-xl bg-white border border-sand-200 border-l-4 border-l-gold-400">
-                <p className="flex-1 text-sm text-sand-800 leading-relaxed">
-                  <strong>You&rsquo;re browsing our sample shops.</strong> Add anything to your cart and check
-                  out: it all works, but payment is a test (use a test card or mobile money), so no real
-                  money is taken. Our first verified vendors are joining now.
-                </p>
-                <Link
-                  href="/vendor/apply"
-                  className="inline-flex items-center justify-center min-h-[44px] px-4 rounded-lg border-2 border-green-600 text-green-700 text-sm font-semibold hover:bg-green-50 transition-colors whitespace-nowrap"
-                >
-                  Become a founding vendor
-                </Link>
-              </div>
-            )}
-
-            {/* Product grid */}
-            <Suspense fallback={<ProductGridSkeleton />}>
+            <Suspense key={marketplaceUrl(filters)} fallback={<ProductGridSkeleton count={12} />}>
               <ProductGrid
                 category={category}
-                valueTags={valueTags}
+                valueTags={values}
                 search={search}
-                sort={sort}
+                sort={filters.sort}
                 limit={LIMIT}
+                page={page}
                 region={region}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
               />
             </Suspense>
 
-            {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-3 mt-10">
+              <nav aria-label="Pages" className="flex items-center justify-center gap-3 mt-10">
                 {page > 1 ? (
-                  <Link
-                    href={buildUrl({ page: String(page - 1) })}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-sand-200 text-sm font-medium text-sand-700 hover:bg-sand-100 transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
+                  <Link href={marketplaceUrl({ ...filters, page: page - 1 })} className="btn btn-secondary btn-sm">
+                    <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                     Previous
                   </Link>
                 ) : (
-                  <span className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-sand-100 text-sm font-medium text-sand-300 cursor-not-allowed">
-                    <ChevronLeft className="w-4 h-4" />
+                  <span className="btn btn-sm text-sand-400 border border-sand-200" aria-disabled="true">
+                    <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                     Previous
                   </span>
                 )}
-
-                <span className="text-sm text-sand-600">
-                  Page {page} of {totalPages}
-                </span>
-
+                <span className="text-sm text-sand-700">Page {page} of {totalPages}</span>
                 {page < totalPages ? (
-                  <Link
-                    href={buildUrl({ page: String(page + 1) })}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-sand-200 text-sm font-medium text-sand-700 hover:bg-sand-100 transition-colors"
-                  >
+                  <Link href={marketplaceUrl({ ...filters, page: page + 1 })} className="btn btn-secondary btn-sm">
                     Next
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-4 h-4" aria-hidden="true" />
                   </Link>
                 ) : (
-                  <span className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-sand-100 text-sm font-medium text-sand-300 cursor-not-allowed">
+                  <span className="btn btn-sm text-sand-400 border border-sand-200" aria-disabled="true">
                     Next
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-4 h-4" aria-hidden="true" />
                   </span>
                 )}
-              </div>
+              </nav>
             )}
           </div>
         </div>

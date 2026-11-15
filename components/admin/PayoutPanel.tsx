@@ -105,9 +105,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
     <div className="space-y-6">
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-4 flex items-start gap-3">
+        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-start gap-3">
           <div>
-            <div className="eyebrow text-sand-600">Held in escrow</div>
+            <div className="text-sm text-sand-600">Held in escrow</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalHeld)}</div>
             <div className="text-xs text-sand-600 mt-0.5">
               {readyCount > 0 ? `${readyCount} ready to release` : 'None ready to release'}
@@ -115,9 +115,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-4 flex items-start gap-3">
+        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-start gap-3">
           <div>
-            <div className="eyebrow text-sand-600">Paid to vendors</div>
+            <div className="text-sm text-sand-600">Paid to vendors</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalReleased)}</div>
             <div className="text-xs text-sand-600 mt-0.5">
               {payouts.filter(p => p.status === 'released').length} payouts
@@ -125,9 +125,9 @@ export function PayoutPanel({ payouts: initialPayouts }: PayoutPanelProps) {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-4 flex items-start gap-3">
+        <div className="bg-white rounded-xl border border-sand-200 p-4 flex items-start gap-3">
           <div>
-            <div className="eyebrow text-sand-600">Commission earned</div>
+            <div className="text-sm text-sand-600">Commission earned</div>
             <div className="text-xl font-bold text-sand-900 mt-0.5">{formatCurrency(totalCommission)}</div>
             <div className="text-xs text-sand-600 mt-0.5">15% of released payouts</div>
           </div>

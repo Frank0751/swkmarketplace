@@ -92,7 +92,7 @@ export function OtpDialog({ open, message, error, busy, onSubmit, onCancel }: Ot
           onOpenAutoFocus={e => { e.preventDefault(); inputRef.current?.focus() }}
           className="fixed left-1/2 top-1/2 z-[60] w-[calc(100vw-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-card-lg outline-none"
         >
-          <p className="eyebrow mb-2">Your bank</p>
+          <p className="title-card mb-2">Your bank</p>
           <Dialog.Title className="text-lg font-display font-bold text-sand-900">Verify this payment</Dialog.Title>
           <Dialog.Description className="text-sm text-sand-600 mt-1 leading-relaxed">{message}</Dialog.Description>
           <form

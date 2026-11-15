@@ -26,7 +26,7 @@ const nextConfig = {
     return [{ source: '/:path*', headers: securityHeaders }]
   },
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    optimizePackageImports: ['lucide-react'],
     // This machine has 8GB RAM; a single build worker keeps peak memory low
     cpus: 1,
     workerThreads: false,

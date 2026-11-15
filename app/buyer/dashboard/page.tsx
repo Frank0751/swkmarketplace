@@ -105,7 +105,6 @@ export default async function BuyerDashboardPage() {
         <main id="main" className="flex-1 p-6 md:p-8 min-w-0">
           {/* Header */}
           <div className="mb-8">
-            <p className="eyebrow mb-2">Your account</p>
             <h1 className="text-3xl font-display font-bold tracking-tight text-sand-900">
               Welcome back{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}
             </h1>
@@ -121,8 +120,8 @@ export default async function BuyerDashboardPage() {
               { label: 'In progress', value: String(activeOrders) },
               { label: 'Total spent', value: formatCurrency(totalSpent) },
             ].map(stat => (
-              <div key={stat.label} className="flex flex-col bg-white rounded-xl border border-sand-200 border-t-4 border-t-green-600 p-5 shadow-card">
-                <dt className="eyebrow order-1">{stat.label}</dt>
+              <div key={stat.label} className="flex flex-col bg-white rounded-xl border border-sand-200 p-5 shadow-card">
+                <dt className="text-sm text-sand-600 order-1">{stat.label}</dt>
                 <dd className="order-2 mt-2 text-3xl font-display font-bold tracking-tight text-sand-900">{stat.value}</dd>
               </div>
             ))}

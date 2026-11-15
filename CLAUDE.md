@@ -120,22 +120,26 @@ supabase/migrations/: All SQL migrations
 ### Typography
 - **Ubuntu** (SWK Ghana's brand typeface) for everything: `font-sans` and `font-display` are both
   Ubuntu, loaded once (upright only) in `app/layout.tsx`.
-- `font-mono` is Ubuntu Mono: order references, card numbers, eyebrow labels.
+- `font-mono` is Ubuntu Mono: order references and card numbers only.
 - Titles are never italic. Highlight a phrase in a heading with colour
   (`<span className="text-green-600">`), not slant.
 - No em dashes in copy, comments or docs: use commas, colons or full stops.
 
 ### Visual language
-- Signature: the kente-inspired woven band (`.kente-band`) closing the hero, opening the footer and
-  framing the order confirmation. Keep it to those places.
-- Sections open with `SectionHeading`: mono eyebrow, title, short gold rule (`.rule`), one line of context.
+- Signature: the kente-inspired woven band (`.kente-band`) opening the footer and framing the order
+  confirmation. Its working counterpart is the escrow track (`components/escrow/EscrowTrack.tsx`).
+- No labels above headings, no two-colour headings, no fade-in-on-scroll, no count-up numbers, no
+  ticker. One gold `.rule` per page, under the page title (`.title-page`). Sections use `.title-section`.
+- Cards have a border, not a shadow. Shadows are for things that float: menus, drawer, dialogs.
+- Buttons: `.btn` with `.btn-primary`, `.btn-secondary`, `.btn-tonal` (card add-to-cart) or `.btn-ghost`.
 - Forest green (`green-900`) for dark sections and the footer; sand for page backgrounds; gold sparingly.
 - Few icons: keep functional ones (cart, search, menu, close, quantity, delete, arrows, status), not
   decorative icon tiles beside headings.
 
 ### Key CSS classes (defined in globals.css)
-- `.eyebrow`, `.rule`, `.kente-band`, `.card-accent` (green line draws in on hover), `.rise` (hero entrance)
-- `.product-card`: product card with hover lift
+- `.rule`, `.kente-band`, `.card-accent` (green line draws in on hover), `.panel` (white bordered box)
+- `.title-page`, `.title-section`, `.title-card`, `.link`, `.nums` (tabular figures)
+- `.product-card`: product and shop cards
 - `.sdg-badge`: SDG 12 verified green pill
 - `.trust-badge`: escrow/verification teal badge
 - `.category-pill`: filterable category button
@@ -276,3 +280,9 @@ Optional:
 - Admin email: info@swkghana.org
 - Supabase project: zxxzmqrxvmkscibfhpjn (`qaen86pl` is the Sanity project behind swkghana.org)
 - WhatsApp community: chat.whatsapp.com/LrSVJrNFHGY6kdPnW8xoTu
+
+### Search, saved items, recently viewed
+- Instant search (`components/search/*`) ranks the catalogue in the browser with `lib/search/rank.ts`
+  (typo and plural tolerant). The catalogue comes from `/api/search/index` (public data, cached 60s).
+  `/marketplace?search=` uses the same ranker, so both always find the same things. `/` or Ctrl+K opens it.
+- Saved items, recently viewed and recent searches live in localStorage (`lib/local/lists.ts`), like the cart.

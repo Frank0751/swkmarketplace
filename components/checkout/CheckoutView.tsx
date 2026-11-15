@@ -404,7 +404,6 @@ export function CheckoutView({ profile, addresses, paymentMethods, paymentsMode 
   if (summary.lines.length === 0) {
     return (
       <div className="max-w-lg mx-auto bg-white rounded-2xl border border-sand-200 shadow-card px-6 py-14 text-center">
-        <p className="eyebrow mb-3">Nothing to pay for</p>
         <h2 className="text-2xl font-display font-bold text-sand-900">Your cart is empty</h2>
         <p className="text-sm text-sand-600 mt-1 mb-6">
           {items.length > 0 ? 'The items in your cart are no longer available.' : 'Add something to your cart to check out.'}
@@ -419,7 +418,6 @@ export function CheckoutView({ profile, addresses, paymentMethods, paymentsMode 
   if (summary.kind === 'mixed') {
     return (
       <div className="max-w-lg mx-auto bg-white rounded-2xl border border-sand-200 shadow-card px-6 py-12 text-center">
-        <p className="eyebrow mb-3">One more step</p>
         <h2 className="text-2xl font-display font-bold text-sand-900">Sample and real products are paid separately</h2>
         <p className="text-sm text-sand-600 mt-2 mb-6">
           Sample products use a test payment, so they can’t share a checkout with real ones.
@@ -630,7 +628,7 @@ export function CheckoutView({ profile, addresses, paymentMethods, paymentsMode 
             </h2>
 
             {isSample && (
-              <div className="mt-3 rounded-xl border border-gold-200 border-l-4 border-l-gold-400 bg-gold-50 px-4 py-3 text-sm text-gold-900">
+              <div className="mt-3 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-900">
                 <p>
                   <strong>Test payment.</strong> These are sample products, so you pay with a test card or a
                   simulated mobile money prompt. No real money is taken, and real cards are refused.

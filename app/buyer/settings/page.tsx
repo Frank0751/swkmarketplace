@@ -113,7 +113,6 @@ export default function AccountSettingsPage() {
         >
           <ArrowLeft className="w-4 h-4" /> Dashboard
         </Link>
-        <p className="eyebrow mb-2">Your account</p>
         <h1 className="text-3xl font-display font-bold tracking-tight text-sand-900 mb-1">Account settings</h1>
         <p className="text-sm text-sand-600 mb-8">
           Signed in as <span className="font-medium text-sand-700">{profile?.email}</span>

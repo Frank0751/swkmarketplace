@@ -6,6 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { CartProvider } from '@/lib/cart/CartProvider'
 import { CartDrawer } from '@/components/cart/CartDrawer'
+import { SearchProvider } from '@/components/search/SearchProvider'
 import './globals.css'
 
 // SWK Ghana's brand typeface, Ubuntu, for everything: headings and body share
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
     template: '%s | SWK Marketplace',
   },
   description:
-    'A curated, SDG 12-aligned marketplace connecting eco-conscious buyers with verified green entrepreneurs across Ghana and Africa.',
+    'Buy from youth-led green businesses in Ghana. SWK Ghana holds your payment until your order arrives, and checks every listing against SDG 12.',
   keywords: ['sustainable', 'Ghana', 'marketplace', 'eco-friendly', 'youth', 'SDG', 'green', 'organic', 'handmade'],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://marketplace.swkghana.org'),
   openGraph: {
@@ -42,13 +43,13 @@ export const metadata: Metadata = {
     url: 'https://marketplace.swkghana.org',
     siteName: 'SWK Marketplace',
     title: 'SWK Marketplace: Ghana\'s Sustainable Youth Marketplace',
-    description: 'Shop verified eco-friendly products from youth-led green entrepreneurs across Ghana.',
+    description: 'Buy from youth-led green businesses in Ghana. Your payment is held until your order arrives.',
     images: [{ url: '/images/og-image.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SWK Marketplace',
-    description: 'Ghana\'s curated sustainable marketplace.',
+    description: 'Goods from youth-led green businesses in Ghana.',
   },
   robots: { index: true, follow: true },
 }
@@ -57,8 +58,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${ubuntu.variable} ${ubuntuMono.variable}`}>
       <body className="min-h-screen bg-sand-50 font-sans antialiased">
-        {/* Lets keyboard users jump the marquee, logo, nav links, search and
-            filter pills that precede content on every page. */}
+        {/* Lets keyboard users jump the logo, nav links, search and filter
+            pills that precede content on every page. */}
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:inline-flex focus:items-center focus:min-h-[44px] focus:px-4 focus:rounded-xl focus:bg-green-600 focus:text-white focus:text-sm focus:font-semibold focus:shadow-card-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-green-600"
@@ -73,7 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             url: 'https://marketplace.swkghana.org',
             logo: 'https://marketplace.swkghana.org/images/swk-logo.png',
             description:
-              'A curated, SDG 12-aligned marketplace connecting eco-conscious buyers with verified youth-led green entrepreneurs across Ghana and Africa.',
+              'A marketplace for youth-led green businesses in Ghana, run by SWK Ghana. Payments are held in escrow until delivery and every listing is checked against SDG 12.',
             parentOrganization: {
               '@type': 'NGO',
               name: 'SWK Ghana',
@@ -91,7 +92,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* One cart for the whole site, kept in the browser so it survives
             signing in and refreshing */}
         <CartProvider>
-          {children}
+          <SearchProvider>
+            {children}
+          </SearchProvider>
           <CartDrawer />
         </CartProvider>
         <Toaster

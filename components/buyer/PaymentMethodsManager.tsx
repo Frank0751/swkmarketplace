@@ -141,7 +141,7 @@ export function PaymentMethodsManager({ initialMethods, defaultName }: { initial
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-gold-200 border-l-4 border-l-gold-400 bg-gold-50 px-4 py-3 text-sm text-gold-900">
+      <div className="rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-900">
         <p>
           Payments are in test mode while our first vendors join, so only test cards can be saved here and they
           pay for sample orders. When live payments start, cards are kept securely by our payment provider.
@@ -150,7 +150,6 @@ export function PaymentMethodsManager({ initialMethods, defaultName }: { initial
 
       {methods.length === 0 ? (
         <div className="bg-white rounded-2xl border border-sand-200 shadow-card px-6 py-12 text-center">
-          <p className="eyebrow mb-3">Nothing saved yet</p>
           <p className="text-lg font-bold text-sand-900">No saved payment methods</p>
           <p className="text-sm text-sand-600 mt-1 max-w-sm mx-auto">
             Save a card or mobile money number to check out in one tap. You can also save one while paying.

@@ -32,7 +32,6 @@ export function CartView() {
   if (items.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-sand-200 shadow-card px-6 py-16 text-center">
-        <p className="eyebrow mb-3">Nothing here yet</p>
         <h2 className="text-2xl font-display font-bold text-sand-900">Your cart is empty</h2>
         <p className="text-sm text-sand-600 mt-2 mb-7 max-w-sm mx-auto">
           Every product here is checked for sustainability before it goes live. Find something you’ll love.

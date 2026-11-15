@@ -72,7 +72,7 @@ export function SampleOrderControls({
       aria-labelledby="sample-controls-heading"
       className="rounded-xl border-2 border-dashed border-gold-200 bg-gold-50/60 p-4"
     >
-      <p className="eyebrow text-gold-800 mb-1">Sample order</p>
+      <p className="text-sm font-bold text-gold-800 mb-1">Sample order</p>
       <h2 id="sample-controls-heading" className="text-base font-bold text-sand-900">Demo controls</h2>
 
       {step ? (

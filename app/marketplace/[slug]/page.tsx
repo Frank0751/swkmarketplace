@@ -12,7 +12,6 @@ import {
   Star,
   ChevronLeft,
   ChevronRight,
-  Leaf,
   ArrowRight,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -23,6 +22,9 @@ import { ReviewSection } from '@/components/marketplace/ReviewSection'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { ShareButtons } from '@/components/ui/ShareButtons'
 import { ProductPurchasePanel } from '@/components/cart/ProductPurchasePanel'
+import { SaveButton } from '@/components/saved/SaveButton'
+import { RecordView, RecentlyViewed } from '@/components/marketplace/RecentlyViewed'
+import { MoreFromShop } from '@/components/marketplace/MoreFromShop'
 import { formatCurrency } from '@/lib/utils'
 import { canOptimizeImage } from '@/lib/marketplace/images'
 import {
@@ -193,8 +195,6 @@ export default function ProductDetailPage() {
         setNotFound(true)
       } else {
         setProduct(data as Product)
-        // Count the visit (fire and forget)
-        supabase.rpc('increment_product_views', { product_id: data.id }).then(() => {})
       }
       setLoading(false)
     }
@@ -210,12 +210,9 @@ export default function ProductDetailPage() {
       <>
         <Navbar />
         <main id="main" className="container-app py-24 text-center">
-          <div className="w-16 h-16 rounded-full bg-sand-100 flex items-center justify-center mx-auto mb-4">
-            <Leaf className="w-8 h-8 text-sand-600" aria-hidden="true" />
-          </div>
           <h1 className="text-2xl font-display font-bold text-sand-900 mb-2">Product not found</h1>
           <p className="text-sand-600 mb-6">This product may have been removed or is no longer available.</p>
-          <Link href="/marketplace" className="inline-flex items-center gap-2 min-h-[44px] px-5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors">
+          <Link href="/marketplace" className="btn btn-primary">
             <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             Back to marketplace
           </Link>
@@ -259,8 +256,15 @@ export default function ProductDetailPage() {
         }}
       />}
       <Navbar />
+      <RecordView
+        product={{
+          id: product.id, slug: product.slug, title: product.title,
+          image: product.images?.[0] ?? null, price: product.price_ghs, unit: product.unit,
+          vendor_name: vendor?.business_name, is_demo: isSample,
+        }}
+      />
 
-      <main id="main" className="container-app py-6 pb-28 md:pb-8">
+      <main id="main" className="container-app py-6 pb-28 md:pb-12">
 
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-sand-600 mb-6" aria-label="Breadcrumb">
@@ -284,32 +288,15 @@ export default function ProductDetailPage() {
           {/* Right: details + order form */}
           <div className="space-y-5">
 
-            {/* Badges row */}
-            <div className="flex flex-wrap gap-2">
-              {categoryMeta && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sand-100 text-sand-700 text-xs font-medium border border-sand-200">
-                  {categoryMeta.label}
-                </span>
-              )}
-              {hasSDG12 && (
-                <span className="sdg-badge">SDG 12 verified</span>
-              )}
-              {isSample && (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-gold-50 text-gold-800 text-xs font-semibold border border-gold-100">
-                  Sample product
-                </span>
-              )}
-              {isOutOfStock && (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-sand-100 text-sand-600 text-xs font-medium border border-sand-200">
-                  Out of stock
-                </span>
-              )}
-              {isLowStock && (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-gold-50 text-gold-700 text-xs font-medium border border-gold-100">
-                  Only {product.stock_quantity} left!
-                </span>
-              )}
-            </div>
+            {vendor && (
+              <p className="text-sm text-sand-700">
+                <Link href={`/store/${vendor.slug ?? vendor.id}`} className="font-bold text-green-800 hover:text-green-700">
+                  {vendor.business_name}
+                </Link>
+                {product.location ? `, ${product.location}` : ''}
+                {isSample && <span className="ml-2 px-1.5 py-0.5 rounded bg-sand-100 text-sand-700 text-[11px] font-medium">Sample</span>}
+              </p>
+            )}
 
             {/* Title */}
             <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-[-0.02em] text-sand-900 leading-[1.1] text-balance">
@@ -333,10 +320,10 @@ export default function ProductDetailPage() {
               </p>
             )}
 
-            {/* Location */}
-            {product.location && (
-              <p className="text-sm text-sand-600">
-                Made in {product.location}{product.region ? `, ${product.region}` : ''}
+            {(hasSDG12 || isLowStock) && (
+              <p className="text-sm text-sand-700">
+                {hasSDG12 && <>Checked against SDG 12 by SWK Ghana.</>}
+                {isLowStock && <span className="ml-1 font-medium text-gold-700">Only {product.stock_quantity} left.</span>}
               </p>
             )}
 
@@ -370,10 +357,19 @@ export default function ProductDetailPage() {
 
             {/* Quantity, Add to cart, Buy now */}
             <ProductPurchasePanel product={product} />
+            <SaveButton
+              variant="button"
+              className="w-full sm:w-auto"
+              product={{
+                id: product.id, slug: product.slug, title: product.title,
+                image: product.images?.[0] ?? null, price: product.price_ghs, unit: product.unit,
+                vendor_name: vendor?.business_name, is_demo: isSample,
+              }}
+            />
 
             {/* Vendor card */}
             {vendor && (
-              <div className="rounded-xl border border-sand-200 bg-white p-4 flex items-start gap-4">
+              <div className="panel p-4 flex items-start gap-4">
                 <div className="flex-shrink-0">
                   {vendor.logo_url ? (
                     <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-sand-200">
@@ -393,12 +389,12 @@ export default function ProductDetailPage() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="eyebrow mb-1">Sold by</p>
+                  <p className="text-xs text-sand-600 mb-0.5">Sold by</p>
                   <h2 className="text-base font-bold text-sand-900 truncate">{vendor.business_name}</h2>
                   {vendor.location && (
                     <p className="text-xs text-sand-600 mt-0.5">{vendor.location}</p>
                   )}
-                  {vendor.rating > 0 && (
+                  {vendor.rating > 0 && !isSample && (
                     <div className="flex items-center gap-1 mt-1">
                       <Star className="w-3.5 h-3.5 fill-gold-400 text-gold-400" aria-hidden="true" />
                       <span className="text-xs font-medium text-sand-700">{vendor.rating.toFixed(1)}</span>
@@ -418,11 +414,11 @@ export default function ProductDetailPage() {
             {/* Share: previews on WhatsApp show this product's photo and price */}
             {!isSample && (
               <div>
-                <h2 className="eyebrow mb-2">Share this product</h2>
+                <h2 className="title-card mb-2">Share</h2>
                 <ShareButtons
                   url={`${APP_URL}/marketplace/${product.slug}`}
                   title={product.title}
-                  text={`${product.title}, ${formatCurrency(product.price_ghs)} on SWK Marketplace 🌿`}
+                  text={`${product.title}, ${formatCurrency(product.price_ghs)} on SWK Marketplace`}
                 />
               </div>
             )}
@@ -432,9 +428,7 @@ export default function ProductDetailPage() {
         {/* Full description */}
         {product.description && (
           <div className="mt-14 max-w-3xl">
-            <p className="eyebrow mb-2">Product details</p>
-            <h2 className="text-2xl font-display font-bold tracking-tight text-sand-900">About this product</h2>
-            <span className="rule mt-3 mb-5" aria-hidden="true" />
+            <h2 className="title-section mb-4">About this product</h2>
             <div className="max-w-none text-base text-sand-700 leading-[1.75] space-y-4">
               {product.description.split('\n').filter(Boolean).map((para, i) => (
                 <p key={i}>{para}</p>
@@ -447,6 +441,17 @@ export default function ProductDetailPage() {
         <div className="mt-12 max-w-3xl">
           <ReviewSection productId={product.id} />
         </div>
+
+        {vendor && (
+          <MoreFromShop
+            vendorId={vendor.id}
+            vendorName={vendor.business_name}
+            vendorSlug={vendor.slug ?? vendor.id}
+            excludeId={product.id}
+            className="mt-14"
+          />
+        )}
+        <RecentlyViewed excludeId={product.id} className="mt-14" />
       </main>
 
       <Footer />

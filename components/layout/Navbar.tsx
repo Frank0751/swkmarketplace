@@ -4,21 +4,29 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Search, Menu, X, ShoppingBag, User, ChevronDown, Settings, ExternalLink, Package, CreditCard } from 'lucide-react'
+import { Search, Menu, X, ChevronDown, ExternalLink, Heart } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CartButton } from '@/components/cart/CartButton'
+import { useSearch } from '@/components/search/SearchProvider'
+import { useSaved } from '@/lib/local/lists'
 import type { User as UserType } from '@/types'
 import { clsx } from 'clsx'
 
+const NAV_LINKS = [
+  { href: '/marketplace',  label: 'Products' },
+  { href: '/shops',        label: 'Shops' },
+  { href: '/how-it-works', label: 'How it works' },
+]
+
 export function Navbar() {
-  const [user, setUser]             = useState<UserType | null>(null)
-  const [menuOpen, setMenuOpen]     = useState(false)
-  const [scrolled, setScrolled]     = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [user, setUser]               = useState<UserType | null>(null)
+  const [menuOpen, setMenuOpen]       = useState(false)
+  const [scrolled, setScrolled]       = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const accountRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+  const search = useSearch()
+  const saved = useSaved()
 
   // Close the account menu on Escape or a click outside it
   useEffect(() => {
@@ -57,7 +65,7 @@ export function Navbar() {
     })
 
     const onScroll = () => setScrolled(window.scrollY > 16)
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
@@ -77,306 +85,245 @@ export function Navbar() {
     return '/buyer/dashboard'
   }
 
-  return (
-    <>
-      <nav className={clsx(
-        'sticky top-0 z-40 w-full transition-all duration-200',
-        scrolled ? 'bg-white/95 backdrop-blur-sm shadow-card border-b border-sand-200' : 'bg-white border-b border-sand-200'
-      )}>
-        <div className="container-app">
-          <div className="flex items-center h-16 gap-4">
+  const accountLinks = [
+    { href: getDashboardLink(), label: 'Dashboard' },
+    { href: '/buyer/orders', label: 'My orders' },
+    { href: '/saved', label: 'Saved items' },
+    { href: '/buyer/payment-methods', label: 'Payment methods' },
+    { href: '/buyer/settings', label: 'Account settings' },
+    ...(user?.role === 'vendor' ? [{ href: '/vendor/listings', label: 'My listings' }] : []),
+  ]
 
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
-              <Image
-                src="/images/swk-logo.png"
-                alt="SWK: Sustainability with Koomson"
-                width={77}
-                height={40}
-                priority
-                className="h-10 w-auto transition-transform group-hover:scale-105"
-              />
-              <div className="hidden sm:block">
-                <div className="text-sm font-display font-bold text-sand-900 leading-tight">Marketplace</div>
-                <div className="text-[10px] font-medium text-green-600 leading-tight tracking-wide uppercase">by SWK Ghana</div>
-              </div>
+  const savedLabel = saved.items.length === 0
+    ? 'Saved items'
+    : `Saved items, ${saved.items.length}`
+
+  return (
+    <nav
+      aria-label="Main"
+      className={clsx(
+        'sticky top-0 z-40 w-full bg-white border-b border-sand-200 transition-shadow duration-200',
+        scrolled && 'shadow-card-md',
+      )}
+    >
+      <div className="container-app">
+        <div className="flex items-center h-16 gap-3">
+
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
+            <Image
+              src="/images/swk-logo.png"
+              alt="SWK: Sustainability with Koomson"
+              width={77}
+              height={40}
+              priority
+              className="h-10 w-auto"
+            />
+            <span className="hidden sm:block leading-tight">
+              <span className="block text-sm font-bold text-sand-900">Marketplace</span>
+              <span className="block text-[11px] font-medium text-green-700">by SWK Ghana</span>
+            </span>
+          </Link>
+
+          {/* Desktop nav links */}
+          <div className="hidden lg:flex items-center gap-1 ml-3">
+            {NAV_LINKS.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={isActive(link.href) ? 'page' : undefined}
+                className={clsx(
+                  'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  isActive(link.href)
+                    ? 'text-green-800 bg-green-50'
+                    : 'text-sand-700 hover:text-sand-900 hover:bg-sand-100',
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            {/* Route back to the parent organisation: the marketplace is a
+                programme of SWK Ghana */}
+            <a
+              href="https://swkghana.org"
+              className="hidden xl:inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-sand-700 hover:text-sand-900 hover:bg-sand-100 transition-colors"
+            >
+              About SWK Ghana
+              <ExternalLink className="w-3 h-3 text-sand-600" aria-hidden="true" />
+              <span className="sr-only">(opens the main SWK Ghana website)</span>
+            </a>
+          </div>
+
+          {/* Search, desktop: looks like a field, opens the search window */}
+          <button
+            type="button"
+            onClick={() => search.open()}
+            onMouseEnter={search.warm}
+            onFocus={search.warm}
+            className="hidden md:flex flex-1 max-w-md mx-2 items-center gap-2.5 h-10 px-3.5 rounded-lg bg-sand-100 border border-sand-200 text-sm text-sand-600 text-left hover:border-sand-300 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+          >
+            <Search className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+            Search products and shops
+          </button>
+
+          {/* Right side */}
+          <div className="flex items-center gap-1 ml-auto">
+            <button
+              type="button"
+              className="md:hidden w-11 h-11 flex items-center justify-center rounded-lg text-sand-700 hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+              onClick={() => search.open()}
+              aria-label="Search products and shops"
+            >
+              <Search className="w-5 h-5" aria-hidden="true" />
+            </button>
+
+            <Link
+              href="/saved"
+              aria-label={savedLabel}
+              className="relative hidden sm:flex w-11 h-11 items-center justify-center rounded-lg text-sand-700 hover:bg-sand-100 hover:text-sand-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+            >
+              <Heart className="w-5 h-5" aria-hidden="true" />
+              {saved.items.length > 0 && (
+                <span aria-hidden="true" className="absolute top-1 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-sand-900 text-white text-[10px] font-bold leading-[18px] text-center nums">
+                  {saved.items.length > 99 ? '99+' : saved.items.length}
+                </span>
+              )}
             </Link>
 
-            {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-1 ml-4">
-              {[
-                { href: '/marketplace',   label: 'Shop' },
-                { href: '/how-it-works',  label: 'How it works' },
-              ].map(link => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={clsx(
-                    'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                    isActive(link.href)
-                      ? 'bg-green-50 text-green-700'
-                      : 'text-sand-600 hover:text-sand-900 hover:bg-sand-100'
-                  )}
+            <CartButton />
+
+            {user ? (
+              <div className="relative" ref={accountRef}>
+                <button
+                  type="button"
+                  onClick={() => setAccountOpen(o => !o)}
+                  aria-expanded={accountOpen}
+                  aria-haspopup="menu"
+                  className="flex items-center gap-2 min-h-[44px] px-2 sm:px-3 rounded-lg text-sm font-medium text-sand-700 hover:bg-sand-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                 >
-                  {link.label}
-                </Link>
-              ))}
+                  <span className="w-7 h-7 rounded-full bg-green-900 flex items-center justify-center text-white text-xs font-bold flex-shrink-0" aria-hidden="true">
+                    {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                  </span>
+                  <span className="hidden sm:block max-w-24 truncate">{user.full_name?.split(' ')[0]}</span>
+                  <ChevronDown
+                    className={clsx('w-3.5 h-3.5 text-sand-600 hidden sm:block transition-transform', accountOpen && 'rotate-180')}
+                    aria-hidden="true"
+                  />
+                  <span className="sr-only">Account menu</span>
+                </button>
 
-              {/* Route back to the parent organisation. The marketplace is a
-                  programme of SWK Ghana, and without this the only way back was
-                  a link buried in the footer. */}
-              <a
-                href="https://swkghana.org"
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-sand-600 hover:text-sand-900 hover:bg-sand-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
-              >
-                About SWK Ghana
-                <ExternalLink className="w-3 h-3 text-sand-600" aria-hidden="true" />
-                <span className="sr-only">(opens the main SWK Ghana website)</span>
-              </a>
-            </div>
-
-            {/* Search bar, desktop */}
-            <div className="hidden md:flex flex-1 max-w-sm mx-4">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-600" />
-                <input
-                  type="search"
-                  aria-label="Search eco-friendly products"
-                  placeholder="Search eco-friendly products..."
-                  className="w-full pl-9 pr-4 py-2 text-sm bg-sand-100 border border-sand-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:bg-white transition-all"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && searchQuery.trim()) {
-                      window.location.href = `/marketplace?search=${encodeURIComponent(searchQuery)}`
-                    }
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Right side */}
-            <div className="flex items-center gap-2 ml-auto">
-              {/* Mobile search toggle */}
-              <button
-                className="md:hidden w-11 h-11 flex items-center justify-center rounded-lg text-sand-600 hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
-                onClick={() => setSearchOpen(o => !o)}
-                aria-label="Search"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-
-              <CartButton />
-
-              {user ? (
-                /* Click-driven disclosure. This was hover-only with
-                   `invisible group-hover:visible`, which removed every item
-                   (including Sign out) from the tab order and left touch users
-                   with no way to open it at all. */
-                <div className="relative" ref={accountRef}>
-                  <button
-                    type="button"
-                    onClick={() => setAccountOpen(o => !o)}
-                    aria-expanded={accountOpen}
-                    aria-haspopup="menu"
-                    className="flex items-center gap-2 min-h-[44px] px-3 rounded-lg text-sm font-medium text-sand-700 hover:bg-sand-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
-                  >
-                    <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-xs font-semibold flex-shrink-0">
-                      {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                {accountOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-xl shadow-card-lg border border-sand-200 py-1 z-50">
+                    <div className="px-4 py-2.5 border-b border-sand-200">
+                      <div className="text-sm font-bold text-sand-900 truncate">{user.full_name}</div>
+                      <div className="text-xs text-sand-600 truncate">{user.email}</div>
                     </div>
-                    <span className="hidden sm:block max-w-24 truncate">{user.full_name?.split(' ')[0]}</span>
-                    <ChevronDown
-                      className={clsx(
-                        'w-3.5 h-3.5 text-sand-600 hidden sm:block transition-transform',
-                        accountOpen && 'rotate-180',
-                      )}
-                      aria-hidden="true"
-                    />
-                    <span className="sr-only">Account menu</span>
-                  </button>
-
-                  {/* Dropdown */}
-                  {accountOpen && (
-                    <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl shadow-card-lg border border-sand-200 py-1 z-50">
-                      <div className="px-3 py-2 border-b border-sand-100">
-                        <div className="text-xs font-medium text-sand-900 truncate">{user.full_name}</div>
-                        <div className="text-xs text-sand-600 truncate">{user.email}</div>
-                      </div>
-                      <Link href={getDashboardLink()} onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
-                        <User className="w-4 h-4" aria-hidden="true" /> Dashboard
-                      </Link>
-                      <Link href="/buyer/orders" onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
-                        <Package className="w-4 h-4" aria-hidden="true" /> My orders
-                      </Link>
-                      <Link href="/buyer/payment-methods" onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
-                        <CreditCard className="w-4 h-4" aria-hidden="true" /> Payment methods
-                      </Link>
-                      <Link href="/buyer/settings" onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
-                        <Settings className="w-4 h-4" aria-hidden="true" /> Account settings
-                      </Link>
-                      {user.role === 'vendor' && (
-                        <Link href="/vendor/listings" onClick={() => setAccountOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 transition-colors">
-                          <ShoppingBag className="w-4 h-4" aria-hidden="true" /> My Listings
-                        </Link>
-                      )}
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    {accountLinks.map(link => (
+                      <Link
+                        key={link.label}
+                        href={link.href}
+                        onClick={() => setAccountOpen(false)}
+                        className="block px-4 py-2.5 text-sm text-sand-800 hover:bg-sand-100 transition-colors"
                       >
-                        Sign out
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/login"
-                    className="hidden sm:block px-3 py-2 text-sm font-medium text-sand-700 hover:text-sand-900 transition-colors"
-                  >
-                    Log in
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="px-4 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
-                  >
-                    Sign up
-                  </Link>
-                </div>
-              )}
+                        {link.label}
+                      </Link>
+                    ))}
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-700 hover:bg-red-50 border-t border-sand-200 transition-colors"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 ml-1">
+                <Link
+                  href="/login"
+                  className="hidden sm:flex items-center min-h-[44px] px-3 text-sm font-medium text-sand-700 hover:text-sand-900 transition-colors"
+                >
+                  Log in
+                </Link>
+                <Link href="/signup" className="btn btn-primary btn-sm">
+                  Sign up
+                </Link>
+              </div>
+            )}
 
-              {/* Mobile menu toggle */}
-              <button
-                className="md:hidden w-11 h-11 flex items-center justify-center rounded-lg text-sand-600 hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
-                onClick={() => setMenuOpen(o => !o)}
-                aria-label="Menu"
-              >
-                {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
-            </div>
+            {/* Mobile menu toggle */}
+            <button
+              type="button"
+              className="lg:hidden w-11 h-11 flex items-center justify-center rounded-lg text-sand-700 hover:bg-sand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+              onClick={() => setMenuOpen(o => !o)}
+              aria-expanded={menuOpen}
+              aria-label="Menu"
+            >
+              {menuOpen ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Mobile search */}
-        {searchOpen && (
-          <div className="md:hidden border-t border-sand-200 px-4 py-3 bg-white">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sand-600" />
-              <input
-                autoFocus
-                type="search"
-                  aria-label="Search eco-friendly products"
-                placeholder="Search products..."
-                className="w-full pl-9 pr-4 py-2.5 text-sm bg-sand-100 border border-sand-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:bg-white"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && searchQuery.trim()) {
-                    window.location.href = `/marketplace?search=${encodeURIComponent(searchQuery)}`
-                  }
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden border-t border-sand-200 bg-white">
-            <div className="px-4 py-3 space-y-1">
-              {[
-                { href: '/marketplace',   label: 'Shop all products' },
-                { href: '/how-it-works',  label: 'How it works' },
-                { href: '/vendor/apply',  label: 'Become a vendor' },
-              ].map(link => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="block px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-
-              {/* The desktop nav is hidden on mobile, so without this entry a
-                  phone user has no route back to the main site at all. */}
-              <a
-                href="https://swkghana.org"
+      {/* Mobile and tablet menu */}
+      {menuOpen && (
+        <div className="lg:hidden border-t border-sand-200 bg-white">
+          <div className="container-app py-3 space-y-1">
+            {[...NAV_LINKS, { href: '/saved', label: 'Saved items' }, { href: '/vendor/apply', label: 'Sell on SWK Marketplace' }].map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="block px-3 py-2.5 text-sm font-medium text-sand-800 hover:bg-sand-100 rounded-lg transition-colors"
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-1.5 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
               >
-                About SWK Ghana
-                <ExternalLink className="w-3.5 h-3.5 text-sand-600" aria-hidden="true" />
-                <span className="sr-only">(opens the main SWK Ghana website)</span>
-              </a>
-              {user ? (
-                /* Signed-in users previously had nothing here, and the desktop
-                   account menu is hover-only on touch, so there was no way to
-                   reach a dashboard or sign out from a phone at all. */
-                <div className="pt-2 mt-2 border-t border-sand-100 space-y-1">
-                  <div className="px-3 pb-1">
-                    <div className="text-xs font-medium text-sand-900 truncate">{user.full_name}</div>
-                    <div className="text-xs text-sand-600 truncate">{user.email}</div>
-                  </div>
-                  <Link
-                    href={getDashboardLink()}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
-                  >
-                    <User className="w-4 h-4" aria-hidden="true" /> Dashboard
-                  </Link>
-                  <Link
-                    href="/buyer/orders"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
-                  >
-                    <Package className="w-4 h-4" aria-hidden="true" /> My orders
-                  </Link>
-                  <Link
-                    href="/buyer/payment-methods"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
-                  >
-                    <CreditCard className="w-4 h-4" aria-hidden="true" /> Payment methods
-                  </Link>
-                  <Link
-                    href="/buyer/settings"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
-                  >
-                    <Settings className="w-4 h-4" aria-hidden="true" /> Account settings
-                  </Link>
-                  {user.role === 'vendor' && (
-                    <Link
-                      href="/vendor/listings"
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2.5 text-sm text-sand-700 hover:bg-sand-50 rounded-lg transition-colors"
-                    >
-                      <ShoppingBag className="w-4 h-4" aria-hidden="true" /> My Listings
-                    </Link>
-                  )}
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    Sign out
-                  </button>
+                {link.label}
+              </Link>
+            ))}
+
+            {/* Without this a phone user has no route back to the main site */}
+            <a
+              href="https://swkghana.org"
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium text-sand-800 hover:bg-sand-100 rounded-lg transition-colors"
+            >
+              About SWK Ghana
+              <ExternalLink className="w-3.5 h-3.5 text-sand-600" aria-hidden="true" />
+              <span className="sr-only">(opens the main SWK Ghana website)</span>
+            </a>
+
+            {user ? (
+              <div className="pt-2 mt-2 border-t border-sand-200 space-y-1">
+                <div className="px-3 pb-1">
+                  <div className="text-sm font-bold text-sand-900 truncate">{user.full_name}</div>
+                  <div className="text-xs text-sand-600 truncate">{user.email}</div>
                 </div>
-              ) : (
-                <div className="pt-2 border-t border-sand-100 flex gap-2">
-                  <Link href="/login" className="flex-1 min-h-[44px] flex items-center justify-center text-sm font-medium text-sand-700 border border-sand-200 rounded-lg hover:bg-sand-50">
-                    Log in
+                {accountLinks.filter(l => l.href !== '/saved').map(link => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="block px-3 py-2.5 text-sm text-sand-800 hover:bg-sand-100 rounded-lg transition-colors"
+                  >
+                    {link.label}
                   </Link>
-                  <Link href="/signup" className="flex-1 min-h-[44px] flex items-center justify-center text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700">
-                    Sign up
-                  </Link>
-                </div>
-              )}
-            </div>
+                ))}
+                <button
+                  onClick={handleSignOut}
+                  className="w-full text-left px-3 py-2.5 text-sm text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div className="pt-3 mt-2 border-t border-sand-200 flex gap-2">
+                <Link href="/login" className="btn btn-secondary flex-1">Log in</Link>
+                <Link href="/signup" className="btn btn-primary flex-1">Sign up</Link>
+              </div>
+            )}
           </div>
-        )}
-      </nav>
-    </>
+        </div>
+      )}
+    </nav>
   )
 }

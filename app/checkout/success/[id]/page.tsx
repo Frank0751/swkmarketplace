@@ -139,7 +139,7 @@ export default async function CheckoutSuccessPage({ params }: { params: { id: st
         </section>
 
         {checkout.is_demo && (
-          <div className="mt-6 rounded-2xl border border-gold-200 border-l-4 border-l-gold-400 bg-gold-50 px-5 py-4 text-sm text-gold-900">
+          <div className="mt-6 rounded-2xl border border-gold-200 bg-gold-50 px-5 py-4 text-sm text-gold-900">
             <div>
               <p className="font-semibold">This was a sample order, so no money was taken.</p>
               <p className="mt-0.5 leading-relaxed">
@@ -213,7 +213,7 @@ export default async function CheckoutSuccessPage({ params }: { params: { id: st
         {/* ── Delivery + escrow ────────────────────────────────────── */}
         <div className="mt-6 grid sm:grid-cols-2 gap-4">
           <section aria-labelledby="delivery-heading" className="bg-white rounded-2xl border border-sand-200 shadow-card p-5">
-            <h2 id="delivery-heading" className="eyebrow mb-3">Delivering to</h2>
+            <h2 id="delivery-heading" className="title-card mb-3">Delivering to</h2>
             <p className="text-sm text-sand-800 leading-relaxed">{checkout.delivery_address}, {checkout.delivery_region}</p>
             <p className="text-sm text-sand-700 mt-1">{formatGhanaPhone(checkout.delivery_phone)}</p>
             {checkout.buyer_notes && (
@@ -231,7 +231,7 @@ export default async function CheckoutSuccessPage({ params }: { params: { id: st
 
         {/* ── What happens next ────────────────────────────────────── */}
         <section aria-labelledby="next-heading" className="mt-6 bg-white rounded-2xl border border-sand-200 shadow-card p-5">
-          <h2 id="next-heading" className="eyebrow mb-4">What happens next</h2>
+          <h2 id="next-heading" className="title-card mb-4">What happens next</h2>
           <ol className="grid sm:grid-cols-2 gap-5">
             {NEXT_STEPS.map(({ title, body }, i) => (
               <li key={title} className="flex items-start gap-3">

@@ -10,7 +10,6 @@ import {
   Instagram,
   Facebook,
   Twitter,
-  Leaf,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
@@ -19,7 +18,6 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { ProductCard } from '@/components/marketplace/ProductCard'
 import { ShareStoreLink } from '@/components/vendor/ShareStoreLink'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { FadeIn, Stagger, StaggerItem } from '@/components/ui/motion'
 import { whatsappDigits, formatGhanaPhone } from '@/lib/marketplace/phone'
 import { CATEGORY_META, type Product, type VendorProfile } from '@/types'
 
@@ -115,8 +113,10 @@ export default async function StorePage({ params }: StorePageProps) {
   const facts = [
     vendor.year_founded && { label: 'Founded', value: String(vendor.year_founded) },
     vendor.team_size && { label: 'Team', value: `${vendor.team_size} people` },
-    vendor.total_sales > 0 && { label: 'Orders fulfilled', value: `${vendor.total_sales}+` },
-    vendor.review_count > 0 && { label: 'Rating', value: `${vendor.rating.toFixed(1)} (${vendor.review_count})` },
+    // A sample shop's sales and rating are made up, so they aren't shown
+    !isSample && vendor.total_sales > 0 && { label: 'Orders fulfilled', value: String(vendor.total_sales) },
+    !isSample && vendor.review_count > 0 && { label: 'Rating', value: `${vendor.rating.toFixed(1)} (${vendor.review_count})` },
+    { label: 'Products', value: String(products.length) },
   ].filter(Boolean) as { label: string; value: string }[]
 
   const socials = [
@@ -170,24 +170,19 @@ export default async function StorePage({ params }: StorePageProps) {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-sand-900/60 via-sand-900/10 to-transparent" />
-          {isSample && (
-            <span className="absolute top-4 right-4 px-2.5 py-1 text-[11px] font-semibold bg-sand-900/70 backdrop-blur-sm text-white rounded-full">
-              Sample shop: checkout works with a test payment
-            </span>
-          )}
         </div>
 
         {/* ── Header card ────────────────────────────────────────── */}
         <div className="container-app">
-          <div className="relative -mt-16 md:-mt-20 bg-white rounded-2xl border border-sand-200 shadow-card-lg p-6 md:p-8">
+          <div className="relative -mt-16 md:-mt-20 panel p-6 md:p-8">
             <div className="flex flex-col md:flex-row md:items-start gap-5">
               {/* Logo */}
-              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-4 border-white shadow-card bg-green-50 flex-shrink-0 -mt-14 md:-mt-16">
+              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden border-4 border-white bg-green-50 flex-shrink-0 -mt-14 md:-mt-16">
                 {vendor.logo_url ? (
                   <Image src={vendor.logo_url} alt={`${vendor.business_name} logo`} fill sizes="96px" className="object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Leaf className="w-10 h-10 text-green-600" />
+                  <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-green-800" aria-hidden="true">
+                    {vendor.business_name.charAt(0)}
                   </div>
                 )}
               </div>
@@ -197,7 +192,7 @@ export default async function StorePage({ params }: StorePageProps) {
                   <h1 className="text-2xl md:text-3xl font-display font-bold text-sand-900">
                     {vendor.business_name}
                   </h1>
-                  <span className="sdg-badge">SDG 12 Verified ✓</span>
+                  {isSample && <span className="px-1.5 py-0.5 rounded bg-sand-100 text-sand-700 text-xs font-medium">Sample shop</span>}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-sand-600 mb-3">
@@ -207,7 +202,7 @@ export default async function StorePage({ params }: StorePageProps) {
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5" /> {vendor.location}, {vendor.region}
                   </span>
-                  {vendor.review_count > 0 && (
+                  {vendor.review_count > 0 && !isSample && (
                     <span className="flex items-center gap-1">
                       <Star className="w-3.5 h-3.5 text-gold-400 fill-gold-400" />
                       {vendor.rating.toFixed(1)} · {vendor.review_count} reviews
@@ -242,25 +237,14 @@ export default async function StorePage({ params }: StorePageProps) {
 
         {/* ── Products ───────────────────────────────────────────── */}
         <section className="container-app mt-10" aria-label="Products">
-          <FadeIn className="flex items-end justify-between mb-6">
-            <div>
-              <p className="eyebrow mb-2">The shop</p>
-              <h2 className="text-xl md:text-2xl font-display font-bold text-sand-900">
-                Products from {vendor.business_name}
-              </h2>
-              <p className="text-sm text-sand-600 mt-1">
-                {products.length} product{products.length !== 1 ? 's' : ''} · every order escrow-protected by SWK Ghana
-              </p>
-            </div>
-          </FadeIn>
+          <h2 className="title-section mb-5">Products</h2>
 
           {products.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-sand-200 p-12 text-center">
-              <Leaf className="w-10 h-10 text-green-200 mx-auto mb-3" />
-              <p className="text-sm text-sand-600">No live products yet, check back soon.</p>
+            <div className="panel px-6 py-10">
+              <p className="text-sm text-sand-700">Nothing for sale right now. Check back soon.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               {products.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -272,10 +256,8 @@ export default async function StorePage({ params }: StorePageProps) {
         <section className="container-app mt-14" aria-label="About the business">
           <div className="grid lg:grid-cols-[1fr,380px] gap-8 items-start">
             <div>
-              <FadeIn>
-                <h2 className="text-xl md:text-2xl font-display font-bold text-sand-900 mb-4">
-                  About {vendor.business_name}
-                </h2>
+              <div>
+                <h2 className="title-section mb-4">About {vendor.business_name}</h2>
                 <div className="space-y-4 text-sand-600 text-sm md:text-base leading-relaxed">
                   {(vendor.story || vendor.business_description || '')
                     .split('\n')
@@ -284,32 +266,26 @@ export default async function StorePage({ params }: StorePageProps) {
                       <p key={i}>{para}</p>
                     ))}
                 </div>
-              </FadeIn>
+              </div>
 
               {/* Sustainability statement */}
               {vendor.sustainability_statement && (
-                <FadeIn className="mt-8">
-                  <figure className="rounded-2xl bg-green-50 border-l-4 border-gold-400 px-6 py-6 md:px-8">
-                    <figcaption className="eyebrow mb-3">Our sustainability commitment</figcaption>
-                    <blockquote className="text-base md:text-lg font-medium text-green-900 leading-relaxed">
-                      {vendor.sustainability_statement}
-                    </blockquote>
-                  </figure>
-                </FadeIn>
+                <figure className="mt-8 rounded-xl bg-green-50 px-6 py-6 md:px-8">
+                  <figcaption className="text-sm font-bold text-green-900 mb-2">How they work responsibly</figcaption>
+                  <blockquote className="text-base md:text-lg text-green-900 leading-relaxed">
+                    {vendor.sustainability_statement}
+                  </blockquote>
+                </figure>
               )}
 
               {/* Team */}
               {founders.length > 0 && (
                 <div className="mt-10">
-                  <FadeIn>
-                    <h2 className="text-xl md:text-2xl font-display font-bold text-sand-900 mb-5">
-                      Meet the people behind it
-                    </h2>
-                  </FadeIn>
-                  <Stagger className="grid sm:grid-cols-2 gap-4">
+                  <h2 className="title-section mb-5">The people behind it</h2>
+                  <div className="grid sm:grid-cols-2 gap-4">
                     {founders.map(founder => (
-                      <StaggerItem key={founder.name}>
-                        <div className="bg-white rounded-2xl border border-sand-200 shadow-card p-5 h-full">
+                      <div key={founder.name}>
+                        <div className="panel p-5 h-full">
                           <div className="w-12 h-12 rounded-full bg-green-600 text-white flex items-center justify-center text-lg font-display font-bold mb-3">
                             {founder.name.split(' ').map(w => w.charAt(0)).slice(0, 2).join('')}
                           </div>
@@ -319,17 +295,17 @@ export default async function StorePage({ params }: StorePageProps) {
                             <p className="text-xs text-sand-600 leading-relaxed">{founder.bio}</p>
                           )}
                         </div>
-                      </StaggerItem>
+                      </div>
                     ))}
-                  </Stagger>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* ── Contact sidebar ─────────────────────────────────── */}
-            <FadeIn className="lg:sticky lg:top-24">
-              <div className="bg-white rounded-2xl border border-sand-200 shadow-card p-6">
-                <h3 className="text-sm font-bold text-sand-900 mb-4">Contact & links</h3>
+            <div className="lg:sticky lg:top-24">
+              <div className="panel p-6">
+                <h3 className="title-card mb-4">Contact and links</h3>
 
                 <div className="space-y-3 mb-5">
                   <div className="flex items-start gap-2.5 text-sm text-sand-600">
@@ -350,7 +326,7 @@ export default async function StorePage({ params }: StorePageProps) {
                             rel="noopener noreferrer"
                             className="text-xs text-green-700 font-semibold hover:text-green-800"
                           >
-                            Chat on WhatsApp →
+                            Chat on WhatsApp
                           </a>
                         )}
                         {/* Matches the Terms: questions welcome, payment only
@@ -383,7 +359,7 @@ export default async function StorePage({ params }: StorePageProps) {
                   </div>
                 )}
 
-                <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 mb-5">
+                <div className="bg-teal-50 rounded-lg p-4 mb-5">
                   <p className="text-xs font-bold text-teal-800 mb-1">Buy with confidence</p>
                   <p className="text-xs text-teal-800 leading-relaxed">
                     All orders are placed and paid through SWK Marketplace. Your money is held in
@@ -393,7 +369,7 @@ export default async function StorePage({ params }: StorePageProps) {
 
                 <ShareStoreLink slug={slug} businessName={vendor.business_name} variant="row" />
               </div>
-            </FadeIn>
+            </div>
           </div>
         </section>
 
@@ -411,7 +387,7 @@ export default async function StorePage({ params }: StorePageProps) {
               href="/vendor/apply"
               className="text-xs font-semibold text-green-600 hover:text-green-700 hover:underline"
             >
-              Sell your sustainable products too →
+              Sell your products here too
             </Link>
           </div>
         </div>

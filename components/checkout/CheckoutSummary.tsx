@@ -13,7 +13,7 @@ export function CheckoutSummary({ summary }: { summary: PricedCart }) {
       <ul className="space-y-4" aria-label="Items in your order">
         {summary.shops.map(shop => (
           <li key={shop.vendor_id}>
-            <p className="eyebrow mb-2.5">{shop.vendor_name}</p>
+            <p className="title-card mb-2.5">{shop.vendor_name}</p>
             <ul className="space-y-2.5">
               {shop.lines.map(line => {
                 const image = line.image || '/images/product-placeholder.svg'

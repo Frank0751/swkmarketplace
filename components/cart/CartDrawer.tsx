@@ -67,7 +67,6 @@ export function CartDrawer() {
             </div>
           ) : items.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-              <p className="eyebrow mb-3">Nothing here yet</p>
               <p className="text-lg font-bold text-sand-900">Your cart is empty</p>
               <p className="text-sm text-sand-600 mt-1 mb-6 max-w-xs">
                 Browse sustainable products from youth-led shops across Ghana.

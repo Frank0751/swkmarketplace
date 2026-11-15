@@ -11,7 +11,7 @@ interface AddToCartButtonProps {
   className?: string
 }
 
-/** The compact "Add" button on a product card */
+/** The "Add to cart" button on a product card: quiet green, solid for a moment once added */
 export function AddToCartButton({ product, className }: AddToCartButtonProps) {
   const { addItem, openDrawer, items } = useCart()
   const [justAdded, setJustAdded] = useState(false)
@@ -36,7 +36,7 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
     return (
       <span
         className={cn(
-          'inline-flex items-center min-h-[40px] px-3 rounded-lg text-xs font-semibold bg-sand-100 text-sand-600',
+          'inline-flex items-center justify-center min-h-[40px] px-3 rounded-lg text-[13px] font-bold bg-sand-100 text-sand-600',
           className,
         )}
       >
@@ -51,9 +51,8 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
       onClick={handleAdd}
       aria-label={inCart > 0 ? `Add another ${product.title} to cart (${inCart} in cart)` : `Add ${product.title} to cart`}
       className={cn(
-        'inline-flex items-center gap-1.5 min-h-[40px] px-3 rounded-lg text-xs font-semibold shadow-card transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2',
-        justAdded ? 'bg-green-700 text-white' : 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800',
+        'btn btn-sm',
+        justAdded ? 'bg-green-600 text-white' : 'btn-tonal',
         className,
       )}
     >

@@ -1,11 +1,13 @@
-import { Leaf } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Product, ProductCategory } from '@/types'
-import { productSearchFilter } from '@/lib/marketplace/search'
+import { searchProductIds } from '@/lib/search/index'
+import Link from 'next/link'
 import { ProductCard } from './ProductCard'
 
 interface ProductGridProps {
   limit?: number
+  /** 1-based; pages are `limit` products long */
+  page?: number
   category?: ProductCategory
   valueTags?: string[]
   search?: string
@@ -17,10 +19,11 @@ interface ProductGridProps {
 
 async function fetchProducts({
   limit = 20,
+  page = 1,
   category,
   valueTags,
   search,
-  sort = 'newest',
+  sort,
   region,
   minPrice,
   maxPrice,
@@ -57,10 +60,11 @@ async function fetchProducts({
     query = query.contains('value_tags', valueTags)
   }
 
-  // Title, summary and description
-  const searchFilter = productSearchFilter(search)
-  if (searchFilter) {
-    query = query.or(searchFilter)
+  // The same ranking as the instant search window, so both find the same things
+  const matchedIds = await searchProductIds(search)
+  if (matchedIds) {
+    if (matchedIds.length === 0) return []
+    query = query.in('id', matchedIds)
   }
 
   // Region + price range
@@ -68,8 +72,10 @@ async function fetchProducts({
   if (typeof minPrice === 'number') query = query.gte('price_ghs', minPrice)
   if (typeof maxPrice === 'number') query = query.lte('price_ghs', maxPrice)
 
-  // Sorting
-  switch (sort) {
+  // Sorting. A search is ordered by how well each product matches, below.
+  switch (sort ?? (matchedIds ? 'relevance' : 'newest')) {
+    case 'relevance':
+      break
     case 'price_asc':
       query = query.order('price_ghs', { ascending: true })
       break
@@ -88,7 +94,11 @@ async function fetchProducts({
       break
   }
 
-  query = query.limit(limit)
+  // A search is ranked here rather than by the database, so take every match
+  // and cut the page out afterwards
+  const byRelevance = !!matchedIds && (!sort || sort === 'relevance')
+  const from = (page - 1) * limit
+  if (!byRelevance) query = query.range(from, from + limit - 1)
 
   const { data, error } = await query
 
@@ -97,7 +107,13 @@ async function fetchProducts({
     return []
   }
 
-  return (data as Product[]) || []
+  const products = (data as Product[]) || []
+  if (byRelevance && matchedIds) {
+    const rank = new Map(matchedIds.map((id, i) => [id, i]))
+    products.sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0))
+    return products.slice(from, from + limit)
+  }
+  return products
 }
 
 export async function ProductGrid(props: ProductGridProps) {
@@ -107,26 +123,24 @@ export async function ProductGrid(props: ProductGridProps) {
 
   if (products.length === 0) {
     return (
-      <div className="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center">
-        <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-4">
-          <Leaf className="w-8 h-8 text-green-300" />
-        </div>
-        <h3 className="text-lg font-semibold text-sand-800 mb-2">
-          No products found yet
+      <div className="panel px-6 py-12">
+        <h3 className="text-lg text-sand-900">
+          {props.search ? `Nothing matches "${props.search}"` : 'Nothing matches these filters'}
         </h3>
-        <p className="text-sm text-sand-600 max-w-xs">
+        <p className="mt-1 text-sm text-sand-700 max-w-md">
           {props.search
-            ? `We couldn't find any products matching "${props.search}". Try a different search term or browse by category.`
-            : 'No products match your current filters. Try adjusting or clearing your filters.'}
+            ? 'Check the spelling or try one word, like "honey" or "soap".'
+            : 'Try removing a filter.'}
         </p>
+        <Link href="/marketplace" className="btn btn-secondary btn-sm mt-5">See all products</Link>
       </div>
     )
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {products.map(product => (
-        <ProductCard key={product.id} product={product} />
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+      {products.map((product, i) => (
+        <ProductCard key={product.id} product={product} priority={i < 4} />
       ))}
     </div>
   )

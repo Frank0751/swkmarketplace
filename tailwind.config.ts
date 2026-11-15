@@ -65,8 +65,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        // Ubuntu throughout (SWK Ghana's brand typeface); Ubuntu Mono for
-        // references, card numbers and eyebrow labels
+        // Ubuntu throughout (SWK Ghana's brand typeface); Ubuntu Mono only for
+        // data: order references and card numbers
         sans:    ['var(--font-body)', 'Ubuntu', 'system-ui', 'sans-serif'],
         display: ['var(--font-body)', 'Ubuntu', 'system-ui', 'sans-serif'],
         mono:    ['var(--font-mono)', 'Ubuntu Mono', 'ui-monospace', 'monospace'],
@@ -84,49 +84,42 @@ const config: Config = {
         '6xl':  ['3.75rem',  { lineHeight: '1.05' }],
         '7xl':  ['4.5rem',   { lineHeight: '1' }],
       },
+      // A tight scale: 12px cards, 10px controls. Full rounding is kept for
+      // filter chips, count badges and avatars only.
       borderRadius: {
-        'sm':   '6px',
-        DEFAULT:'8px',
-        'md':   '10px',
-        'lg':   '14px',
-        'xl':   '18px',
-        '2xl':  '24px',
-        '3xl':  '32px',
+        'sm':   '4px',
+        DEFAULT:'6px',
+        'md':   '8px',
+        'lg':   '10px',
+        'xl':   '12px',
+        '2xl':  '16px',
+        '3xl':  '20px',
       },
+      // Cards sit on the page with a border, not a shadow. Shadows are for
+      // things that float above it: menus, the cart drawer, dialogs, sticky
+      // bars. Tinted with the text colour so they read warm on sand.
       boxShadow: {
-        'card':    '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04)',
-        'card-md': '0 4px 12px 0 rgb(0 0 0 / 0.08), 0 2px 4px -1px rgb(0 0 0 / 0.04)',
-        'card-lg': '0 8px 24px 0 rgb(0 0 0 / 0.10), 0 4px 8px -2px rgb(0 0 0 / 0.06)',
-        'glow-green': '0 0 0 3px rgb(59 109 17 / 0.15)',
-        'glow-gold':  '0 0 0 3px rgb(186 117 23 / 0.20)',
+        'card':    '0 0 #0000',
+        'card-md': '0 6px 16px -6px rgb(42 40 35 / 0.14), 0 2px 4px -2px rgb(42 40 35 / 0.06)',
+        'card-lg': '0 18px 44px -12px rgb(42 40 35 / 0.22), 0 4px 10px -4px rgb(42 40 35 / 0.08)',
       },
       animation: {
-        'fade-in':       'fadeIn 0.4s ease-out',
-        'slide-up':      'slideUp 0.4s ease-out',
-        'slide-down':    'slideDown 0.3s ease-out',
-        'scale-in':      'scaleIn 0.2s ease-out',
+        'fade-in':       'fadeIn 0.2s ease-out',
         'shimmer':       'shimmer 1.8s infinite',
-        'pulse-slow':    'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'marquee':       'marquee 28s linear infinite',
         'drawer-in':     'drawerIn 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
+        'sheet-in':      'sheetIn 0.32s cubic-bezier(0.32, 0.72, 0, 1)',
+        'dialog-in':     'dialogIn 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
         'pop-in':        'popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both',
         'draw':          'draw 0.5s 0.25s ease-out forwards',
       },
       keyframes: {
         fadeIn:   { from: { opacity: '0' }, to: { opacity: '1' } },
-        slideUp:  { from: { opacity: '0', transform: 'translateY(16px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
-        slideDown:{ from: { opacity: '0', transform: 'translateY(-8px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
-        scaleIn:  { from: { opacity: '0', transform: 'scale(0.95)' }, to: { opacity: '1', transform: 'scale(1)' } },
         shimmer:  { from: { backgroundPosition: '-200% 0' }, to: { backgroundPosition: '200% 0' } },
-        marquee:  { from: { transform: 'translateX(0%)' }, to: { transform: 'translateX(-50%)' } },
         drawerIn: { from: { transform: 'translateX(100%)' }, to: { transform: 'translateX(0)' } },
+        sheetIn:  { from: { transform: 'translateY(100%)' }, to: { transform: 'translateY(0)' } },
+        dialogIn: { from: { opacity: '0', transform: 'translateY(8px) scale(0.985)' }, to: { opacity: '1', transform: 'translateY(0) scale(1)' } },
         popIn:    { '0%': { opacity: '0', transform: 'scale(0.6)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
         draw:     { to: { strokeDashoffset: '0' } },
-      },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'dot-pattern': "radial-gradient(circle, #3B6D11 1px, transparent 1px)",
-        'leaf-pattern': "url('/images/leaf-pattern.svg')",
       },
       spacing: {
         '18': '4.5rem',
