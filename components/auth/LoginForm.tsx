@@ -9,6 +9,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { GoogleButton, AuthDivider } from '@/components/auth/GoogleButton'
+import type { LoginNotice } from '@/lib/auth/callback'
 import { cn, safeRedirect } from '@/lib/utils'
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
@@ -91,12 +92,24 @@ export default function LoginForm() {
     router.refresh()
   }
 
-  const oauthFailed = searchParams.get('error') === 'oauth'
+  // Set by /auth/callback when it couldn't sign someone in
+  const notice = searchParams.get('error') as LoginNotice | null
 
   return (
     <div>
+      {notice === 'email_confirmed' && (
+        <div role="status" className="mb-5 rounded-lg bg-teal-50 border border-teal-100 px-4 py-3 text-sm text-teal-700">
+          Your email is confirmed. Please sign in to continue.
+        </div>
+      )}
+      {notice === 'link_expired' && (
+        <div role="alert" className="mb-5 rounded-lg bg-gold-50 border border-gold-200 px-4 py-3 text-sm text-sand-800">
+          That link has expired or was already used. If you have confirmed your email, sign in below.
+          If not, sign up again for a new link.
+        </div>
+      )}
       <GoogleButton redirect={safeRedirect(searchParams.get('redirect'))} label="Sign in with Google" />
-      {oauthFailed && (
+      {notice === 'oauth' && (
         <div className="mt-3 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           Google sign-in did not complete. Please try again, or use your email and password.
         </div>

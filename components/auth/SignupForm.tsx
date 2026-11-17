@@ -9,6 +9,8 @@ import { Eye, EyeOff, ShoppingBag, Store, Check } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { GoogleButton, AuthDivider } from '@/components/auth/GoogleButton'
+import { rememberAuthNext } from '@/lib/auth/next-cookie'
+import { firstStopAfterSignup } from '@/lib/auth/callback'
 import { cn } from '@/lib/utils'
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
@@ -80,17 +82,28 @@ export default function SignupForm({ redirect }: { redirect?: string | null } = 
     setServerError(null)
     const supabase = createClient()
 
+    // Where the new account goes first. If Supabase asks them to confirm their
+    // email, the link comes back to the bare callback address (Supabase matches
+    // return addresses exactly), so the page waits in a cookie, as it does for
+    // Google sign-in
+    const firstStop = firstStopAfterSignup(data.role, redirect)
+    rememberAuthNext(firstStop, { emailSignup: true })
+
     // 1. Sign up with Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email:    data.email,
       password: data.password,
       options:  {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
           full_name: data.full_name,
           role:      data.role,
         },
       },
     })
+
+    // The cookie only matters while a confirmation email is on its way
+    if (authError || !authData.user || authData.session) rememberAuthNext(null)
 
     if (authError) {
       setServerError(authError.message)
@@ -104,9 +117,10 @@ export default function SignupForm({ redirect }: { redirect?: string | null } = 
     }
 
     // If email confirmation is required, Supabase returns a user but no session.
-    // There's no session to insert the profile row or reach a protected route with,
-    // so stop here and tell the user to confirm their email instead of pretending
-    // signup finished.
+    // There's no session to insert the profile row or reach a protected route
+    // with, so stop here and tell the user to confirm their email. The link signs
+    // them in through /auth/callback (the database trigger has already created
+    // their profile with the role they picked).
     if (!authData.session) {
       setConfirmEmailSentTo(data.email)
       return
@@ -129,11 +143,10 @@ export default function SignupForm({ redirect }: { redirect?: string | null } = 
     // 3. Redirect
     if (data.role === 'vendor') {
       toast.success('Account created! Complete your vendor application to start selling.')
-      router.push('/vendor/apply')
     } else {
       toast.success('Welcome to SWK Marketplace!')
-      router.push(redirect ?? '/buyer/dashboard')
     }
+    router.push(firstStop)
     router.refresh()
   }
 
@@ -150,7 +163,7 @@ export default function SignupForm({ redirect }: { redirect?: string | null } = 
         </h2>
         <p className="text-sm text-sand-600 max-w-xs mx-auto">
           We sent a confirmation link to <span className="font-medium text-sand-700">{confirmEmailSentTo}</span>.
-          Click it to activate your account, then sign in.
+          Click it to confirm your account and carry on where you left off.
         </p>
       </div>
     )

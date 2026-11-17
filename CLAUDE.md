@@ -31,6 +31,18 @@ SWK Marketplace is a world-class, production-grade sustainable e-commerce platfo
 4. Admin reviews → approves or rejects with reason
 5. On approval: vendor_profiles.status = `approved`, users.role = `vendor`
 
+### Sign-in and email confirmation
+- Google sign-in and the sign-up confirmation email both return to the bare `/auth/callback`.
+  Supabase matches return addresses exactly, so the page to land on waits in the `swk_auth_next`
+  cookie (`lib/auth/next-cookie.ts`). New sellers land on `/vendor/apply`.
+- Supabase confirms the email before redirecting, so a code that can't be exchanged (link opened in
+  another browser, opened after Supabase's five-minute sign-in window, or after a second sign-up)
+  still means a confirmed email: the callback sends them to `/login?error=email_confirmed` to sign
+  in. An expired or used link (`error_code=otp_expired`) shows `link_expired`. These decisions live
+  in `lib/auth/callback.ts`.
+- The role picked at sign-up (buyer or vendor) is in user metadata. `handle_new_user()` and the
+  callback's fallback profile insert both read it.
+
 ### Product approval flow
 1. Approved vendor submits listing → status = `pending_review`
 2. Admin reviews SDG 12 alignment → approves or rejects
