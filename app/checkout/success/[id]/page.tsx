@@ -234,14 +234,11 @@ export default async function CheckoutSuccessPage({ params }: { params: { id: st
           <h2 id="next-heading" className="title-card mb-4">What happens next</h2>
           <ol className="grid sm:grid-cols-2 gap-5">
             {NEXT_STEPS.map(({ title, body }, i) => (
-              <li key={title} className="flex items-start gap-3">
-                <span className="w-9 h-9 rounded-full border-2 border-green-600 text-green-700 font-mono font-bold text-xs flex items-center justify-center flex-shrink-0" aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
+              <li key={title}>
+                <span className="block text-sm font-bold text-sand-900">
+                  <span className="text-sand-600 font-medium mr-1.5">{i + 1}.</span>{title}
                 </span>
-                <span>
-                  <span className="block text-sm font-semibold text-sand-900">{title}</span>
-                  <span className="block text-xs text-sand-600 mt-0.5">{body}</span>
-                </span>
+                <span className="block text-sm text-sand-700 mt-0.5">{body}</span>
               </li>
             ))}
           </ol>

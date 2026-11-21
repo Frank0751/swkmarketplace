@@ -102,6 +102,17 @@ export function Footer() {
         <div className="container-app py-5 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between text-xs text-green-100">
           <p>&copy; {new Date().getFullYear()} SWK Ghana. All rights reserved.</p>
           <p>Shop green. Support youth. Build Africa.</p>
+          <p>
+            Site built by KoomBei,{' '}
+            <a
+              href="https://koombei.com"
+              target="_blank"
+              rel="noopener"
+              className="font-bold text-white underline underline-offset-2 hover:text-green-100 transition-colors"
+            >
+              koombei.com
+            </a>
+          </p>
         </div>
       </div>
     </footer>

@@ -92,13 +92,13 @@ export default function BuyerOrderDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId])
 
-  // While the shop is working on the order, check for news every 20 seconds
+  // While an order is moving, check for news every 8 seconds
   // (only while the tab is open and visible), so the page moves on by itself
   useEffect(() => {
-    if (!order || !['paid', 'confirmed', 'dispatched'].includes(order.status)) return
+    if (!order || !['paid', 'confirmed', 'dispatched', 'delivered'].includes(order.status)) return
     const timer = window.setInterval(() => {
       if (document.visibilityState === 'visible') fetchOrder({ quiet: true })
-    }, 20000)
+    }, 8000)
     return () => window.clearInterval(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order?.status])
