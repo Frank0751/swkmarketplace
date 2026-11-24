@@ -1,11 +1,12 @@
 import { unstable_cache } from 'next/cache'
 import { createClient as createPublicClient } from '@supabase/supabase-js'
-import { CATEGORY_META, VALUE_TAG_META, type ProductCategory, type ValueTag } from '@/types'
-import type { SearchIndex, SearchProduct, SearchShop } from '@/lib/search/rank'
+import { CATEGORY_META, type ProductCategory } from '@/types'
+import { toSearchProduct, type SearchIndex, type SearchProduct, type SearchShop } from '@/lib/search/rank'
 
 // The catalogue as the search box needs it: every live product and shop, a few
 // fields each. Read with the public key and no cookies (only what any visitor
-// may see), so one copy can be shared by everyone for a minute.
+// may see), so one copy can be shared by everyone for five minutes, or until
+// the catalogue changes (revalidateCatalogue).
 
 /** Enough for instant search in the browser; past this, search moves to the database */
 const MAX_PRODUCTS = 1000
@@ -73,23 +74,7 @@ async function buildIndex(): Promise<SearchIndex> {
 
   const products: SearchProduct[] = productRows
     .filter(row => row.vendor)
-    .map(row => ({
-      id: row.id,
-      slug: row.slug,
-      title: row.title,
-      price: Number(row.price_ghs),
-      unit: row.unit,
-      image: row.images?.[0] ?? null,
-      category: CATEGORY_META[row.category]?.label ?? '',
-      category_key: row.category,
-      vendor_name: row.vendor!.business_name,
-      vendor_slug: row.vendor!.slug,
-      location: row.location ?? '',
-      tags: (row.value_tags ?? []).map(t => VALUE_TAG_META[t as ValueTag]?.label).filter(Boolean) as string[],
-      blurb: row.short_description ?? '',
-      in_stock: row.stock_quantity > 0,
-      is_demo: !!row.is_demo,
-    }))
+    .map(row => toSearchProduct(row, row.vendor!))
 
   const shops: SearchShop[] = shopRows.map(row => ({
     id: row.id,
@@ -107,20 +92,8 @@ async function buildIndex(): Promise<SearchIndex> {
   return { products, shops, categories }
 }
 
-/** The search index, rebuilt at most once a minute */
+/** The search index, rebuilt every five minutes or when the catalogue changes */
 export const loadSearchIndex = unstable_cache(buildIndex, ['search-index-v1'], {
-  revalidate: 60,
+  revalidate: 300,
   tags: ['catalogue'],
 })
-
-/**
- * The ids a search finds, best match first, or null when there is no search
- * term. Used by the product grid so the results page agrees with the instant
- * search window, typos and all.
- */
-export async function searchProductIds(term: string | null | undefined): Promise<string[] | null> {
-  const q = (term ?? '').trim()
-  if (!q) return null
-  const { searchCatalogue } = await import('@/lib/search/rank')
-  return searchCatalogue(await loadSearchIndex(), q.slice(0, 80)).products.map(p => p.id)
-}

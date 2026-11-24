@@ -5,10 +5,10 @@ import { canOptimizeImage } from '@/lib/marketplace/images'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import { SaveButton } from '@/components/saved/SaveButton'
 import { QuickView } from '@/components/marketplace/QuickView'
-import type { Product } from '@/types'
+import type { CardProduct } from '@/types'
 
 interface ProductCardProps {
-  product: Product
+  product: CardProduct
   /** Load the photo eagerly: for cards at the top of a page */
   priority?: boolean
 }

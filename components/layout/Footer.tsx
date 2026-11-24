@@ -27,6 +27,8 @@ function FooterLinks({ title, links }: { title: string; links: { href: string; l
           <li key={href}>
             <Link
               href={href}
+              // Filtered copies of the marketplace are for people, not crawlers
+              rel={href.includes('?') ? 'nofollow' : undefined}
               className="inline-flex items-center min-h-[40px] text-sm text-green-50/90 hover:text-white transition-colors"
             >
               {label}

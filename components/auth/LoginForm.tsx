@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -10,7 +10,7 @@ import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { GoogleButton, AuthDivider } from '@/components/auth/GoogleButton'
 import type { LoginNotice } from '@/lib/auth/callback'
-import { cn, safeRedirect } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
@@ -31,9 +31,15 @@ const ROLE_REDIRECTS: Record<string, string> = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function LoginForm() {
-  const router       = useRouter()
-  const searchParams = useSearchParams()
+interface LoginFormProps {
+  /** Where to go after signing in (checkout, an order page): a path on this site */
+  redirect?: string | null
+  /** Set by /auth/callback when it couldn't sign someone in */
+  notice?: LoginNotice | null
+}
+
+export default function LoginForm({ redirect = null, notice = null }: LoginFormProps = {}) {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [serverError,  setServerError]  = useState<string | null>(null)
 
@@ -69,10 +75,9 @@ export default function LoginForm() {
       return
     }
 
-    // 2. Back to where they were (checkout, an order page), if it's on this site
-    const redirectParam = safeRedirect(searchParams.get('redirect'))
-    if (redirectParam) {
-      router.push(redirectParam)
+    // 2. Back to where they were (checkout, an order page)
+    if (redirect) {
+      router.push(redirect)
       router.refresh()
       return
     }
@@ -92,9 +97,6 @@ export default function LoginForm() {
     router.refresh()
   }
 
-  // Set by /auth/callback when it couldn't sign someone in
-  const notice = searchParams.get('error') as LoginNotice | null
-
   return (
     <div>
       {notice === 'email_confirmed' && (
@@ -108,7 +110,7 @@ export default function LoginForm() {
           If not, sign up again for a new link.
         </div>
       )}
-      <GoogleButton redirect={safeRedirect(searchParams.get('redirect'))} label="Sign in with Google" />
+      <GoogleButton redirect={redirect} label="Sign in with Google" />
       {notice === 'oauth' && (
         <div className="mt-3 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           Google sign-in did not complete. Please try again, or use your email and password.

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { sendVendorApproved } from '@/lib/email/brevo'
+import { revalidateCatalogue } from '@/lib/marketplace/revalidate'
 
 export async function POST(
   _request: NextRequest,
@@ -75,6 +76,9 @@ export async function POST(
       sendVendorApproved(vendorEmail, { business_name: vendor.business_name })
         .catch(err => console.error('[Email] vendor approved:', err))
     }
+
+    // The shop joins /shops and its listings show their seller
+    revalidateCatalogue()
 
     return NextResponse.json({
       data: updatedVendor,

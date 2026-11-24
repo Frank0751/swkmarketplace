@@ -9,10 +9,15 @@ import { EscrowTrack } from '@/components/escrow/EscrowTrack'
 import { DELIVERY_FEE_GHS } from '@/lib/marketplace/orders'
 import { formatCurrency } from '@/lib/utils'
 
+// Cached, not rendered per visit. Only the sample shops notice can change, so
+// this refreshes on the same five-minute cycle as the storefront.
+export const revalidate = 300
+
 export const metadata: Metadata = {
   title: 'How it works',
   description:
     'How buying and selling work on SWK Marketplace: one cart, a payment held by SWK Ghana until your order arrives, and listings checked against SDG 12.',
+  alternates: { canonical: '/how-it-works' },
   openGraph: {
     title: 'How SWK Marketplace works',
     description: 'Your payment is held by SWK Ghana until your order arrives. Every listing is checked against SDG 12.',

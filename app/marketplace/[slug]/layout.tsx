@@ -1,8 +1,16 @@
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import { formatCurrency } from '@/lib/utils'
 
 const APP_URL = 'https://marketplace.swkghana.org'
+
+// Each product page is built on its first visit and then served from the cache
+// (refreshed every five minutes, or straight away after the listing changes),
+// instead of rendering for every visitor and crawler
+export const revalidate = 300
+export function generateStaticParams() {
+  return []
+}
 
 type ProductForMeta = {
   id: string
@@ -15,7 +23,7 @@ type ProductForMeta = {
 }
 
 async function findProduct(slug: string): Promise<ProductForMeta | null> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const { data } = await supabase
     .from('products')
     .select('id, title, short_description, images, price_ghs, is_demo, vendor:vendor_profiles(business_name)')

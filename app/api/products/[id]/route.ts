@@ -9,6 +9,7 @@ import {
   firstIssue,
 } from '@/lib/marketplace/listing'
 import { sendListingApproved, sendListingRejected, sendAdminAlert } from '@/lib/email/brevo'
+import { revalidateCatalogue } from '@/lib/marketplace/revalidate'
 
 export async function GET(
   _request: NextRequest,
@@ -125,6 +126,7 @@ export async function PATCH(
         .single()
 
       if (error) throw error
+      revalidateCatalogue()
 
       const vendorEmail = vendor?.user?.email
       if (vendorEmail && status !== product.status) {
@@ -188,6 +190,8 @@ export async function PATCH(
       }
       throw updateError
     }
+    // A live listing's new price or stock shows now; one sent back for review leaves the storefront
+    revalidateCatalogue()
 
     const sentForReview = updated.status === 'pending_review' && product.status !== 'pending_review'
 
@@ -283,6 +287,7 @@ export async function DELETE(
       .eq('id', params.id)
 
     if (deleteError) throw deleteError
+    revalidateCatalogue()
 
     return NextResponse.json({ message: 'Product deleted' })
   } catch (err) {

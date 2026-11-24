@@ -11,7 +11,7 @@ import {
   Facebook,
   Twitter,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
@@ -25,10 +25,18 @@ interface StorePageProps {
   params: { slug: string }
 }
 
+// Each shop page is built on its first visit and served from the cache after
+// that. A minute, not five: vendors edit their shop profile straight from the
+// browser, so nothing tells the cache to refresh when they save.
+export const revalidate = 60
+export function generateStaticParams() {
+  return []
+}
+
 // ─── Data ──────────────────────────────────────────────────────────────────────
 
 async function fetchVendor(slug: string): Promise<VendorProfile | null> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   // Resolve by slug first, then by id (so old /store/<uuid> links keep working)
   const { data: bySlug } = await supabase
@@ -55,7 +63,7 @@ async function fetchVendor(slug: string): Promise<VendorProfile | null> {
 }
 
 async function fetchVendorProducts(vendor: VendorProfile): Promise<Product[]> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const { data } = await supabase
     .from('products')
     .select('*, vendor:vendor_profiles(id, business_name, slug, location, region, logo_url, rating, review_count, status)')

@@ -94,8 +94,19 @@ export async function middleware(request: NextRequest) {
   return supabaseResponse
 }
 
+// Only the signed-in areas listed in isProtected above (keep the two lists in
+// step). Middleware runs before the cache, so matching every page cost a
+// function call per visit, crawlers included, even for cached pages it then
+// waved through.
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/admin/:path*',
+    '/buyer/:path*',
+    '/checkout/:path*',
+    '/vendor/dashboard/:path*',
+    '/vendor/listings/:path*',
+    '/vendor/store/:path*',
+    '/vendor/orders/:path*',
+    '/vendor/payouts/:path*',
   ],
 }
