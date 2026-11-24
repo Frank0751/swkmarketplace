@@ -1,19 +1,23 @@
 import type { MetadataRoute } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://marketplace.swkghana.org'
+
+// Crawlers fetch this often; rebuild it at most once an hour
+export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticEntries: MetadataRoute.Sitemap = [
     { url: BASE_URL, changeFrequency: 'daily', priority: 1 },
     { url: `${BASE_URL}/marketplace`, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/shops`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/how-it-works`, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE_URL}/terms`, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${BASE_URL}/privacy`, changeFrequency: 'yearly', priority: 0.3 },
   ]
 
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data: products } = await supabase
       .from('products')
       .select('slug, updated_at')

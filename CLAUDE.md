@@ -43,6 +43,26 @@ SWK Marketplace is a world-class, production-grade sustainable e-commerce platfo
 - The role picked at sign-up (buyer or vendor) is in user metadata. `handle_new_user()` and the
   callback's fallback profile insert both read it.
 
+### Cached public pages and crawlers (November 2026)
+- Crawlers (GPTBot, SemrushBot, a headless scraper) ran about a million function invocations a week
+  on `/marketplace` filter combinations, because every public page rendered per request. Public pages
+  are now cached instead: `/`, `/marketplace`, `/shops` and `/how-it-works` refresh every 5 minutes;
+  product and shop pages are built on first visit (`generateStaticParams` returns `[]`).
+- Their data comes through `createPublicClient()` (`lib/supabase/public.ts`: anon key, no cookies),
+  via `lib/marketplace/catalogue.ts` and `lib/search/index.ts`. Anything that reads `cookies()`,
+  `headers()` or `searchParams` makes a page render per request again, so keep those out of public
+  pages and the components they share (`SampleNotice`, `Navbar`, `Footer`).
+- `/marketplace` filters, sorts, searches and pages in the browser (`lib/marketplace/browse.ts`), so
+  every filtered address is the same cached page. `/login` and `/signup` read `?redirect=` and
+  `?error=` in the browser (`components/auth/AuthPages.tsx`).
+- After changing what shoppers see, call `revalidateCatalogue()` (`lib/marketplace/revalidate.ts`).
+  The listing, vendor approval and sample shop routes do. Stock after a sale and a vendor's own shop
+  profile edits refresh on the timer.
+- `middleware.ts` runs only on the signed-in areas; keep its matcher in step with `isProtected`.
+- For crawlers: `app/robots.ts` disallows filtered copies (`/marketplace?`, `/shops?`), sign-in and
+  private areas; filter, sort and page links are `rel="nofollow"`; `next.config.mjs` adds
+  `X-Robots-Tag: noindex` when `/marketplace` or `/shops` carries a filter query.
+
 ### Product approval flow
 1. Approved vendor submits listing → status = `pending_review`
 2. Admin reviews SDG 12 alignment → approves or rejects
@@ -105,6 +125,7 @@ lib/
   supabase/
     client.ts      browser Supabase client
     server.ts      server Supabase client + admin client
+    public.ts      cookie-free client for public, cached pages
   paystack/
     client.ts      Paystack init + helpers
     webhook.ts     signature verification
@@ -263,7 +284,9 @@ Optional:
 
 ## Important conventions
 
-1. **Always use `createClient()` from `lib/supabase/server.ts`** in Server Components and API routes
+1. **Always use `createClient()` from `lib/supabase/server.ts`** in Server Components and API routes,
+   except for public storefront data, which uses `createPublicClient()` from `lib/supabase/public.ts`
+   so the page can be cached (see "Cached public pages and crawlers")
 2. **Always use `createClient()` from `lib/supabase/client.ts`** in Client Components
 3. **Never bypass RLS**: use `createAdminClient()` only for admin operations in API routes
 4. **Prices are stored in GHS** (decimal, e.g. 45.00 = GHS 45.00): always format with `formatCurrency()`

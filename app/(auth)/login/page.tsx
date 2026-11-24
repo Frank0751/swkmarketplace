@@ -1,54 +1,18 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
-import Link from 'next/link'
-import LoginForm from '@/components/auth/LoginForm'
-import { safeRedirect } from '@/lib/utils'
+import { LoginBody, LoginFromAddress } from '@/components/auth/AuthPages'
 
 export const metadata: Metadata = {
   title: 'Sign in',
+  robots: { index: false, follow: false },
 }
 
-export default function LoginPage({ searchParams }: { searchParams: { redirect?: string } }) {
-  // A buyer sent here from checkout who signs up instead should still end up
-  // back at checkout
-  const redirect = safeRedirect(searchParams.redirect)
-  const signupHref = redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : '/signup'
-
+// Static: where to go after signing in, and any notice from /auth/callback,
+// are read from the address in the browser (components/auth/AuthPages.tsx)
+export default function LoginPage() {
   return (
-    <div>
-      {/* Heading */}
-      <div className="mb-6 text-center">
-        <h1 className="font-display text-2xl font-semibold text-sand-900 mb-1">
-          Welcome back
-        </h1>
-        <p className="text-sm text-sand-600">
-          {redirect === '/checkout' ? 'Sign in to finish checking out. Your cart is saved.' : 'Sign in to your SWK account'}
-        </p>
-      </div>
-
-      {/* useSearchParams (redirect param) requires a Suspense boundary for prerender */}
-      <Suspense>
-        <LoginForm />
-      </Suspense>
-
-      {/* Links */}
-      <div className="mt-5 space-y-3 text-center text-sm">
-        <p className="text-sand-600">
-          Don&apos;t have an account?{' '}
-          <Link
-            href={signupHref}
-            className="text-green-600 font-medium hover:text-green-700 hover:underline transition-colors"
-          >
-            Sign up
-          </Link>
-        </p>
-        <Link
-          href="/forgot-password"
-          className="block text-sand-600 hover:text-sand-600 hover:underline transition-colors"
-        >
-          Forgot your password?
-        </Link>
-      </div>
-    </div>
+    <Suspense fallback={<LoginBody />}>
+      <LoginFromAddress />
+    </Suspense>
   )
 }

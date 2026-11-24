@@ -5,6 +5,8 @@
 // Pure functions, shared by the search dialog and the /marketplace results
 // page, so both always agree on what a search finds.
 
+import { CATEGORY_META, VALUE_TAG_META, type ProductCategory, type ValueTag } from '@/types'
+
 export interface SearchProduct {
   id: string
   slug: string
@@ -51,6 +53,49 @@ export interface SearchResults {
   products: SearchProduct[]
   shops: SearchShop[]
   categories: SearchCategory[]
+}
+
+/** The fields of a listing that search looks at */
+export interface SearchableListing {
+  id: string
+  slug: string
+  title: string
+  price_ghs: number
+  unit?: string | null
+  images?: string[] | null
+  category: ProductCategory
+  location?: string | null
+  value_tags?: string[] | null
+  short_description?: string | null
+  stock_quantity: number
+  is_demo?: boolean | null
+}
+
+/**
+ * A listing as search sees it. Built the same way for the search window
+ * (lib/search/index.ts) and the /marketplace results, so both find the same.
+ */
+export function toSearchProduct(
+  row: SearchableListing,
+  vendor: { business_name: string; slug?: string | null },
+): SearchProduct {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    price: Number(row.price_ghs),
+    unit: row.unit ?? null,
+    image: row.images?.[0] ?? null,
+    category: CATEGORY_META[row.category]?.label ?? '',
+    category_key: row.category,
+    vendor_name: vendor.business_name,
+    vendor_slug: vendor.slug ?? null,
+    location: row.location ?? '',
+    tags: (row.value_tags ?? []).map(t => VALUE_TAG_META[t as ValueTag]?.label).filter(Boolean) as string[],
+    blurb: row.short_description ?? '',
+    in_stock: row.stock_quantity > 0,
+    is_demo: !!row.is_demo,
+  }
 }
 
 /** Lowercase, accents removed, punctuation to spaces */

@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
@@ -7,15 +7,22 @@ import { Navbar }           from '@/components/layout/Navbar'
 import { Footer }           from '@/components/layout/Footer'
 import { MobileBottomNav }  from '@/components/layout/MobileBottomNav'
 import { SearchField }      from '@/components/search/SearchField'
-import { ProductGrid }      from '@/components/marketplace/ProductGrid'
-import { ProductGridSkeleton } from '@/components/marketplace/ProductGridSkeleton'
+import { ProductCard }      from '@/components/marketplace/ProductCard'
 import { ShopCard }         from '@/components/marketplace/ShopCard'
 import { RecentlyViewed }   from '@/components/marketplace/RecentlyViewed'
 import { EscrowTrack }      from '@/components/escrow/EscrowTrack'
 import { loadSearchIndex }  from '@/lib/search/index'
+import { loadCatalogue }    from '@/lib/marketplace/catalogue'
 import { canOptimizeImage } from '@/lib/marketplace/images'
 import { formatCurrency }   from '@/lib/utils'
 import { CATEGORY_META, type ProductCategory } from '@/types'
+
+// Cached, not rendered per visit: see app/marketplace/page.tsx
+export const revalidate = 300
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+}
 
 const CATEGORY_IMAGES: Record<ProductCategory, string> = {
   agribusiness: '/images/cat-agribusiness.jpg',
@@ -41,7 +48,8 @@ function SeeAll({ href, children }: { href: string; children: React.ReactNode })
 // A shop front, not a brochure: what is for sale, who sells it, and how your
 // money is kept safe. Everything shown comes from the catalogue.
 export default async function HomePage() {
-  const index = await loadSearchIndex()
+  const [index, catalogue] = await Promise.all([loadSearchIndex(), loadCatalogue()])
+  const newest = catalogue.slice(0, 8)
   const categories = (Object.keys(CATEGORY_META) as ProductCategory[]).map(key => ({
     key,
     label: CATEGORY_META[key].label,
@@ -72,7 +80,7 @@ export default async function HomePage() {
               <SearchField className="mt-7" />
               <nav aria-label="Categories" className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm">
                 {categories.map(c => (
-                  <Link key={c.key} href={`/marketplace?category=${c.key}`} className="link inline-flex items-center min-h-[40px]">
+                  <Link key={c.key} href={`/marketplace?category=${c.key}`} rel="nofollow" className="link inline-flex items-center min-h-[40px]">
                     {c.label}
                   </Link>
                 ))}
@@ -118,6 +126,7 @@ export default async function HomePage() {
               <li key={c.key}>
                 <Link
                   href={`/marketplace?category=${c.key}`}
+                  rel="nofollow"
                   className="product-card card-accent group flex items-center gap-3 p-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
                 >
                   <span className="relative flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-sand-100">
@@ -143,9 +152,11 @@ export default async function HomePage() {
             <h2 id="home-new" className="title-section">New on the market</h2>
             <SeeAll href="/marketplace">All {index.products.length || ''} products</SeeAll>
           </div>
-          <Suspense fallback={<ProductGridSkeleton />}>
-            <ProductGrid limit={8} />
-          </Suspense>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            {newest.map((product, i) => (
+              <ProductCard key={product.id} product={product} priority={i < 4} />
+            ))}
+          </div>
         </section>
 
         <div className="container-app">

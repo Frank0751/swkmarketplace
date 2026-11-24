@@ -9,7 +9,7 @@ import { useCart } from '@/lib/cart/CartProvider'
 import { QuantityStepper } from '@/components/cart/QuantityStepper'
 import { DELIVERY_FEE_GHS } from '@/lib/marketplace/orders'
 import { formatCurrency } from '@/lib/utils'
-import type { Product } from '@/types'
+import type { CardProduct } from '@/types'
 
 /**
  * Quantity, Add to cart and Buy now on the product page. Replaces the old
@@ -21,7 +21,7 @@ export function ProductPurchasePanel({
   compact = false,
   onDone,
 }: {
-  product: Product
+  product: CardProduct
   /** In the quick view: buttons only, without the delivery notes */
   compact?: boolean
   /** Called once something was added, so a dialog can close itself */

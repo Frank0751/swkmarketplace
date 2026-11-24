@@ -7,9 +7,13 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { ShopCard } from '@/components/marketplace/ShopCard'
 import { loadSearchIndex } from '@/lib/search/index'
 
+// Cached, not rendered per visit: see app/marketplace/page.tsx
+export const revalidate = 300
+
 export const metadata: Metadata = {
   title: 'Shops',
   description: 'The youth-led green businesses selling on SWK Marketplace, each checked by SWK Ghana before it can sell.',
+  alternates: { canonical: '/shops' },
 }
 
 export default async function ShopsPage() {

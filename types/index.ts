@@ -145,6 +145,22 @@ export interface Product {
   vendor?: VendorProfile
 }
 
+/** What a product card (and its quick view) shows */
+export type CardProduct = Pick<
+  Product,
+  | 'id' | 'vendor_id' | 'slug' | 'title' | 'short_description' | 'price_ghs' | 'unit'
+  | 'images' | 'location' | 'stock_quantity' | 'minimum_order' | 'is_demo'
+> & {
+  vendor?: Pick<VendorProfile, 'id' | 'business_name' | 'slug'> | null
+}
+
+/**
+ * A live listing as the storefront loads it: the card, plus what /marketplace
+ * filters, sorts and searches on (lib/marketplace/catalogue.ts)
+ */
+export type CatalogueProduct = CardProduct &
+  Pick<Product, 'category' | 'value_tags' | 'region' | 'order_count' | 'created_at'>
+
 // ─── Order ────────────────────────────────────────────────────────────────────
 
 export type OrderStatus =

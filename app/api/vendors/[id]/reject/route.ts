@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { sendVendorRejected } from '@/lib/email/brevo'
+import { revalidateCatalogue } from '@/lib/marketplace/revalidate'
 
 export async function POST(
   request: NextRequest,
@@ -73,6 +74,9 @@ export async function POST(
         reason:        reason.trim(),
       }).catch(err => console.error('[Email] vendor rejected:', err))
     }
+
+    // In case the shop was on show
+    revalidateCatalogue()
 
     return NextResponse.json({
       data: updatedVendor,

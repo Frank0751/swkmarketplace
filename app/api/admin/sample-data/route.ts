@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { loadSampleDataStatus } from '@/lib/admin/sample-data'
+import { revalidateCatalogue } from '@/lib/marketplace/revalidate'
 
 // Admin controls for the sample shops: see what's there, reset it between
 // rehearsals, or hide it before launch. Real shops, products and orders are
@@ -53,6 +54,8 @@ export async function POST(request: NextRequest) {
         ? 'Sample shops are visible again.'
         : 'Sample shops are hidden from the storefront.'
     }
+    // The storefront, and the sample shops notice on every page, change now
+    revalidateCatalogue()
     return NextResponse.json({ message, status: await loadSampleDataStatus() })
   } catch (err) {
     console.error('[POST /api/admin/sample-data]', err)

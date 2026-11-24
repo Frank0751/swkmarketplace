@@ -8,14 +8,14 @@ import { X } from 'lucide-react'
 import { ProductPurchasePanel } from '@/components/cart/ProductPurchasePanel'
 import { canOptimizeImage } from '@/lib/marketplace/images'
 import { cn, formatCurrency } from '@/lib/utils'
-import type { Product } from '@/types'
+import type { CardProduct } from '@/types'
 
 /**
  * A look at a product without leaving the grid: photo, price, the short
  * description and the buy buttons. Shown on desktop when a card is hovered or
  * focused; on a phone a tap opens the product page, which is just as quick.
  */
-export function QuickView({ product, className }: { product: Product; className?: string }) {
+export function QuickView({ product, className }: { product: CardProduct; className?: string }) {
   const [open, setOpen] = useState(false)
   const image = product.images?.[0] || '/images/product-placeholder.svg'
 

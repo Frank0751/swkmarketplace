@@ -270,7 +270,7 @@ export default function ProductDetailPage() {
         <nav className="flex items-center gap-2 text-xs text-sand-600 mb-6" aria-label="Breadcrumb">
           <Link href="/marketplace" className="hover:text-green-600 transition-colors">Marketplace</Link>
           <span aria-hidden="true">›</span>
-          <Link href={`/marketplace?category=${product.category}`} className="hover:text-green-600 transition-colors">
+          <Link href={`/marketplace?category=${product.category}`} rel="nofollow" className="hover:text-green-600 transition-colors">
             {categoryMeta?.label}
           </Link>
           <span aria-hidden="true">›</span>
@@ -336,6 +336,7 @@ export default function ProductDetailPage() {
                     <Link
                       key={tag}
                       href={`/marketplace?values=${tag}`}
+                      rel="nofollow"
                       className="value-tag text-xs"
                     >
                       {meta.label}
